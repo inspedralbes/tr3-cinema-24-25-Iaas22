@@ -1,19 +1,31 @@
 <script setup>
+import { ref, computed } from 'vue';
 const config = useRuntimeConfig();
 const { data: movies, pending, error } = useFetch(`${config.public.apiBase}/movies`);
+const searchQuery = ref('');
+
+const filteredMovies = computed(() => {
+  if (!movies.value) return [];
+  return movies.value.filter(movie =>
+    movie.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
 </script>
 
 <template>
+  <nav class="navbar">
+    <button @click="navigateTo('/movies')" class="crud-button">CRUD</button>
+    <input v-model="searchQuery" type="text" placeholder="Buscar películas..." class="search-bar" />
+  </nav>
+
   <div class="container">
-    <button @click="navigateTo('/movies')" class="crud-button">Ir al CRUD</button>
-    
     <h1>Cartelera de Películas</h1>
 
     <div v-if="pending" class="text-center">Cargando películas...</div>
     <div v-else-if="error" class="text-red-500">Error al cargar películas.</div>
     
     <div v-else class="movie-grid">
-      <div v-for="movie in movies" :key="movie.id" class="movie-card" @click="navigateTo(`/detallesMovies?id=${movie.id}`)">
+      <div v-for="movie in filteredMovies" :key="movie.id" class="movie-card" @click="navigateTo(`/detallesMovies?id=${movie.id}`)">
         <h2>{{ movie.title }}</h2>
       </div>
     </div>
@@ -21,6 +33,25 @@ const { data: movies, pending, error } = useFetch(`${config.public.apiBase}/movi
 </template>
 
 <style scoped>
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #090127;
+  color: white;
+}
+
+.search-bar {
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 500px;
+  margin-top: 10px;
+  height: 30px;
+}
+
 .container {
   max-width: 100%;
   margin: 20px auto;
@@ -29,19 +60,19 @@ const { data: movies, pending, error } = useFetch(`${config.public.apiBase}/movi
 }
 
 .crud-button {
-  background-color: #007bff;
-  color: white;
+  background-color: white;
+  color:#090127;
   border: none;
   padding: 10px 20px;
   font-size: 16px;
   border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 20px;
   transition: background 0.3s ease;
 }
 
 .crud-button:hover {
-  background-color: #0056b3;
+  background-color: #46596d;
+  color: white;
 }
 
 .movie-grid {
