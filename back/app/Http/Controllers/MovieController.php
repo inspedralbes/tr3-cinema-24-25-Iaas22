@@ -2,43 +2,54 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 
 class MovieController extends Controller
 {
-    public function index()
+    private $apiKey;
+
+    public function __construct()
     {
-        $filePath = public_path('data.json');
-    
-        if (!file_exists($filePath)) {
-            return response()->json(['error' => 'Archivo JSON no encontrado'], 404);
-        }
-    
-        $jsonContent = file_get_contents($filePath);
-        $movies = json_decode($jsonContent, true);
-    
-        if ($movies === null) {
-            return response()->json(['error' => 'Error al decodificar JSON'], 500);
-        }
-    
-        return response()->json($movies, 200);
+        $this->apiKey = env('OMDB_API_KEY', '19f8a30e'); // Cargar clave desde .env o usar una por defecto
     }
-    
 
-    public function show($id)
+    // Buscar películas en OMDb
+    public function index(Request $request)
     {
-        $filePath = public_path('data.json'); // Cambia la ruta aquí
+        $query = $request->query('query'); // Capturar el término de búsqueda
 
-        if (!File::exists($filePath)) {
-            return response()->json(['error' => 'Archivo JSON no encontrado'], 404);
+        if (!$query) {
+            return response()->json(['error' => 'Debe ingresar un término de búsqueda'], 400);
         }
 
-        $movies = json_decode(File::get($filePath), true);
+        // Petición a OMDb con verificación SSL deshabilitada
+        $response = Http::withOptions(['verify' => false])->get("https://www.omdbapi.com/", [
+            's' => $query,
+            'apikey' => $this->apiKey
+        ]);
 
-        foreach ($movies as $movie) {
-            if ($movie['id'] == $id) {
-                return response()->json($movie, 200);
-            }
+        $data = $response->json();
+
+        if (isset($data['Response']) && $data['Response'] === 'True') {
+            return response()->json($data['Search'], 200);
+        }
+
+        return response()->json(['error' => 'No se encontraron películas'], 404);
+    }
+
+    // Obtener detalles de una película por su IMDB ID
+    public function show($imdbID)
+    {
+        // Petición a OMDb con verificación SSL deshabilitada
+        $response = Http::withOptions(['verify' => false])->get("https://www.omdbapi.com/", [
+            'i' => $imdbID,
+            'apikey' => $this->apiKey
+        ]);
+
+        $data = $response->json();
+
+        if (isset($data['Response']) && $data['Response'] === 'True') {
+            return response()->json($data, 200);
         }
 
         return response()->json(['error' => 'Película no encontrada'], 404);
