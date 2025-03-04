@@ -23,14 +23,44 @@ const fetchMovies = async () => {
     console.error('Error al obtener las películas:', error)
   }
 }
-
 const createMovie = async () => {
   try {
-    await axios.post('http://127.0.0.1:8000/api/movies', newMovie.value)
-    fetchMovies()
-    newMovie.value = {}
+    // Hacer la solicitud POST usando fetch
+    const response = await fetch('http://127.0.0.1:8000/api/movies', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newMovie.value) // Convertir los datos a JSON
+    });
+
+    // Verificar si la respuesta es exitosa
+    if (!response.ok) {
+      throw new Error('Error al crear la película');
+    }
+
+    // Parsear la respuesta JSON
+    const data = await response.json();
+
+    // Mostrar el mensaje de éxito en consola (también podrías mostrar una notificación en la UI)
+    console.log(data.message);
+
+    // Limpiar el formulario
+    newMovie.value = {
+      title: '',
+      duration: '',
+      genre: '',
+      director: '',
+      actors: '',
+      sinopsis: '',
+      premiere: '',
+      room_id: ''
+    };
+
+    // Recargar la lista de películas
+    fetchMovies();
   } catch (error) {
-    console.error('Error al crear la película:', error)
+    console.error('Error al crear la película:', error);
   }
 }
 
@@ -55,6 +85,7 @@ const deleteMovie = async (id) => {
 
 onMounted(fetchMovies)
 </script>
+
 
 <template>
   <div class="container">

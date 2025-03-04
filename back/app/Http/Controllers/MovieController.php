@@ -25,29 +25,41 @@ class MovieController extends Controller
         return response()->json($movie, 200);
     }
 
-    // Crear una nueva película en la base de datos
     public function store(Request $request)
     {
-        // Validar los datos
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'duration' => 'required|integer',
-            'genre' => 'required|string|max:255',
-            'director' => 'required|string',
-            'actors' => 'required|string',
-            'sinopsis' => 'required|string',
-            'premiere' => 'required|date',
-            'room_id' => 'required|exists:rooms,id'
-        ]);
-
-        // Crear la película en la base de datos
-        $movie = Movie::create($request->all());
-
-        return response()->json([
-            'message' => 'Película creada con éxito',
-            'movie' => $movie
-        ], 201);
+        try {
+            // Validar los datos
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'duration' => 'required|integer',
+                'genre' => 'required|string|max:255',
+                'director' => 'required|string',
+                'actors' => 'required|string',
+                'sinopsis' => 'required|string',
+                'premiere' => 'required|date',
+                'room_id' => 'required|exists:rooms,id'
+            ]);
+    
+            // Crear la película en la base de datos
+            $movie = Movie::create($request->all());
+    
+            return response()->json([
+                'message' => 'Película creada con éxito',
+                'movie' => $movie
+            ], 201);
+    
+        } catch (\Exception $e) {
+            // Loggear el error para poder diagnosticarlo
+            \Log::error("Error al crear la película: " . $e->getMessage());
+    
+            // Retornar un mensaje de error
+            return response()->json([
+                'error' => 'Hubo un error al procesar la solicitud.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
+    
     // Editar una película en la base de datos
 public function update(Request $request, $id)
 {
