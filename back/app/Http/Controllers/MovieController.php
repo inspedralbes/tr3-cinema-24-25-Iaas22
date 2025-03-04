@@ -8,15 +8,22 @@ class MovieController extends Controller
 {
     public function index()
     {
-        $filePath = public_path('data.json'); // Cambia la ruta aquí
-
-        if (!File::exists($filePath)) {
+        $filePath = public_path('data.json');
+    
+        if (!file_exists($filePath)) {
             return response()->json(['error' => 'Archivo JSON no encontrado'], 404);
         }
-
-        $movies = json_decode(File::get($filePath), true);
+    
+        $jsonContent = file_get_contents($filePath);
+        $movies = json_decode($jsonContent, true);
+    
+        if ($movies === null) {
+            return response()->json(['error' => 'Error al decodificar JSON'], 500);
+        }
+    
         return response()->json($movies, 200);
     }
+    
 
     public function show($id)
     {
