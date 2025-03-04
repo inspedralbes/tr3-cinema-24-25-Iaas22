@@ -2,49 +2,30 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 use App\Models\Movie;
-
 
 class MovieController extends Controller
 {
+    // Obtener todas las películas desde la base de datos
     public function index()
     {
-        $filePath = public_path('data.json');
-    
-        if (!file_exists($filePath)) {
-            return response()->json(['error' => 'Archivo JSON no encontrado'], 404);
-        }
-    
-        $jsonContent = file_get_contents($filePath);
-        $movies = json_decode($jsonContent, true);
-    
-        if ($movies === null) {
-            return response()->json(['error' => 'Error al decodificar JSON'], 500);
-        }
-    
+        $movies = Movie::all(); // Obtiene todas las películas
         return response()->json($movies, 200);
     }
-    
 
+    // Obtener una película específica por ID desde la base de datos
     public function show($id)
     {
-        $filePath = public_path('data.json'); // Cambia la ruta aquí
+        $movie = Movie::find($id); // Busca la película por ID
 
-        if (!File::exists($filePath)) {
-            return response()->json(['error' => 'Archivo JSON no encontrado'], 404);
+        if (!$movie) {
+            return response()->json(['error' => 'Película no encontrada'], 404);
         }
 
-        $movies = json_decode(File::get($filePath), true);
-
-        foreach ($movies as $movie) {
-            if ($movie['id'] == $id) {
-                return response()->json($movie, 200);
-            }
-        }
-
-        return response()->json(['error' => 'Película no encontrada'], 404);
+        return response()->json($movie, 200);
     }
+
+    // Crear una nueva película en la base de datos
     public function store(Request $request)
     {
         // Validar los datos
