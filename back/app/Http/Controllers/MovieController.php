@@ -3,6 +3,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use App\Models\Movie;
+
 
 class MovieController extends Controller
 {
@@ -42,5 +44,27 @@ class MovieController extends Controller
         }
 
         return response()->json(['error' => 'Película no encontrada'], 404);
+    }
+    public function store(Request $request)
+    {
+        // Validar los datos
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'duration' => 'required|integer',
+            'genre' => 'required|string|max:255',
+            'director' => 'required|string',
+            'actors' => 'required|string',
+            'sinopsis' => 'required|string',
+            'premiere' => 'required|date',
+            'room_id' => 'required|exists:rooms,id'
+        ]);
+
+        // Crear la película en la base de datos
+        $movie = Movie::create($request->all());
+
+        return response()->json([
+            'message' => 'Película creada con éxito',
+            'movie' => $movie
+        ], 201);
     }
 }

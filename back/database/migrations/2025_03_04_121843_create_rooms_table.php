@@ -9,6 +9,8 @@ return new class extends Migration {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id(); // Esto crea un BIGINT UNSIGNED autoincremental
             $table->string('name');
+            $table->timestamps(); // Esto crea 'created_at' y 'updated_at'
+
         });
         
     }
