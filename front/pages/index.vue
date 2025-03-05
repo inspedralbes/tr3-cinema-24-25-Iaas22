@@ -45,6 +45,7 @@ const filteredMovies = computed(() => {
     <div class="container">
       <button @click="navigateTo('/movies')" class="crud-button">Ir al CRUD</button>
       
+      <h1>Cartelera de Películas</h1>
 
       <div v-if="pending" class="text-center">Cargando películas...</div>
       <div v-else-if="error" class="text-red-500">Error al cargar películas.</div>
