@@ -9,6 +9,8 @@ return new class extends Migration {
         Schema::create('seats', function (Blueprint $table) {
             $table->id();
             $table->enum('status', ['reserved', 'available']);
+            // Agregamos la columna movie_id que será una clave foránea
+            $table->foreignId('movie_id')->constrained('movies')->onDelete('cascade');
         });
     }
 

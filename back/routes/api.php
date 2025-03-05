@@ -4,6 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReservationController;
+
+Route::get('/seats/{movie_id}', [ReservationController::class, 'showSeats']);
+Route::post('/reserve', [ReservationController::class, 'createReservation']);
+
 
 
 Route::get('/movies', [MovieController::class, 'index']);  // Obtener todas las películas
