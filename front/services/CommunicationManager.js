@@ -1,138 +1,74 @@
-export default {
-  // Configuración base para la API
-  apiBaseUrl: 'http://localhost:8000/api/',
+import axios from 'axios';
 
-  // Método para hacer peticiones POST
-  async post(url, data, headers = {}) {
+export default class CommunicationManager {
+  static baseUrl = 'http://localhost:8000/api';  // Cambia la URL a tu backend
+
+  static async login(email, password) {
     try {
-      const token = localStorage.getItem('token'); // Obtén el token de localStorage
+      const response = await axios.post(`${this.baseUrl}/login`, { email, password });
+      this.storeToken(response.data.token);  // Almacenar el token
+      return response.data;
+    } catch (error) {
+      console.error("Error al hacer login", error);
+      throw error;
+    }
+  }
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`; // Añades el token al header
-      }
-
-      const response = await fetch(`${this.apiBaseUrl}${url}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers, // Si ya hay headers, se combinan con el Authorization
-        },
-        body: JSON.stringify(data),
+  static async register(name, email, password, birthday) {
+    try {
+      const response = await axios.post(`${this.baseUrl}/register`, {
+        name,
+        email,
+        password,
+        birthday,
       });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || `Error en la petición POST: ${response.statusText}`);
-      }
-
-      return responseData;
+      this.storeToken(response.data.token);  // Almacenar el token
+      return response.data;
     } catch (error) {
-      throw new Error(error.message);
+      console.error("Error al hacer registro", error);
+      throw error;
     }
-  },
+  }
 
-  // Método para hacer peticiones GET
-  async get(url, headers = {}) {
+  static storeToken(token) {
+    localStorage.setItem('authToken', token);  // Almacena el token en localStorage
+  }
+
+  static getToken() {
+    return localStorage.getItem('authToken');  // Recupera el token desde localStorage
+  }
+
+  static async logout() {
     try {
-      const token = localStorage.getItem('token');
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${this.apiBaseUrl}${url}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers,
-        },
+      const token = this.getToken();
+      await axios.post(`${this.baseUrl}/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || `Error en la petición GET: ${response.statusText}`);
-      }
-
-      return responseData;
+      this.clearToken();  // Elimina el token después del logout
+      return true;
     } catch (error) {
-      throw new Error(error.message);
+      console.error("Error al hacer logout", error);
+      throw error;
     }
-  },
+  }
 
-  // Verifica si el usuario está autenticado
-  isAuthenticated() {
-    const token = localStorage.getItem('token');
-    return token !== null;
-  },
+  static clearToken() {
+    localStorage.removeItem('authToken');  // Elimina el token del localStorage
+  }
 
-  // Método para obtener los datos del usuario autenticado
-  async getUser() {
+  static async getUserDetails() {
     try {
-      const response = await this.get('me'); // Llama a la ruta que te devuelve el usuario
-      return response;
-    } catch (error) {
-      throw new Error('Error al obtener los datos del usuario');
-    }
-  },
-
-  // Método para hacer peticiones PUT (opcional)
-  async put(url, data, headers = {}) {
-    try {
-      const token = localStorage.getItem('token');
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('No token available');
       }
-
-      const response = await fetch(`${this.apiBaseUrl}${url}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers,
-        },
-        body: JSON.stringify(data),
+      const response = await axios.get(`${this.baseUrl}/user`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || `Error en la petición PUT: ${response.statusText}`);
-      }
-
-      return responseData;
+      return response.data;
     } catch (error) {
-      throw new Error(error.message);
+      console.error("Error al obtener detalles del usuario", error);
+      throw error;
     }
-  },
-
-  // Método para hacer peticiones DELETE (opcional)
-  async delete(url, headers = {}) {
-    try {
-      const token = localStorage.getItem('token');
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${this.apiBaseUrl}${url}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers,
-        },
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || `Error en la petición DELETE: ${response.statusText}`);
-      }
-
-      return responseData;
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  },
-};
+  }
+}

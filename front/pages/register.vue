@@ -1,68 +1,47 @@
 <template>
-    <div class="auth-container">
-      <h1>Registro</h1>
-      <form @submit.prevent="registerUser">
-        <div>
-          <label for="name">Nombre</label>
-          <input type="text" v-model="form.name" required />
-        </div>
-        <div>
-          <label for="email">Correo Electrónico</label>
-          <input type="email" v-model="form.email" required />
-        </div>
-        <div>
-          <label for="password">Contraseña</label>
-          <input type="password" v-model="form.password" required />
-        </div>
-        <div>
-          <label for="birthday">Fecha de Nacimiento</label>
-          <input type="date" v-model="form.birthday" />
-        </div>
-        <button type="submit">Registrarse</button>
-      </form>
-      <p>¿Ya tienes cuenta? <router-link to="/login">Inicia sesión</router-link></p>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        form: {
-          name: '',
-          email: '',
-          password: '',
-          birthday: '',
-        },
-      };
-    },
-    methods: {
-      async registerUser() {
-        try {
-          const response = await fetch('http://localhost:8000/api/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(this.form),
-          });
-  
-          const data = await response.json();
-  
-          if (!response.ok) {
-            throw new Error(data.message || 'Error al registrar el usuario');
-          }
-  
-          alert(data.message);
-          this.$router.push('/login'); // Redirige al login después del registro
-        } catch (error) {
-          alert(error.message);
-        }
-      },
-    },
-  };
-  </script>
-  
+  <div>
+    <form @submit.prevent="register">
+      <input v-model="name" type="text" placeholder="Name" />
+      <input v-model="email" type="email" placeholder="Email" />
+      <input v-model="password" type="password" placeholder="Password" />
+      <input v-model="birthday" type="date" placeholder="Birthday" />
+      <button type="submit">Register</button>
+    </form>
+  </div>
+</template>
+
+<script>
+import CommunicationManager from '@/utils/CommunicationManager';
+
+export default {
+  data() {
+    return {
+      name: '',
+      email: '',
+      password: '',
+      birthday: '',
+    };
+  },
+  methods: {
+    async register() {
+      try {
+        const response = await CommunicationManager.register(
+          this.name,
+          this.email,
+          this.password,
+          this.birthday
+        );
+        console.log('Registro exitoso:', response);
+        this.$router.push('/dashboard');  // Redirigir al dashboard u otra página
+      } catch (error) {
+        console.error('Error de registro:', error);
+        alert('Registro fallido');
+      }
+    }
+  }
+};
+</script>
+
   <style scoped>
   .auth-container {
     max-width: 400px;
