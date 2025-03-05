@@ -4,7 +4,6 @@ const config = useRuntimeConfig();
 const { data: movie, pending, error } = useFetch(`${config.public.apiBase}/movies/${route.query.id}`);
 </script>
 
-
 <template>
   <div class="container">
     <div v-if="pending" class="text-center">Cargando detalles...</div>
@@ -18,6 +17,11 @@ const { data: movie, pending, error } = useFetch(`${config.public.apiBase}/movie
       <p><strong>Actores:</strong> {{ movie.actors }}</p>
       <p><strong>Sinopsis:</strong> {{ movie.sinopsis }}</p>
       <p><strong>Estreno:</strong> {{ movie.premiere }}</p>
+
+      <!-- Botón para redirigir a la vista de reserva -->
+      <nuxt-link :to="{ name: 'reservations', query: { movie_id: movie.id } }">
+        <button class="btn btn-primary">Reservar asientos</button>
+      </nuxt-link>
     </div>
   </div>
 </template>
