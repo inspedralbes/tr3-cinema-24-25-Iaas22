@@ -1,17 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 
 const config = useRuntimeConfig();
-const router = useRouter();
-
 const { data: movies, pending, error } = useFetch(`${config.public.apiBase}/movies`);
 
 const showSearch = ref(false);
 const searchQuery = ref("");
-const isAuthenticated = ref(false); // Simulación de estado de autenticación
-const showModal = ref(false); // Estado para controlar el modal
-const selectedMovie = ref(null);
 
 // Mostrar/Ocultar la barra de búsqueda
 const toggleSearch = () => {
@@ -26,22 +20,6 @@ const filteredMovies = computed(() => {
     movie.title.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
-
-// Manejar clic en una película
-const handleMovieClick = (movie) => {
-  if (!isAuthenticated.value) {
-    selectedMovie.value = movie;
-    showModal.value = true;
-  } else {
-    router.push(`/detallesMovies?id=${movie.id}`);
-  }
-};
-
-// Redirigir al login
-const goToLogin = () => {
-  showModal.value = false;
-  router.push('/login'); // Asegúrate de tener la ruta de login configurada en Vue Router
-};
 </script>
 
 <template>
@@ -65,8 +43,10 @@ const goToLogin = () => {
 
     <!-- Contenido principal -->
     <div class="container">
-      <button @click="router.push('/movies')" class="crud-button">Ir al CRUD</button>
+      <button @click="navigateTo('/movies')" class="crud-button">Ir al CRUD</button>
       
+      <h1>Cartelera de Películas</h1>
+
       <div v-if="pending" class="text-center">Cargando películas...</div>
       <div v-else-if="error" class="text-red-500">Error al cargar películas.</div>
       
@@ -75,21 +55,9 @@ const goToLogin = () => {
           v-for="movie in filteredMovies" 
           :key="movie.id" 
           class="movie-card" 
-          @click="handleMovieClick(movie)"
+          @click="navigateTo(`/detallesMovies?id=${movie.id}`)"
         >
           <h2>{{ movie.title }}</h2>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal de Login -->
-    <div v-if="showModal" class="modal">
-      <div class="modal-content">
-        <h2>🔒 Acceso restringido</h2>
-        <p>Debes iniciar sesión o registrarte para ver los detalles de esta película.</p>
-        <div class="modal-buttons">
-          <button @click="goToLogin" class="login-button">Iniciar sesión</button>
-          <button @click="showModal = false" class="close-button">Cancelar</button>
         </div>
       </div>
     </div>
@@ -116,7 +84,7 @@ const goToLogin = () => {
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 10px; /* Espacio entre los elementos */
 }
 
 .search-button {
@@ -137,6 +105,14 @@ const goToLogin = () => {
   width: 380px;
   margin-top: 10px;
   height: 30px;
+}
+
+/* Animación de aparición */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 
 /* Contenedor */
@@ -188,52 +164,6 @@ h1 {
   color: #f8f7f7;
   margin-bottom: 20px;
   font-size: 1.5rem;
-}
-
-/* Modal */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  max-width: 400px;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.login-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.close-button {
-  background-color: #ccc;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
 @media (min-width: 600px) {
