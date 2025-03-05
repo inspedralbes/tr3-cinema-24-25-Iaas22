@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="login-form">
     <form @submit.prevent="login">
       <input v-model="email" type="email" placeholder="Email" />
       <input v-model="password" type="password" placeholder="Password" />
@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import CommunicationManager from '@/services/CommunicationManager';
+import CommunicationManager from '@/services/CommunicationManager'
 
 export default {
   data() {
@@ -20,27 +20,23 @@ export default {
   },
   methods: {
     async login() {
-  try {
-    const response = await CommunicationManager.login(this.email, this.password);
+      try {
+        const response = await CommunicationManager.login(this.email, this.password);
 
-    // Asegúrate de que el token esté presente en la respuesta
-    const token = response.token;
-    if (token) {
-      // Guardamos el token en localStorage
-      localStorage.setItem('authToken', token);
-      console.log('Token guardado en localStorage:', token);  // Verifica en la consola si el token se guardó correctamente
-
-      // Redirigir a la vista index.vue
-      this.$router.push('/');
-    } else {
-      console.error('Token no disponible en la respuesta del servidor');
+        // Guardamos el token en localStorage
+        const token = response.token;
+        if (token) {
+          localStorage.setItem('authToken', token);
+          this.$emit('login-success'); // Emitir el evento de éxito para cerrar el popup
+        } else {
+          alert('Credenciales incorrectas');
+        }
+      } catch (error) {
+        alert('Login fallido');
+        console.error(error);
+      }
     }
-  } catch (error) {
-    console.error('Error de login:', error);
-    alert('Login fallido');
-  }
-}
-
   }
 };
 </script>
+

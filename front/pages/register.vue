@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import CommunicationManager from '@/utils/CommunicationManager';
+import CommunicationManager from '@/services/CommunicationManager';
 
 export default {
   data() {
@@ -32,7 +32,7 @@ export default {
           this.birthday
         );
         console.log('Registro exitoso:', response);
-        this.$router.push('/dashboard');  // Redirigir al dashboard u otra página
+        this.$router.push('/');  // Redirigir al dashboard u otra página
       } catch (error) {
         console.error('Error de registro:', error);
         alert('Registro fallido');
