@@ -21,9 +21,10 @@ Route::get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Rutas protegidas (requieren autenticación)
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
-});
+//Requiere autentificación.
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+
+
+
 
