@@ -1,28 +1,32 @@
 <?php
-
-// app/Models/Seat.php
+// app/Models/Reservation.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Seat extends Model
+class Reservation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['room_id', 'status'];
+    protected $fillable = ['user_id', 'seat_id', 'movie_id', 'status'];
 
-    // Relación con la sala
-    public function room()
+    // Relación con el usuario
+    public function user()
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(User::class);
     }
 
-    // Relación con las reservas
-    public function reservation()
+    // Relación con el asiento
+    public function seat()
     {
-        return $this->hasOne(Reservation::class);
+        return $this->belongsTo(Seat::class);
+    }
+
+    // Relación con la película
+    public function movie()
+    {
+        return $this->belongsTo(Movie::class);
     }
 }
-

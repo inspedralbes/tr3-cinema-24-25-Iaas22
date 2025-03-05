@@ -1,4 +1,5 @@
 <?php
+// app/Models/Seat.php
 
 namespace App\Models;
 

@@ -7,7 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservationController;
 
 Route::get('/seats/{movie_id}', [ReservationController::class, 'showSeats']);
-Route::post('/reserve', [ReservationController::class, 'createReservation']);
+Route::post('/reservations', [ReservationController::class, 'createReservation']);
 
 
 
