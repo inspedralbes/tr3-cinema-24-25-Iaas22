@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Movie extends Model
+class Session extends Model
 {
     use HasFactory;
 
-    // Definir la relación con las sesiones
-    public function sessions()
+    // Definir la relación con la película
+    public function movie()
     {
-        return $this->hasMany(Session::class, 'movie_id');
+        return $this->belongsTo(Movie::class, 'movie_id');
     }
 }

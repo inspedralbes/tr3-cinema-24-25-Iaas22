@@ -25,33 +25,43 @@ class MovieController extends Controller
         return response()->json($movie, 200);
     }
 
+    // Crear una nueva película en la base de datos
     public function store(Request $request)
     {
         try {
             // Validar los datos
             $request->validate([
                 'title' => 'required|string|max:255',
-                'duration' => 'required|integer',
                 'genre' => 'required|string|max:255',
-                'director' => 'required|string',
-                'actors' => 'required|string',
-                'sinopsis' => 'required|string',
-                'premiere' => 'required|date',
-                'room_id' => 'required|exists:rooms,id'
+                'duration' => 'required|integer',
+                'director' => 'required|string|max:255',
+                'actors' => 'required|string|max:255',
+                'synopsis' => 'required|string',
+                'release_date' => 'required|date',
+                'img' => 'nullable|string', // Imagen es opcional
             ]);
-    
+
             // Crear la película en la base de datos
-            $movie = Movie::create($request->all());
-    
+            $movie = Movie::create([
+                'title' => $request->title,
+                'genre' => $request->genre,
+                'duration' => $request->duration,
+                'director' => $request->director,
+                'actors' => $request->actors,
+                'synopsis' => $request->synopsis,
+                'release_date' => $request->release_date,
+                'img' => $request->img, // Imagen es opcional
+            ]);
+
             return response()->json([
                 'message' => 'Película creada con éxito',
                 'movie' => $movie
             ], 201);
-    
+
         } catch (\Exception $e) {
             // Loggear el error para poder diagnosticarlo
             \Log::error("Error al crear la película: " . $e->getMessage());
-    
+
             // Retornar un mensaje de error
             return response()->json([
                 'error' => 'Hubo un error al procesar la solicitud.',
@@ -59,50 +69,49 @@ class MovieController extends Controller
             ], 500);
         }
     }
-    
+
     // Editar una película en la base de datos
-public function update(Request $request, $id)
-{
-    // Buscar la película por ID
-    $movie = Movie::find($id);
+    public function update(Request $request, $id)
+    {
+        // Buscar la película por ID
+        $movie = Movie::find($id);
 
-    if (!$movie) {
-        return response()->json(['error' => 'Película no encontrada'], 404);
+        if (!$movie) {
+            return response()->json(['error' => 'Película no encontrada'], 404);
+        }
+
+        // Validar los datos
+        $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'genre' => 'sometimes|string|max:255',
+            'duration' => 'sometimes|integer',
+            'director' => 'sometimes|string|max:255',
+            'actors' => 'sometimes|string|max:255',
+            'synopsis' => 'sometimes|string',
+            'release_date' => 'sometimes|date',
+            'img' => 'nullable|string',
+        ]);
+
+        // Actualizar los campos que se han enviado
+        $movie->update($request->all());
+
+        return response()->json([
+            'message' => 'Película actualizada con éxito',
+            'movie' => $movie
+        ], 200);
     }
 
-    // Validar los datos
-    $request->validate([
-        'title' => 'sometimes|string|max:255',
-        'duration' => 'sometimes|integer',
-        'genre' => 'sometimes|string|max:255',
-        'director' => 'sometimes|string',
-        'actors' => 'sometimes|string',
-        'sinopsis' => 'sometimes|string',
-        'premiere' => 'sometimes|date',
-        'room_id' => 'sometimes|exists:rooms,id'
-    ]);
+    // Eliminar una película de la base de datos
+    public function destroy($id)
+    {
+        $movie = Movie::find($id);
 
-    // Actualizar los campos que se han enviado
-    $movie->update($request->all());
+        if (!$movie) {
+            return response()->json(['error' => 'Película no encontrada'], 404);
+        }
 
-    return response()->json([
-        'message' => 'Película actualizada con éxito',
-        'movie' => $movie
-    ], 200);
-}
+        $movie->delete();
 
-// Eliminar una película de la base de datos
-public function destroy($id)
-{
-    $movie = Movie::find($id);
-
-    if (!$movie) {
-        return response()->json(['error' => 'Película no encontrada'], 404);
+        return response()->json(['message' => 'Película eliminada con éxito'], 200);
     }
-
-    $movie->delete();
-
-    return response()->json(['message' => 'Película eliminada con éxito'], 200);
-}
-
 }
