@@ -1,5 +1,4 @@
 <?php
-// app/Models/Seat.php
 
 namespace App\Models;
 
@@ -10,17 +9,10 @@ class Seat extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['room_id', 'status'];
-
-    // Relación con la sala
-    public function room()
+    // Definimos la relación con la tabla `session`
+    public function session()
     {
-        return $this->belongsTo(Room::class);
-    }
-
-    // Relación con las reservas
-    public function reservation()
-    {
-        return $this->hasOne(Reservation::class);
+        return $this->belongsTo(Session::class, 'session_id');
     }
 }
+?>

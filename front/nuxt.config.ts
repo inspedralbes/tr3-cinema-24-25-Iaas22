@@ -7,4 +7,6 @@ export default defineNuxtConfig({
       apiBase: 'http://127.0.0.1:8000/api' // URL de la API de Laravel
     }
   }
+
 })
+

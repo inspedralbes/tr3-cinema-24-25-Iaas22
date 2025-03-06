@@ -3,6 +3,19 @@ import axios from 'axios';
 export default class CommunicationManager {
   static baseUrl = 'http://localhost:8000/api';  // Cambia la URL a tu backend
 
+  // Método para obtener todas las películas
+  static async fetchMovies() {
+    try {
+      const response = await axios.get(`${this.baseUrl}/movies`);
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener las películas", error);
+      throw error;
+    }
+  }
+
+  
+
   static async login(email, password) {
     try {
       const response = await axios.post(`${this.baseUrl}/login`, { email, password });

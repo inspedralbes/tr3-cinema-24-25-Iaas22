@@ -13,17 +13,21 @@ class MovieController extends Controller
         return response()->json($movies, 200);
     }
 
-    // Obtener una película específica por ID desde la base de datos
-    public function show($id)
-    {
-        $movie = Movie::find($id); // Busca la película por ID
+  // Obtener una película por ID desde la base de datos
+public function show($id)
+{
+    // Buscar la película por ID
+    $movie = Movie::find($id);
 
-        if (!$movie) {
-            return response()->json(['error' => 'Película no encontrada'], 404);
-        }
-
-        return response()->json($movie, 200);
+    // Verificar si la película existe
+    if (!$movie) {
+        return response()->json(['error' => 'Película no encontrada'], 404);
     }
+
+    return response()->json($movie, 200);
+}
+
+    
 
     // Crear una nueva película en la base de datos
     public function store(Request $request)
