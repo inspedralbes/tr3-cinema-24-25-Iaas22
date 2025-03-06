@@ -14,6 +14,7 @@ Route::post('/movies', [MovieController::class, 'store']);  // Crear una nueva p
 Route::put('/movies/{id}', [MovieController::class, 'update']); // Actualizar una película
 Route::delete('/movies/{id}', [MovieController::class, 'destroy']); // Eliminar una película
 
+
 Route::get('/seats', [SeatController::class, 'index']);  // Ver todos los asientos
 Route::get('/seats/{id}', [SeatController::class, 'show']);  // Ver un asiento
 Route::put('/seats/{id}/reserve', [SeatController::class, 'reserve']);  // Reservar un asiento
