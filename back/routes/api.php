@@ -5,9 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservationController;
-
-
-
+use App\Http\Controllers\SeatController;
 
 
 Route::get('/movies', [MovieController::class, 'index']);  // Obtener todas las películas
@@ -15,6 +13,10 @@ Route::get('/movies/{id}', [MovieController::class, 'show']);
 Route::post('/movies', [MovieController::class, 'store']);  // Crear una nueva película
 Route::put('/movies/{id}', [MovieController::class, 'update']); // Actualizar una película
 Route::delete('/movies/{id}', [MovieController::class, 'destroy']); // Eliminar una película
+
+Route::get('/seats', [SeatController::class, 'index']);  // Ver todos los asientos
+Route::get('/seats/{id}', [SeatController::class, 'show']);  // Ver un asiento
+Route::put('/seats/{id}/reserve', [SeatController::class, 'reserve']);  // Reservar un asiento
 
 
 Route::get('/user', function (Request $request) {
