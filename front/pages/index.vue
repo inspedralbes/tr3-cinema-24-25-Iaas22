@@ -1,6 +1,18 @@
 <template>
   <div>
-    <h1>Lista de Películas</h1>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <h1>Lista de Películas</h1>
+      <!-- Lupa y barra de búsqueda -->
+      <div class="search-container">
+        <button @click="toggleSearch">
+          <img src="https://img.icons8.com/material-outlined/24/000000/search.png" alt="lupa" />
+        </button>
+        <div v-if="searchVisible" class="search-bar">
+          <input type="text" v-model="searchQuery" @input="filterMovies" placeholder="Buscar películas..."/>
+        </div>
+      </div>
+    </nav>
 
     <div v-if="loading">Cargando películas...</div>
     <div v-if="error" class="error">
@@ -11,7 +23,7 @@
       <!-- Lista de películas, solo se muestra si no hay una película seleccionada -->
       <div class="movies-grid">
         <div 
-          v-for="(movie, index) in movies" 
+          v-for="(movie, index) in filteredMovies" 
           :key="movie.id" 
           class="movie-card"
           @click="selectMovie(movie)"
@@ -44,15 +56,19 @@ export default {
   data() {
     return {
       movies: [],
+      filteredMovies: [], // Array para almacenar las películas filtradas
+      searchQuery: '', // Para almacenar el texto de búsqueda
       loading: true,
       error: null,
       selectedMovie: null, // Aquí guardamos la película seleccionada
+      searchVisible: false, // Para controlar la visibilidad de la barra de búsqueda
     };
   },
   async created() {
     try {
       const movies = await CommunicationManager.fetchMovies();
       this.movies = movies;
+      this.filteredMovies = movies; // Inicialmente mostramos todas las películas
     } catch (error) {
       this.error = error;
     } finally {
@@ -67,11 +83,20 @@ export default {
     // Método para deseleccionar la película y volver a la lista
     deselectMovie() {
       this.selectedMovie = null;
+    },
+    // Método para mostrar u ocultar la barra de búsqueda
+    toggleSearch() {
+      this.searchVisible = !this.searchVisible;
+    },
+    // Método para filtrar las películas por la búsqueda
+    filterMovies() {
+      this.filteredMovies = this.movies.filter(movie =>
+        movie.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
     }
   }
 };
 </script>
-
 <style scoped>
 /* Estilos generales */
 .error {
@@ -142,6 +167,39 @@ export default {
   background-color: #0056b3;
 }
 
+/* Estilos para la barra de búsqueda */
+.search-container {
+  position: absolute;
+  right: 20px;
+  top: 50px; /* Baja el botón de lupa */
+  display: flex;
+  align-items: center;
+}
+
+.search-container button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-left: 10px; /* Espacio entre la lupa y la barra */
+}
+
+.search-bar input {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 200px;
+}
+
+.search-bar input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
 /* Estilos para pantallas de tablet en adelante */
 @media (min-width: 600px) {
   .movies-grid {
@@ -160,5 +218,34 @@ export default {
   .movie-card h3 {
     font-size: 20px;
   }
+  /* Estilos para el Navbar */
+.navbar {
+  background-color: #333;
+  padding: 10px 20px;
+  text-align: center;
+}
+
+.navbar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.navbar li {
+  margin: 0 15px;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
 }
 </style>
