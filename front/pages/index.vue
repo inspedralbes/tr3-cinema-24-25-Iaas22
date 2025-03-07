@@ -2,6 +2,10 @@
   <div>
     <nav class="navbar">
       <h1>Lista de Películas</h1>
+      <div class="search-container">
+        <input v-if="searchVisible" v-model="searchQuery" type="text" placeholder="Buscar..." class="search-bar" />
+        <button @click="toggleSearch" class="search-button">🔍</button>
+      </div>
     </nav>
 
     <div v-if="pending">Cargando películas...</div>
@@ -32,6 +36,11 @@ import CommunicationManager from '@/services/CommunicationManager';
 const searchQuery = ref('');
 const searchVisible = ref(false);
 
+const toggleSearch = () => {
+  searchVisible.value = !searchVisible.value;
+  if (!searchVisible.value) searchQuery.value = ''; // Limpia la búsqueda al cerrar
+};
+
 const { data: movies, pending, error } = await useAsyncData('movies', () => 
   CommunicationManager.fetchMovies()
 );
@@ -46,5 +55,97 @@ const filteredMovies = computed(() => {
 </script>
 
 <style scoped>
-/* Estilos aquí */
+.navbar {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-bar {
+  padding: 5px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: block;
+}
+
+.search-button {
+  background: #ff6600;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.search-button:hover {
+  background: #e65c00;
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  justify-content: center;
+  max-width: 1400px;
+  margin: auto;
+}
+
+@media (min-width: 1400px) {
+  .movies-grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+.movie-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.movie-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.movie-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.pending {
+  text-align: center;
+  font-size: 1.2rem;
+}
 </style>

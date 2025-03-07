@@ -2,71 +2,72 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    // Registro de usuario
     public function register(Request $request)
     {
-        // Validación de los datos de entrada
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:users,name',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'birthday' => 'required|date',  // Validación para la fecha de nacimiento
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'birthday' => 'required|date',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
 
         // Crear el usuario
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password, // No ciframos aquí, se hace en el modelo
             'birthday' => $request->birthday,
-            'role' => 'user',  // Asignar rol por defecto, se puede modificar según sea necesario
         ]);
 
-        // Generar el token y guardarlo automáticamente en la tabla personal_access_tokens
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
-            'user' => [
-                'id_user' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'birthday' => $user->birthday,
-                'role' => $user->role,
-            ],
-            'token' => $token,
+            'message' => 'Usuario creado con éxito',
         ], 201);
     }
 
     // Login de usuario
     public function login(Request $request)
     {
-        $user = User::where('email', $request->email)->first(); // Cambié 'name' por 'email' para el login
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string|min:8',
+        ]);
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Credenciales inválidas'], 401);
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => 'Datos de acceso incorrectos',
+                'details' => $validator->errors()
+            ], 422);
         }
 
-        // Generar el token y guardarlo automáticamente en la tabla personal_access_tokens
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $cliente = User::where('email', $request->email)->first();
+
+        if (!$cliente) {
+            return response()->json([
+                'error' => 'El usuario no existe'
+            ], 404);
+        }
+
+        if (!Hash::check($request->password, $cliente->password)) {
+            return response()->json([
+                'error' => 'Credenciales incorrectas'
+            ], 401);
+        }
+
+        $token = $cliente->createToken('API Token')->plainTextToken;
 
         return response()->json([
-            'user' => [
-                'id_user' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'birthday' => $user->birthday,
-                'role' => $user->role,
-            ],
+            'message' => 'Inicio de sesión exitoso.',
+            'user' => $cliente,
             'token' => $token,
         ], 200);
     }
@@ -74,65 +75,13 @@ class AuthController extends Controller
     // Logout de usuario
     public function logout(Request $request)
     {
-        $user = $request->user();
-
-        // Revocar el token actual, esto borra el token de la tabla personal_access_tokens
-        $user->currentAccessToken()->delete();
-
-        return response()->json(['message' => 'Logout exitoso'], 200);
-    }
-
-    // Obtener detalles del usuario
-    public function user(Request $request)
-    {
-        return response()->json($request->user());
-    }
-
-    // Actualizar perfil del usuario
-    public function updatePerfil(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255|unique:users,name,' . $request->user()->id,
-            'email' => 'sometimes|email|max:255|unique:users,email,' . $request->user()->id,
-            'birthday' => 'sometimes|date',  // Validación de fecha de nacimiento
-            'role' => 'sometimes|string|in:user,admin',  // Validación del rol, solo 'user' o 'admin'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $user = $request->user();
-        $user->update($request->only(['name', 'email', 'birthday', 'role']));  // Actualizamos los campos relevantes
+        // Revoke el token del usuario
+        $request->user()->tokens->each(function ($token) {
+            $token->delete();
+        });
 
         return response()->json([
-            'message' => 'Perfil actualizado correctamente.',
-            'user' => $user,
-        ]);
+            'message' => 'Sesión cerrada correctamente',
+        ], 200);
     }
-
-    // Cambiar contraseña
-    public function cambiarContra(Request $request)
-    {
-        $user = $request->user();
-
-        // Validación de los campos
-        $request->validate([
-            'contrasena_actual' => 'required',
-            'nueva_contrasena' => 'required|min:8',
-        ]);
-
-        // Verificar que la contraseña actual coincida
-        if (!Hash::check($request->contrasena_actual, $user->password)) {
-            return response()->json(['message' => 'Contraseña actual incorrecta'], 403);
-        }
-
-        // Cambiar la contraseña
-        $user->password = Hash::make($request->nueva_contrasena);
-        $user->save();
-
-        return response()->json(['message' => 'Contraseña cambiada exitosamente']);
-    }
-
-   
 }
