@@ -25,24 +25,23 @@
   </div>
 </template>
 
-  
-  <script setup>
-  import { useRoute } from 'vue-router';
-  import CommunicationManager from '@/services/CommunicationManager';
-  
-  const route = useRoute();
-  const movieId = route.params.id; // Verifica que 'id' es correcto
-  
-  if (!movieId) {
-    console.error("Error: No se encontró un ID en la ruta");
-  }
-  
-  const { data: movie, pending, error } = await useAsyncData(`movie-${movieId}`, () => 
-    CommunicationManager.fetchMovieDetails(movieId)
-  );
-  </script>
-  
-  <style scoped>
+<script setup>
+import { useRoute } from 'vue-router';
+import CommunicationManager from '@/services/CommunicationManager';
+
+const route = useRoute();
+const movieId = route.params.id; // Verifica que 'id' es correcto
+
+if (!movieId) {
+  console.error("Error: No se encontró un ID en la ruta");
+}
+
+const { data: movie, pending, error } = await useAsyncData(`movie-${movieId}`, () =>
+  CommunicationManager.fetchMovieDetails(movieId)
+);
+</script>
+
+<style scoped>
 /* Estilos para la navbar */
 .navbar {
   background-color: #333;
@@ -109,6 +108,7 @@
   text-align: center;
   font-size: 1.2rem;
 }
+
 /* Estilos para los detalles de la película */
 .movie-details {
   max-width: 1000px; /* Hace que el contenedor sea más largo */
@@ -121,13 +121,14 @@
   flex-direction: column;
   gap: 20px;
   align-items: center;
+  margin-top: 200px;
 }
 
 .movie-info {
   display: flex;
-  flex-direction: row; 
-  gap: 20px; 
-  margin-top: 100px; 
+  flex-direction: row;
+  gap: 20px;
+  margin-top: 20px; /* Aumenta el espacio entre la parte superior y el contenido */
 }
 
 .movie-image {
@@ -183,6 +184,4 @@
 .buy-ticket:active {
   transform: scale(0.98); /* Efecto de presionar el botón */
 }
-
-  </style>
-  
+</style>
