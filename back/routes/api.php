@@ -6,6 +6,7 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SeatController;
+use App\Http\Controllers\SessionController;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 // Rutas públicas - Sin autenticación
@@ -19,6 +20,10 @@ Route::get('/seats', [SeatController::class, 'index']);  // Ver todos los asient
 Route::get('/seats/{id}', [SeatController::class, 'show']);  // Ver un asiento
 Route::put('/seats/{id}/reserve', [SeatController::class, 'reserve']);  // Reservar un asiento
 
+// ✅ Rutas de sesiones fuera de autenticación (accesibles para todos)
+Route::get('/sessions', [SessionController::class, 'index']);
+Route::get('/sessions/{id}', [SessionController::class, 'show']); // Mostrar una sesión por ID
+
 // Rutas de autenticación - Registro y Login
 Route::post('/register', [AuthController::class, 'register']); 
 Route::post('/login', [AuthController::class, 'login']);
@@ -30,13 +35,11 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();  // Obtener los datos del usuario autenticado
     });
 
- 
-    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum'); // Esta ruta debe tener el middleware de autenticación
-    
+    Route::post('logout', [AuthController::class, 'logout']); 
+
     // Rutas para reservas (requieren autenticación)
     Route::post('/reservations', [ReservationController::class, 'store']);
     Route::get('/reservations', [ReservationController::class, 'index']);
     Route::get('/reservations/{id}', [ReservationController::class, 'show']);
     Route::delete('/reservations/{id}', [ReservationController::class, 'destroy']);
 });
-
