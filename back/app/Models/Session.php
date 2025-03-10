@@ -33,4 +33,9 @@ class Session extends Model
     {
         return $this->belongsTo(Movie::class, 'movie_id');
     }
+    public function reservas()
+{
+    return $this->hasMany(Reservation::class);
+}
+
 }

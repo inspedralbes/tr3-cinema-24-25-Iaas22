@@ -16,4 +16,10 @@ class Seat extends Model
     {
         return $this->belongsTo(Session::class, 'session_id');
     }
+    public function reservas()
+    {
+        return $this->hasMany(Reserva::class);
+    }
+    
+
 }

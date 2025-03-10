@@ -4,8 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ReservationController;
-use App\Http\Controllers\SeatController;
+use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\SessionController;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
@@ -16,9 +15,9 @@ Route::post('/movies', [MovieController::class, 'store']);  // Crear una nueva p
 Route::put('/movies/{id}', [MovieController::class, 'update']); // Actualizar una película
 Route::delete('/movies/{id}', [MovieController::class, 'destroy']); // Eliminar una película
 
-Route::get('/seats', [SeatController::class, 'index']);  // Ver todos los asientos
-Route::get('/seats/{id}', [SeatController::class, 'show']);  // Ver un asiento
-Route::put('/seats/{id}/reserve', [SeatController::class, 'reserve']);  // Reservar un asiento
+Route::get('/seats', [ReservaController::class, 'index']);
+Route::post('/reservar/{seat_id}', [ReservaController::class, 'reservar']);
+
 
 // ✅ Rutas de sesiones fuera de autenticación (accesibles para todos)
 Route::get('/sessions', [SessionController::class, 'index']);

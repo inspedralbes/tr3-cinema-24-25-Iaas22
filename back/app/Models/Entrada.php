@@ -27,5 +27,10 @@ class Entrada extends Model
     {
         return $this->belongsTo(Seat::class, 'seat_id');
     }
+
+    public function reservas()
+{
+    return $this->hasMany(Reservation::class, 'entrada_id');
+}
 }
 ?>
