@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Seat;
 use App\Models\Reserva;
+use App\Models\Session;
+
 use Illuminate\Support\Facades\Auth;
+
 
 class ReservaController extends Controller
 {
@@ -35,6 +38,16 @@ class ReservaController extends Controller
     return response()->json($seats);
 }
 
+public function getSeatsBySession($sessionId)
+{
+    $session = Session::with('seats')->find($sessionId);
+
+    if (!$session) {
+        return response()->json(['error' => 'Sesión no encontrada'], 404);
+    }
+
+    return response()->json($session->seats);
+}
 
 
 }

@@ -38,5 +38,26 @@ class ReservasSeeder extends Seeder
         ]);
 
         $this->command->info('Reserva creada con éxito para la butaca ID: ' . $seat->seat_id);
+ 
     }
+
+    public function getSeatsBySession($sessionId)
+{
+    $seats = Seat::leftJoin('reservas', function ($join) use ($sessionId) {
+            $join->on('seats.seat_id', '=', 'reservas.seat_id')
+                 ->where('reservas.session_id', '=', $sessionId);
+        })
+        ->select(
+            'seats.seat_id',
+            'seats.row',
+            'seats.number',
+            'reservas.status'
+        )
+        ->get();
+
+    return response()->json($seats);
+}
+
+
+
 }

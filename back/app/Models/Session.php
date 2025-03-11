@@ -35,7 +35,25 @@ class Session extends Model
     }
     public function reservas()
 {
-    return $this->hasMany(Reservation::class);
+    return $this->hasMany(Reserva::class);
 }
+public function seats()
+{
+    return $this->hasManyThrough(
+        Seat::class,          // Modelo al que deseas acceder
+        Reserva::class,   // Modelo intermedio
+        'session_id',         // Clave foránea en `reservations`
+        'seat_id',            // Clave foránea en `seats`
+        'session_id',         // Clave primaria en `sessions`
+        'seat_id'             // Clave primaria en `reservations`
+    )->select(
+        'seats.seat_id',
+        'seats.row',
+        'seats.number',
+        'reservations.status'
+    );
+}
+
+
 
 }
