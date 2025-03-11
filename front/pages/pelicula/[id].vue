@@ -1,3 +1,4 @@
+<!-- Dentro de pages/movies/_id.vue -->
 <template>
   <div v-if="pending">Cargando detalles de la película...</div>
   <div v-if="error" class="error">
@@ -19,17 +20,18 @@
         <p><strong>Actores:</strong> {{ movie.actors }}</p>
         <p><strong>Estreno:</strong> {{ movie.release_date }}</p>
         <!-- Botón de comprar entrada -->
-        <button class="buy-ticket">Comprar Entrada</button>
+        <button class="buy-ticket" @click="goToReserva">Comprar Entrada</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import CommunicationManager from '@/services/CommunicationManager';
 
 const route = useRoute();
+const router = useRouter();
 const movieId = route.params.id; // Verifica que 'id' es correcto
 
 if (!movieId) {
@@ -39,7 +41,13 @@ if (!movieId) {
 const { data: movie, pending, error } = await useAsyncData(`movie-${movieId}`, () =>
   CommunicationManager.fetchMovieDetails(movieId)
 );
+
+function goToReserva() {
+    router.push({ path: `/Sessions/${movieId}` });  
+}
+
 </script>
+
 
 <style scoped>
 /* Estilos para la navbar */

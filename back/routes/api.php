@@ -16,12 +16,16 @@ Route::put('/movies/{id}', [MovieController::class, 'update']); // Actualizar un
 Route::delete('/movies/{id}', [MovieController::class, 'destroy']); // Eliminar una película
 
 Route::get('/seats', [ReservaController::class, 'index']);
-Route::post('/reservar/{seat_id}', [ReservaController::class, 'reservar']);
+Route::post('/seats/{seat_id}/reserve', [ReservaController::class, 'reservar']);
+Route::get('/sessions/{id}/seats', [ReservaController::class, 'getSeatsBySession']);
+
 
 
 // ✅ Rutas de sesiones fuera de autenticación (accesibles para todos)
 Route::get('/sessions', [SessionController::class, 'index']);
 Route::get('/sessions/{id}', [SessionController::class, 'show']); // Mostrar una sesión por ID
+Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsByMovie']);
+
 
 // Rutas de autenticación - Registro y Login
 Route::post('/register', [AuthController::class, 'register']); 
@@ -41,4 +45,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reservations', [ReservationController::class, 'index']);
     Route::get('/reservations/{id}', [ReservationController::class, 'show']);
     Route::delete('/reservations/{id}', [ReservationController::class, 'destroy']);
+    Route::get('/sessions/{session_id}/seats', [ReservaController::class, 'getSeatsBySession']);
+
 });

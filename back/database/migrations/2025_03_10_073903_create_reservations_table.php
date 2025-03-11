@@ -36,7 +36,8 @@ class CreateReservationsTable extends Migration
                   ->on('entradas')
                   ->onDelete('cascade');
 
-            $table->enum('status', ['reservada', 'no reservada']); // Estado de la reserva
+            // Cambiar la columna 'status' para que pueda tener tres valores
+            $table->enum('status', ['reservada', 'confirmada', 'disponible'])->default('reservada'); // Estado de la reserva
             $table->timestamps(); // Fechas de creación y actualización
         });
     }

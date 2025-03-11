@@ -32,7 +32,7 @@ class ReservasSeeder extends Seeder
                 'session_id' => $sessions->random()->session_id, // Selecciona una sesión aleatoria
                 'user_id' => $users->random()->id,            // Selecciona un usuario aleatorio
                 'entrada_id' => $entradas->random()->entrada_id, // Selecciona una entrada aleatoria
-                'status' => 'no reservada', // Cambiado a un valor válido del ENUM: 'pendiente', 'confirmada', o 'cancelada'
+                'status' => 'disponible', // Cambiado a un valor válido del ENUM: 'pendiente', 'confirmada', o 'cancelada'
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

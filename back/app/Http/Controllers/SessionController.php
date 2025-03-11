@@ -26,4 +26,19 @@ class SessionController extends Controller
 
         return response()->json($session, Response::HTTP_OK);
     }
+  
+    public function getSessionsByMovie($movieId)
+    {
+        $sessions = Session::with('movie')->where('movie_id', $movieId)->get();
+    
+        if ($sessions->isEmpty()) {
+            return response()->json(['message' => 'No hay sesiones disponibles para esta película.'], Response::HTTP_NOT_FOUND);
+        }
+    
+        return response()->json($sessions, Response::HTTP_OK);
+    }
+    
+
+    
+
 }
