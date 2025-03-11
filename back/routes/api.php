@@ -26,7 +26,9 @@ Route::get('/sessions', [SessionController::class, 'index']);
 Route::get('/sessions/{id}', [SessionController::class, 'show']); // Mostrar una sesión por ID
 Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsByMovie']);
 
-Route::get('/seats/session/{session_id}', [ReservaController::class, 'getSeatsBySession']);
+
+Route::get('/seatsStatus', [ReservaController::class, 'getSeatsWithStatus']);
+
 
 
 

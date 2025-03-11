@@ -19,18 +19,22 @@ class ReservaController extends Controller
         // Devolver las sillas como respuesta JSON
         return response()->json($seats);
     }
-    
-    public function getSeatsBySession($session_id)
-    {
-        // Obtener todas las sillas para la sesión específica y su estado
-        $seats = Seat::leftJoin('reservas', function ($join) use ($session_id) {
-            $join->on('seats.seat_id', '=', 'reservas.seat_id')
-                 ->where('reservas.session_id', '=', $session_id);
-        })
-        ->select('seats.*', \DB::raw('COALESCE(reservas.status, "disponible") as status'))
-        ->get();
+   
+    public function getSeatsWithStatus()
+{
+    $seats = Seat::leftJoin('reservas', 'seats.seat_id', '=', 'reservas.seat_id')
+                 ->select(
+                     'seats.seat_id',
+                     'seats.row',
+                     'seats.seat_num',
+                     \DB::raw('COALESCE(reservas.status, "disponible") as status')
+                 )
+                 ->orderBy('seats.seat_id') // 🔥 Aquí se ordenan por seat_id
+                 ->get();
 
-        return response()->json($seats);
-    }
+    return response()->json($seats);
+}
+
+
 
 }
