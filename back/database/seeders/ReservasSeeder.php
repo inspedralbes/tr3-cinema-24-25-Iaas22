@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Reserva;  // Importa el modelo correctamente
+use App\Models\Reserva;
 use App\Models\Seat;
 use App\Models\Session;
 use App\Models\User;
@@ -13,29 +13,30 @@ class ReservasSeeder extends Seeder
 {
     public function run()
     {
-        // Obtener todos los registros necesarios
-        $seats = Seat::all();
-        $sessions = Session::all();
-        $users = User::all();
-        $entradas = Entrada::all();
+        $seat = Seat::inRandomOrder()->first();
 
-        // Asegúrate de tener al menos un registro en las tablas
-        if ($seats->isEmpty() || $sessions->isEmpty() || $users->isEmpty() || $entradas->isEmpty()) {
-            $this->command->info('No hay suficientes registros en las tablas requeridas.');
+        if (!$seat) {
+            $this->command->info('No hay butacas disponibles para reservar.');
             return;
         }
 
-        // Crear reservas de ejemplo
-        for ($i = 0; $i < 10; $i++) {
-            Reserva::create([
-                'seat_id' => $seats->random()->seat_id,       // Selecciona un asiento aleatorio
-                'session_id' => $sessions->random()->session_id, // Selecciona una sesión aleatoria
-                'user_id' => $users->random()->id,            // Selecciona un usuario aleatorio
-                'entrada_id' => $entradas->random()->entrada_id, // Selecciona una entrada aleatoria
-                'status' => 'disponible', // Cambiado a un valor válido del ENUM: 'pendiente', 'confirmada', o 'cancelada'
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        $session = Session::inRandomOrder()->first();
+        $user = User::inRandomOrder()->first();
+        $entrada = Entrada::inRandomOrder()->first();
+
+        if (!$session || !$entrada) {
+            $this->command->info('No hay sesión o entrada disponible para reservar.');
+            return;
         }
+
+        Reserva::create([
+            'seat_id' => $seat->seat_id,
+            'session_id' => $session->session_id,
+            'user_id' => $user ? $user->id : null,
+            'entrada_id' => $entrada->entrada_id,
+            'status' => 'reservada'
+        ]);
+
+        $this->command->info('Reserva creada con éxito para la butaca ID: ' . $seat->seat_id);
     }
 }

@@ -19,6 +19,7 @@ class ReservaController extends Controller
         // Devolver las sillas como respuesta JSON
         return response()->json($seats);
     }
+    
     public function getSeatsBySession($session_id)
     {
         // Obtener todas las sillas para la sesión específica y su estado
