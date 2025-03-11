@@ -26,6 +26,9 @@ Route::get('/sessions', [SessionController::class, 'index']);
 Route::get('/sessions/{id}', [SessionController::class, 'show']); // Mostrar una sesión por ID
 Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsByMovie']);
 
+Route::get('/seats/session/{session_id}', [ReservaController::class, 'getSeatsBySession']);
+
+
 
 // Rutas de autenticación - Registro y Login
 Route::post('/register', [AuthController::class, 'register']); 
@@ -45,6 +48,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reservations', [ReservationController::class, 'index']);
     Route::get('/reservations/{id}', [ReservationController::class, 'show']);
     Route::delete('/reservations/{id}', [ReservationController::class, 'destroy']);
-    Route::get('/sessions/{session_id}/seats', [ReservaController::class, 'getSeatsBySession']);
 
 });
