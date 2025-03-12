@@ -76,4 +76,34 @@ class ReservaController extends Controller
             'precio_con_descuento' => $precioConDescuento
         ]);
     }
+
+    public function reserveSeat(Request $request)
+{
+    $request->validate([
+        'seat_id' => 'required|exists:seats,seat_id',
+        'session_id' => 'required|exists:session,session_id'
+    ]);
+
+    $seatId = $request->seat_id;
+    $sessionId = $request->session_id;
+
+    // ✅ Verificar si la butaca ya está reservada
+    $existingReservation = Reserva::where('seat_id', $seatId)
+                                  ->where('session_id', $sessionId)
+                                  ->first();
+
+    if ($existingReservation) {
+        return response()->json(['error' => 'La butaca ya está reservada'], 400);
+    }
+
+    // ✅ Crear la reserva
+    Reserva::create([
+        'seat_id' => $seatId,
+        'session_id' => $sessionId,
+        'status' => 'reservada'
+    ]);
+
+    return response()->json(['success' => 'Butaca reservada con éxito']);
+}
+
 }

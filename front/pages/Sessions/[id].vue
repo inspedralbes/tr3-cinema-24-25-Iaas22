@@ -1,37 +1,47 @@
 <template>
   <div>
-    <!-- ✅ Título para seleccionar sesión -->
-    <h2 class="text-xl font-bold mb-2">Selecciona tu sección</h2>
-    
+    <!-- ✅ Navbar -->
+    <nav class="navbar">
+      <h1 class="title">Cine de Película</h1>
+    </nav>
+
     <!-- ✅ Select para elegir sesión -->
-    <select 
-      v-model="selectedSession" 
-      class="w-full p-3 border rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
-    >
-      <option value="" disabled>Elige una sesión</option>
-      <option 
-        v-for="session in sessions" 
-        :key="session.session_id" 
-        :value="session.session_id"
+    <div class="mt-4">
+      <h2 class="text-xl font-bold mb-2">Selecciona tu sección</h2>
+      <select 
+        v-model="selectedSession" 
+        class="w-full p-3 border rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
       >
-        🎬 {{ session.movie.title }} - 🕒 {{ session.session_time }} - 📅 {{ formatDate(session.session_date) }}
-        <span v-if="session.special_day" class="ml-2 text-yellow-500 font-bold">🌟 Especial</span>
-      </option>
-    </select>
+        <option value="" disabled>Elige una sesión</option>
+        <option 
+          v-for="session in sessions" 
+          :key="session.session_id" 
+          :value="session.session_id"
+        >
+          🎬 {{ session.movie.title }} - 🕒 {{ session.session_time }} - 📅 {{ formatDate(session.session_date) }}
+          <span v-if="session.special_day" class="ml-2 text-yellow-500 font-bold">🌟 Especial</span>
+        </option>
+      </select>
+    </div>
 
     <!-- ✅ Mostrar título de butacas si hay asientos -->
     <div v-if="seats.length" class="mt-4">
       <h3 class="text-lg font-semibold mb-2">Butacas:</h3>
       
-      <!-- ✅ Mostrar butacas en línea con tamaño uniforme -->
-      <div class="flex flex-wrap gap-2">
+      <p class="text-gray-600 mb-4">
+        Todas las butacas tienen un descuento de <strong>2€</strong> en el <strong>día del espectador</strong>.  
+        Las butacas de la <strong>columna F</strong> son <strong>VIP</strong>, ofreciendo una experiencia premium.
+      </p>
+
+      <div class="seats-container">
         <span 
-          v-for="(seat) in seats" 
+          v-for="seat in seats" 
           :key="seat.seat_id"
           :class="[ 
             seat.status === 'reservada' 
               ? 'bg-red-500 text-white cursor-not-allowed' 
-              : 'cursor-pointer hover:bg-green-500' 
+              : 'cursor-pointer hover:bg-green-500',
+            seat.row === 'F' ? 'border-yellow-400 border-2' : '' 
           ]"
           @click="selectSeat(seat)"
           class="seat"
@@ -45,17 +55,35 @@
     <div v-else-if="selectedSession" class="mt-4 text-gray-500">
       No hay butacas disponibles para esta sesión.
     </div>
+
+    <!-- ✅ Modal para mostrar el precio -->
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <h3 class="text-xl font-bold mb-2">Butaca seleccionada</h3>
+        <p class="text-gray-700 mb-4">
+          🎯 <strong>{{ selectedSeat.row }}{{ selectedSeat.seat_num }}</strong>  
+          💰 Precio: <strong>{{ selectedSeatPrice.toFixed(2) }}€</strong>
+        </p>
+        <div class="modal-buttons">
+          <button class="btn-reserve" @click="reserveSeat">Reservar</button>
+          <button class="btn-cancel" @click="closeModal">Cancelar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'nuxt/app'
 import axios from 'axios'
 
 const sessions = ref([])
 const selectedSession = ref('')
 const seats = ref([])
+const showModal = ref(false)
+const selectedSeat = ref({})
+const selectedSeatPrice = ref(0)
 
 const selectedSessionData = computed(() => 
   sessions.value.find(session => session.session_id === selectedSession.value) || {}
@@ -64,7 +92,6 @@ const selectedSessionData = computed(() =>
 const fetchSessionsByMovie = async (movieId) => {
   try {
     if (!movieId) return
-
     const response = await axios.get(`http://localhost:8000/api/sessions/movie/${movieId}`)
     sessions.value = response.data || []
   } catch (error) {
@@ -92,9 +119,34 @@ const selectSeat = (seat) => {
   const price = isSpecialDay ? seat?.precio_con_descuento : seat?.precio_normal
 
   if (price !== undefined) {
-    alert(`✅ Butaca seleccionada: ${seat.row}${seat.seat_num} - Precio: ${price.toFixed(2)}€`)
-  } else {
-    alert('⚠️ No se pudo obtener el precio de la butaca.')
+    selectedSeat.value = seat
+    selectedSeatPrice.value = price
+    showModal.value = true
+  }
+}
+
+const closeModal = () => {
+  showModal.value = false
+}
+
+const reserveSeat = async () => {
+  try {
+    await axios.post('http://localhost:8000/api/reserve-seat', {
+      seat_id: selectedSeat.value.seat_id,
+      session_id: selectedSession.value
+    })
+
+    // ✅ Marcar el asiento como reservado en el estado
+    const seatIndex = seats.value.findIndex(seat => seat.seat_id === selectedSeat.value.seat_id)
+    if (seatIndex !== -1) {
+      seats.value[seatIndex].status = 'reservada'
+    }
+
+    alert(`🎉 ¡Butaca ${selectedSeat.value.row}${selectedSeat.value.seat_num} reservada con éxito!`)
+    closeModal()
+  } catch (error) {
+    console.error('❌ Error al reservar la butaca:', error.message || error)
+    alert('❌ No se pudo reservar la butaca.')
   }
 }
 
@@ -114,33 +166,45 @@ onMounted(() => {
 })
 
 watch(selectedSession, (newSession) => {
-  if (newSession) {
-    loadSeats(newSession)
-  }
+  if (newSession) loadSeats(newSession)
 })
 </script>
 
+
 <style scoped>
-select, button {
-  transition: all 0.2s ease-in-out;
+/* ✅ Navbar */
+.navbar {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.title {
+  font-size: 1.5rem;
+}
+
+/* ✅ Butacas */
+.seats-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
 
 .seat {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 50px; /* Ancho fijo */
-  height: 50px; /* Alto fijo */
+  width: 50px;
+  height: 50px;
   border-radius: 6px;
   border: 1px solid #ccc;
   cursor: pointer;
-  transition: background-color 0.2s;
   font-size: 16px;
+  transition: background-color 0.2s;
 }
 
 .bg-red-500 {
@@ -155,10 +219,63 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Ajuste de espaciado para que el diseño quede uniforme */
-.flex-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+/* ✅ Estilo para butacas VIP */
+.border-yellow-400 {
+  border-color: #facc15;
 }
+/* ✅ Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Botones */
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.btn-reserve {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-reserve:hover {
+  background-color: #2563eb;
+}
+
+.btn-cancel {
+  background-color: #ef4444;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: #dc2626;
+}
+
 </style>
