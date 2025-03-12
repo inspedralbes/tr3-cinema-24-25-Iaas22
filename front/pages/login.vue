@@ -41,56 +41,48 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  
-  const router = useRouter()
-  
-  const form = ref({
-    email: '',
-    password: ''
-  })
-  
-  const error = ref('')
-  const loading = ref(false)
-  
-  const login = async () => {
-    error.value = ''
-    loading.value = true
-  
-    try {
-      const response = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(form.value)
-      })
-  
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Error al iniciar sesión')
-      }
-  
-      const data = await response.json()
-  
-      // ✅ Guardar token e información en localStorage
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-  
-      // ✅ Redirigir al home
-      router.push('/')
-    } catch (err) {
-      error.value = err.message
-    } finally {
-      loading.value = false
-    }
+ import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import communicationManager from '@/services/communicationManager';
+
+const router = useRouter();
+
+const form = ref({
+  email: '',
+  password: ''
+});
+
+const error = ref('');
+const loading = ref(false);
+
+const login = async () => {
+  error.value = '';
+  loading.value = true;
+
+  try {
+    const data = await communicationManager.login(
+      form.value.email,
+      form.value.password
+    );
+
+    // ✅ Guardar token e información en localStorage
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    // ✅ Redirigir al home
+    router.push('/');
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
   }
-  
-  // ✅ Función para redirigir a la página de registro
-  const goToRegister = () => {
-    router.push('/register')
-  }
+};
+
+// ✅ Función para redirigir a la página de registro
+const goToRegister = () => {
+  router.push('/register');
+};
+
   </script>
   
   <style scoped>

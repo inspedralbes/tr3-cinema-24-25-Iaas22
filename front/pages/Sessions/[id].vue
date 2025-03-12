@@ -74,102 +74,96 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'nuxt/app'
-import axios from 'axios'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute } from 'nuxt/app';
+import CommunicationManager from '@/services/CommunicationManager';
 
-const sessions = ref([])
-const selectedSession = ref('')
-const seats = ref([])
-const showModal = ref(false)
-const selectedSeat = ref({})
-const selectedSeatPrice = ref(0)
+const sessions = ref([]);
+const selectedSession = ref('');
+const seats = ref([]);
+const showModal = ref(false);
+const selectedSeat = ref({});
+const selectedSeatPrice = ref(0);
 
-const selectedSessionData = computed(() => 
+const selectedSessionData = computed(() =>
   sessions.value.find(session => session.session_id === selectedSession.value) || {}
-)
+);
 
 const fetchSessionsByMovie = async (movieId) => {
   try {
-    if (!movieId) return
-    const response = await axios.get(`http://localhost:8000/api/sessions/movie/${movieId}`)
-    sessions.value = response.data || []
+    if (!movieId) return;
+    sessions.value = await CommunicationManager.fetchSessionsByMovie(movieId);
   } catch (error) {
-    console.error('❌ Error al obtener las sesiones:', error.message || error)
+    console.error('❌ Error al obtener sesiones:', error.message);
   }
-}
+};
 
 const loadSeats = async (sessionId) => {
-  if (!sessionId) return
+  if (!sessionId) return;
   try {
-    const response = await axios.get(`http://localhost:8000/api/seats/session/${sessionId}`)
-    seats.value = response.data || []
+    seats.value = await CommunicationManager.fetchSeatsBySession(sessionId);
   } catch (error) {
-    console.error('❌ Error al obtener las butacas:', error.message || error)
+    console.error('❌ Error al obtener butacas:', error.message);
   }
-}
+};
 
 const selectSeat = (seat) => {
   if (seat.status === 'reservada') {
-    alert('🚫 Esta butaca ya está reservada.')
-    return
+    alert('🚫 Esta butaca ya está reservada.');
+    return;
   }
 
-  const isSpecialDay = !!selectedSessionData.value?.special_day
-  const price = isSpecialDay ? seat?.precio_con_descuento : seat?.precio_normal
+  const isSpecialDay = !!selectedSessionData.value?.special_day;
+  const price = isSpecialDay ? seat?.precio_con_descuento : seat?.precio_normal;
 
   if (price !== undefined) {
-    selectedSeat.value = seat
-    selectedSeatPrice.value = price
-    showModal.value = true
+    selectedSeat.value = seat;
+    selectedSeatPrice.value = price;
+    showModal.value = true;
   }
-}
+};
 
 const closeModal = () => {
-  showModal.value = false
-}
+  showModal.value = false;
+};
 
 const reserveSeat = async () => {
   try {
-    await axios.post('http://localhost:8000/api/reserve-seat', {
-      seat_id: selectedSeat.value.seat_id,
-      session_id: selectedSession.value
-    })
+    await CommunicationManager.reserveSeat(selectedSeat.value.seat_id, selectedSession.value);
 
-    // ✅ Marcar el asiento como reservado en el estado
-    const seatIndex = seats.value.findIndex(seat => seat.seat_id === selectedSeat.value.seat_id)
+    // ✅ Marcar asiento como reservado
+    const seatIndex = seats.value.findIndex(seat => seat.seat_id === selectedSeat.value.seat_id);
     if (seatIndex !== -1) {
-      seats.value[seatIndex].status = 'reservada'
+      seats.value[seatIndex].status = 'reservada';
     }
 
-    alert(`🎉 ¡Butaca ${selectedSeat.value.row}${selectedSeat.value.seat_num} reservada con éxito!`)
-    closeModal()
+    alert(`🎉 ¡Butaca ${selectedSeat.value.row}${selectedSeat.value.seat_num} reservada con éxito!`);
+    closeModal();
   } catch (error) {
-    console.error('❌ Error al reservar la butaca:', error.message || error)
-    alert('❌ No se pudo reservar la butaca.')
+    console.error('❌ Error al reservar la butaca:', error.message);
+    alert('❌ No se pudo reservar la butaca.');
   }
-}
+};
 
 const formatDate = (dateString) => {
-  if (!dateString) return ''
+  if (!dateString) return '';
   return new Date(dateString).toLocaleDateString('es-ES', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
-  })
-}
+  });
+};
 
 onMounted(() => {
-  const movieId = useRoute().params.id
-  if (movieId) fetchSessionsByMovie(movieId)
-})
+  const movieId = useRoute().params.id;
+  if (movieId) fetchSessionsByMovie(movieId);
+});
 
 watch(selectedSession, (newSession) => {
-  if (newSession) loadSeats(newSession)
-})
+  if (newSession) loadSeats(newSession);
+});
 </script>
-
 
 <style scoped>
 /* ✅ Navbar */
@@ -204,7 +198,6 @@ watch(selectedSession, (newSession) => {
   border: 1px solid #ccc;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.2s;
 }
 
 .bg-red-500 {
@@ -215,14 +208,6 @@ watch(selectedSession, (newSession) => {
   background-color: #22c55e;
 }
 
-.cursor-not-allowed {
-  cursor: not-allowed;
-}
-
-/* ✅ Estilo para butacas VIP */
-.border-yellow-400 {
-  border-color: #facc15;
-}
 /* ✅ Modal */
 .modal-overlay {
   position: fixed;
@@ -242,10 +227,8 @@ watch(selectedSession, (newSession) => {
   border-radius: 12px;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* ✅ Botones */
 .modal-buttons {
   display: flex;
   justify-content: space-between;
@@ -257,12 +240,6 @@ watch(selectedSession, (newSession) => {
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-reserve:hover {
-  background-color: #2563eb;
 }
 
 .btn-cancel {
@@ -270,12 +247,5 @@ watch(selectedSession, (newSession) => {
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
-
-.btn-cancel:hover {
-  background-color: #dc2626;
-}
-
 </style>

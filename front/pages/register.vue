@@ -68,59 +68,45 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  
-  const router = useRouter()
-  
-  const form = ref({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    birthday: ''
-  })
-  
-  const error = ref('')
-  const loading = ref(false)
-  
-  const register = async () => {
-    error.value = ''
-    loading.value = true
-  
-    try {
-      const response = await fetch('http://localhost:8000/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(form.value)
-      })
-  
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Error al registrar usuario')
-      }
-  
-      const data = await response.json()
-  
-      // ✅ Guardar token e información del usuario en localStorage
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-  
-      // ✅ Redirigir al login
-      router.push('/login')
-    } catch (err) {
-      error.value = err.message
-    } finally {
-      loading.value = false
-    }
+  import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import communicationManager from '@/services/communicationManager';
+
+const router = useRouter();
+
+const form = ref({
+  name: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+  birthday: ''
+});
+
+const error = ref('');
+const loading = ref(false);
+
+const register = async () => {
+  error.value = '';
+  loading.value = true;
+
+  try {
+    // ✅ Llamada a communicationManager para registrar
+    await communicationManager.register(form.value);
+
+    // ✅ Redirigir al login
+    router.push('/login');
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
   }
-  
-  // ✅ Función para redirigir a la página de login
-  const goToLogin = () => {
-    router.push('/login')
-  }
+};
+
+// ✅ Función para redirigir a la página de login
+const goToLogin = () => {
+  router.push('/login');
+};
+
   </script>
   
   <style scoped>
