@@ -14,9 +14,9 @@ class SeatsSeeder extends Seeder
 
         foreach ($rows as $row) {
             for ($i = 1; $i <= 10; $i++) {
-                // Alternar entre normal y vip
-                $type = ($i % 2 == 0) ? 'vip' : 'normal';
-                $price = ($type === 'normal') ? 6.00 : 8.00;
+                // ✅ Toda la fila F es VIP, las demás son normales
+                $type = ($row === 'F') ? 'vip' : 'normal';
+                $price = ($type === 'vip') ? 8.00 : 6.00;
 
                 Seat::create([
                     'row' => $row,

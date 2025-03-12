@@ -18,13 +18,6 @@ class CreateSeatsTable extends Migration
             $table->timestamps();  // Fechas de creación y actualización
         });
 
-        // Inserta precios por defecto con valores fijos
-        DB::table('seats')->insert([
-            ['row' => 'A', 'seat_num' => 1, 'type' => 'normal', 'price' => 6.00],
-            ['row' => 'A', 'seat_num' => 2, 'type' => 'vip', 'price' => 8.00],
-            ['row' => 'B', 'seat_num' => 1, 'type' => 'normal', 'price' => 6.00],
-            ['row' => 'B', 'seat_num' => 2, 'type' => 'vip', 'price' => 8.00],
-        ]);
     }
 
     public function down()

@@ -17,7 +17,7 @@ Route::delete('/movies/{id}', [MovieController::class, 'destroy']); // Eliminar 
 
 Route::get('/seats', [ReservaController::class, 'index']);
 Route::post('/seats/{seat_id}/reserve', [ReservaController::class, 'reservar']);
-Route::get('/seats/{sessionId}', [ReservaController::class, 'getSeatsBySession']);
+Route::get('/seats/session/{sessionId}', [ReservaController::class, 'getSeatsBySession']);
 Route::get('/seat/price/{id}', [ReservaController::class, 'getSeatPriceById']);
 
 
