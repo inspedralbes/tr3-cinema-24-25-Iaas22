@@ -50,7 +50,7 @@ class ReservasSeeder extends Seeder
         ->select(
             'seats.seat_id',
             'seats.row',
-            'seats.number',
+            'seats.seat_num',
             'reservas.status'
         )
         ->get();
