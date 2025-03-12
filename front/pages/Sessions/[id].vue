@@ -75,7 +75,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'nuxt/app';
+import { useRouter, useRoute } from 'nuxt/app';
 import CommunicationManager from '@/services/CommunicationManager';
 
 const sessions = ref([]);
@@ -84,6 +84,7 @@ const seats = ref([]);
 const showModal = ref(false);
 const selectedSeat = ref({});
 const selectedSeatPrice = ref(0);
+const router = useRouter();
 
 const selectedSessionData = computed(() =>
   sessions.value.find(session => session.session_id === selectedSession.value) || {}
@@ -129,6 +130,14 @@ const closeModal = () => {
 
 const reserveSeat = async () => {
   try {
+    const isAuthenticated = await CommunicationManager.checkAuth();
+    if (!isAuthenticated) {
+      // ✅ Mostrar mensaje sin input y redirigir al login
+      alert('⚠️ Debes iniciar sesión para reservar una butaca.');
+      router.push('/login');
+      return;
+    }
+
     await CommunicationManager.reserveSeat(selectedSeat.value.seat_id, selectedSession.value);
 
     // ✅ Marcar asiento como reservado
@@ -164,6 +173,7 @@ watch(selectedSession, (newSession) => {
   if (newSession) loadSeats(newSession);
 });
 </script>
+
 
 <style scoped>
 /* ✅ Navbar */
