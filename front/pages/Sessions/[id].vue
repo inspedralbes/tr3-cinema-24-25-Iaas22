@@ -1,5 +1,8 @@
 <template>
   <div>
+    <!-- ✅ Título para seleccionar sesión -->
+    <h2 class="text-xl font-bold mb-2">Selecciona tu sección</h2>
+    
     <!-- ✅ Select para elegir sesión -->
     <select 
       v-model="selectedSession" 
@@ -16,29 +19,25 @@
       </option>
     </select>
 
-    <!-- ✅ Botón para cargar las butacas -->
-    <button 
-      @click.prevent="loadSeats(selectedSession)"
-      :disabled="!selectedSession"
-      class="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
-    >
-      🚀 Ver Butacas
-    </button>
-
-    <!-- ✅ Mostrar butacas -->
-    <div v-if="seats.length" class="mt-6 grid grid-cols-5 gap-2">
-      <div 
-        v-for="seat in seats" 
-        :key="seat.seat_id"
-        :class="[ 
-          'w-16 h-16 flex items-center justify-center border rounded-lg transition duration-200',
-          seat.status === 'reservada'
-            ? 'bg-red-500 text-white cursor-not-allowed' 
-            : 'bg-green-400 text-white cursor-pointer hover:bg-green-500'
-        ]"
-        @click="selectSeat(seat)"
-      >
-        <span class="font-bold">{{ seat.row }}{{ seat.seat_num }}</span>
+    <!-- ✅ Mostrar título de butacas si hay asientos -->
+    <div v-if="seats.length" class="mt-4">
+      <h3 class="text-lg font-semibold mb-2">Butacas:</h3>
+      
+      <!-- ✅ Mostrar butacas en línea con tamaño uniforme -->
+      <div class="flex flex-wrap gap-2">
+        <span 
+          v-for="(seat) in seats" 
+          :key="seat.seat_id"
+          :class="[ 
+            seat.status === 'reservada' 
+              ? 'bg-red-500 text-white cursor-not-allowed' 
+              : 'cursor-pointer hover:bg-green-500' 
+          ]"
+          @click="selectSeat(seat)"
+          class="seat"
+        >
+          {{ seat.row }}{{ seat.seat_num }}
+        </span>
       </div>
     </div>
 
@@ -62,7 +61,6 @@ const selectedSessionData = computed(() =>
   sessions.value.find(session => session.session_id === selectedSession.value) || {}
 )
 
-// ✅ Obtener sesiones por ID de película
 const fetchSessionsByMovie = async (movieId) => {
   try {
     if (!movieId) return
@@ -74,7 +72,6 @@ const fetchSessionsByMovie = async (movieId) => {
   }
 }
 
-// ✅ Obtener butacas por sesión
 const loadSeats = async (sessionId) => {
   if (!sessionId) return
   try {
@@ -85,7 +82,6 @@ const loadSeats = async (sessionId) => {
   }
 }
 
-// ✅ Seleccionar butaca y mostrar precio
 const selectSeat = (seat) => {
   if (seat.status === 'reservada') {
     alert('🚫 Esta butaca ya está reservada.')
@@ -102,7 +98,6 @@ const selectSeat = (seat) => {
   }
 }
 
-// ✅ Formatear fecha (en español)
 const formatDate = (dateString) => {
   if (!dateString) return ''
   return new Date(dateString).toLocaleDateString('es-ES', {
@@ -113,13 +108,11 @@ const formatDate = (dateString) => {
   })
 }
 
-// ✅ Obtener el ID de la película de la URL dinámicamente
 onMounted(() => {
   const movieId = useRoute().params.id
   if (movieId) fetchSessionsByMovie(movieId)
 })
 
-// ✅ Recargar butacas automáticamente al cambiar de sesión
 watch(selectedSession, (newSession) => {
   if (newSession) {
     loadSeats(newSession)
@@ -137,15 +130,35 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.seat {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px; /* Ancho fijo */
+  height: 50px; /* Alto fijo */
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 16px;
+}
+
 .bg-red-500 {
   background-color: #ef4444;
 }
 
-.bg-green-400 {
-  background-color: #4ade80;
+.hover\:bg-green-500:hover {
+  background-color: #22c55e;
 }
 
-.bg-green-500:hover {
-  background-color: #22c55e;
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+/* Ajuste de espaciado para que el diseño quede uniforme */
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 </style>
