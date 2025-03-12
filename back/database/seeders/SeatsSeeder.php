@@ -9,13 +9,22 @@ class SeatsSeeder extends Seeder
 {
     public function run()
     {
-        $row = 'A';
+        // Filas de la A a la L (12 filas)
+        $rows = range('A', 'L');
 
-        for ($i = 1; $i <= 10; $i++) {
-            Seat::create([
-                'row' => $row,
-                'seat_num' => $i,
-            ]);
+        foreach ($rows as $row) {
+            for ($i = 1; $i <= 10; $i++) {
+                // Alternar entre normal y vip
+                $type = ($i % 2 == 0) ? 'vip' : 'normal';
+                $price = ($type === 'normal') ? 6.00 : 8.00;
+
+                Seat::create([
+                    'row' => $row,
+                    'seat_num' => $i,
+                    'type' => $type,
+                    'price' => $price,
+                ]);
+            }
         }
     }
 }

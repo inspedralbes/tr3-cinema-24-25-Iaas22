@@ -13,7 +13,6 @@ class CreateReservationsTable extends Migration
             $table->unsignedBigInteger('seat_id'); // Relación con la butaca
             $table->unsignedBigInteger('session_id'); // Relación con la sesión
             $table->unsignedBigInteger('user_id')->nullable(); // Relación con el usuario (opcional)
-            $table->unsignedBigInteger('entrada_id'); // Relación con el tipo de entrada
 
             // Claves foráneas
             $table->foreign('seat_id')
@@ -31,12 +30,7 @@ class CreateReservationsTable extends Migration
                   ->on('users')
                   ->onDelete('cascade');
 
-            $table->foreign('entrada_id')
-                  ->references('entrada_id')
-                  ->on('entradas')
-                  ->onDelete('cascade');
-
-            // Cambiar la columna 'status' para que pueda tener tres valores
+            // Cambiar la columna 'status' para que pueda tener dos valores
             $table->enum('status', ['reservada', 'confirmada'])->default('reservada'); // Estado de la reserva
             $table->timestamps(); // Fechas de creación y actualización
         });

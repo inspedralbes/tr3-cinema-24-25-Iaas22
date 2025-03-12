@@ -7,7 +7,6 @@ use App\Models\Reserva;
 use App\Models\Seat;
 use App\Models\Session;
 use App\Models\User;
-use App\Models\Entrada;
 
 class ReservasSeeder extends Seeder
 {
@@ -22,10 +21,9 @@ class ReservasSeeder extends Seeder
 
         $session = Session::inRandomOrder()->first();
         $user = User::inRandomOrder()->first();
-        $entrada = Entrada::inRandomOrder()->first();
 
-        if (!$session || !$entrada) {
-            $this->command->info('No hay sesión o entrada disponible para reservar.');
+        if (!$session) {
+            $this->command->info('No hay sesión disponible para reservar.');
             return;
         }
 
@@ -33,15 +31,9 @@ class ReservasSeeder extends Seeder
             'seat_id' => $seat->seat_id,
             'session_id' => $session->session_id,
             'user_id' => $user ? $user->id : null,
-            'entrada_id' => $entrada->entrada_id,
-            'status' => 'reservada'
+            'status' => 'reservada',
         ]);
 
         $this->command->info('Reserva creada con éxito para la butaca ID: ' . $seat->seat_id);
- 
     }
-
- 
-
-
 }
