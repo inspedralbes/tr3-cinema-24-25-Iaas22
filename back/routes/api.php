@@ -16,9 +16,13 @@ Route::put('/movies/{id}', [MovieController::class, 'update']); // Actualizar un
 Route::delete('/movies/{id}', [MovieController::class, 'destroy']); // Eliminar una película
 
 Route::get('/seats', [ReservaController::class, 'index']);
-Route::post('/reserve-seat', [ReservaController::class, 'reserveSeat']);
 Route::get('/seats/session/{sessionId}', [ReservaController::class, 'getSeatsBySession']);
 Route::get('/seat/price/{id}', [ReservaController::class, 'getSeatPriceById']);
+Route::get('/compras/total/{userId}', [ReservaController::class, 'getTotalPriceByUser']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/reserve-seat', [ReservaController::class, 'reserveSeat']);
+});
 
 
 
@@ -26,6 +30,7 @@ Route::get('/seat/price/{id}', [ReservaController::class, 'getSeatPriceById']);
 Route::get('/sessions', [SessionController::class, 'index']);
 Route::get('/sessions/{id}', [SessionController::class, 'show']); // Mostrar una sesión por ID
 Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsByMovie']);
+
 
 
 Route::get('/seatsStatus', [ReservaController::class, 'getSeatsWithStatus']);

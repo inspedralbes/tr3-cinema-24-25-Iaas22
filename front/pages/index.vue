@@ -2,9 +2,12 @@
   <div>
     <nav class="navbar">
       <h1>Lista de Películas</h1>
-      <div class="search-container">
-        <input v-if="searchVisible" v-model="searchQuery" type="text" placeholder="Buscar..." class="search-bar" />
-        <button @click="toggleSearch" class="search-button">🔍</button>
+      <div class="actions">
+        <div class="search-container">
+          <input v-if="searchVisible" v-model="searchQuery" type="text" placeholder="Buscar..." class="search-bar" />
+          <button @click="toggleSearch" class="search-button">🔍</button>
+        </div>
+        <button @click="goToLogin" class="login-button">Iniciar sesión</button>
       </div>
     </nav>
 
@@ -30,28 +33,34 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import CommunicationManager from '@/services/CommunicationManager';
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import CommunicationManager from '@/services/CommunicationManager'
 
-const searchQuery = ref('');
-const searchVisible = ref(false);
+const router = useRouter()
+const searchQuery = ref('')
+const searchVisible = ref(false)
 
 const toggleSearch = () => {
-  searchVisible.value = !searchVisible.value;
-  if (!searchVisible.value) searchQuery.value = ''; // Limpia la búsqueda al cerrar
-};
+  searchVisible.value = !searchVisible.value
+  if (!searchVisible.value) searchQuery.value = ''
+}
 
-const { data: movies, pending, error } = await useAsyncData('movies', () => 
+const goToLogin = () => {
+  router.push('/login') // ✅ Redirige al login
+}
+
+const { data: movies, pending, error } = await useAsyncData('movies', () =>
   CommunicationManager.fetchMovies()
-);
+)
 
 const filteredMovies = computed(() => {
   return movies.value
     ? movies.value.filter(movie =>
         movie.title.toLowerCase().includes(searchQuery.value.toLowerCase())
       )
-    : [];
-});
+    : []
+})
 </script>
 
 <style scoped>
@@ -65,6 +74,12 @@ const filteredMovies = computed(() => {
   font-size: 1.5rem;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .search-container {
   display: flex;
   align-items: center;
@@ -76,10 +91,10 @@ const filteredMovies = computed(() => {
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
-  display: block;
 }
 
-.search-button {
+.search-button,
+.login-button {
   background: #ff6600;
   color: white;
   border: none;
@@ -90,7 +105,8 @@ const filteredMovies = computed(() => {
   transition: background 0.3s;
 }
 
-.search-button:hover {
+.search-button:hover,
+.login-button:hover {
   background: #e65c00;
 }
 
@@ -102,12 +118,6 @@ const filteredMovies = computed(() => {
   justify-content: center;
   max-width: 1400px;
   margin: auto;
-}
-
-@media (min-width: 1400px) {
-  .movies-grid {
-    grid-template-columns: repeat(7, 1fr);
-  }
 }
 
 .movie-card {
