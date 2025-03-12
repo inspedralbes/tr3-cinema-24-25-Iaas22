@@ -41,23 +41,7 @@ class ReservasSeeder extends Seeder
  
     }
 
-    public function getSeatsBySession($sessionId)
-{
-    $seats = Seat::leftJoin('reservas', function ($join) use ($sessionId) {
-            $join->on('seats.seat_id', '=', 'reservas.seat_id')
-                 ->where('reservas.session_id', '=', $sessionId);
-        })
-        ->select(
-            'seats.seat_id',
-            'seats.row',
-            'seats.seat_num',
-            'reservas.status'
-        )
-        ->get();
-
-    return response()->json($seats);
-}
-
+ 
 
 
 }
