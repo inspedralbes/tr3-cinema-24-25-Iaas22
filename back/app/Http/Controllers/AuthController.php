@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    // Registro de usuario
+    // ✅ Registro de usuario
     public function register(Request $request)
     {
         $request->validate([
@@ -21,20 +21,25 @@ class AuthController extends Controller
             'birthday' => 'required|date',
         ]);
 
-        // Crear el usuario
+        // ✅ Crear el usuario con la contraseña cifrada
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password, // No ciframos aquí, se hace en el modelo
+            'password' => Hash::make($request->password), // ✅ Ciframos la contraseña aquí
             'birthday' => $request->birthday,
         ]);
 
+        // ✅ Generar token al registrarse automáticamente
+        $token = $user->createToken('API Token')->plainTextToken;
+
         return response()->json([
             'message' => 'Usuario creado con éxito',
+            'user' => $user,
+            'token' => $token,
         ], 201);
     }
 
-    // Login de usuario
+    // ✅ Login de usuario
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -63,7 +68,8 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $token = $cliente->createToken('API Token')->plainTextToken;
+        // ✅ Generar token de acceso
+        $token = $cliente->createToken('API Token Login')->plainTextToken;
 
         return response()->json([
             'message' => 'Inicio de sesión exitoso.',
@@ -72,13 +78,11 @@ class AuthController extends Controller
         ], 200);
     }
 
-    // Logout de usuario
+    // ✅ Logout de usuario
     public function logout(Request $request)
     {
-        // Revoke el token del usuario
-        $request->user()->tokens->each(function ($token) {
-            $token->delete();
-        });
+        // ✅ Eliminar solo el token activo
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Sesión cerrada correctamente',

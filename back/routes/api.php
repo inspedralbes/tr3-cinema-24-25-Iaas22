@@ -6,55 +6,54 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\SessionController;
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
-// Rutas públicas - Sin autenticación
+// ✅ Rutas públicas - Sin autenticación
 Route::get('/movies', [MovieController::class, 'index']);  // Obtener todas las películas
 Route::get('/movies/{id}', [MovieController::class, 'show']);
 Route::post('/movies', [MovieController::class, 'store']);  // Crear una nueva película
 Route::put('/movies/{id}', [MovieController::class, 'update']); // Actualizar una película
 Route::delete('/movies/{id}', [MovieController::class, 'destroy']); // Eliminar una película
 
+// ✅ Rutas para butacas y reservas sin autenticación
 Route::get('/seats', [ReservaController::class, 'index']);
 Route::get('/seats/session/{sessionId}', [ReservaController::class, 'getSeatsBySession']);
 Route::get('/seat/price/{id}', [ReservaController::class, 'getSeatPriceById']);
 Route::get('/compras/total/{userId}', [ReservaController::class, 'getTotalPriceByUser']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/reserve-seat', [ReservaController::class, 'reserveSeat']);
-});
-
-
-
 // ✅ Rutas de sesiones fuera de autenticación (accesibles para todos)
 Route::get('/sessions', [SessionController::class, 'index']);
 Route::get('/sessions/{id}', [SessionController::class, 'show']); // Mostrar una sesión por ID
 Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsByMovie']);
-
-
-
 Route::get('/seatsStatus', [ReservaController::class, 'getSeatsWithStatus']);
 
-
-
-
-// Rutas de autenticación - Registro y Login
+// ✅ Rutas de autenticación (registro y login)
 Route::post('/register', [AuthController::class, 'register']); 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login']); 
 
-// Rutas protegidas por autenticación (requieren token)
+// ✅ RUTA DE LOGIN PARA ERRORES DE AUTENTICACIÓN
+Route::get('/login', function () {
+    return response()->json([
+        'error' => 'No autenticado. Por favor, inicia sesión.'
+    ], 401);
+})->name('login');
+
+// ✅ Rutas protegidas por token con Sanctum
 Route::middleware('auth:sanctum')->group(function () {
 
+    // ✅ Obtener datos del usuario autenticado
     Route::get('/user', function (Request $request) {
-        return $request->user();  // Obtener los datos del usuario autenticado
+        return $request->user();
     });
 
-    Route::post('logout', [AuthController::class, 'logout']); 
+    // ✅ Cierre de sesión
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Rutas para reservas (requieren autenticación)
-    Route::post('/reservations', [ReservationController::class, 'store']);
-    Route::get('/reservations', [ReservationController::class, 'index']);
-    Route::get('/reservations/{id}', [ReservationController::class, 'show']);
-    Route::delete('/reservations/{id}', [ReservationController::class, 'destroy']);
+    // ✅ Reservar butaca (solo con token)
+    Route::post('/reserve-seat', [ReservaController::class, 'reserveSeat']);
 
+    // ✅ Rutas para reservas
+    Route::post('/reservations', [ReservaController::class, 'store']);
+    Route::get('/reservations', [ReservaController::class, 'index']);
+    Route::get('/reservations/{id}', [ReservaController::class, 'show']);
+    Route::delete('/reservations/{id}', [ReservaController::class, 'destroy']);
 });
