@@ -25,6 +25,8 @@ Route::get('/sessions', [SessionController::class, 'index']);
 Route::get('/sessions/{id}', [SessionController::class, 'show']); // Mostrar una sesión por ID
 Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsByMovie']);
 Route::get('/seatsStatus', [ReservaController::class, 'getSeatsWithStatus']);
+Route::get('/sessions/date/{movieId}', [SessionController::class, 'getSessionDateByMovieId']);
+
 
 // ✅ Rutas de autenticación (registro y login)
 Route::post('/register', [AuthController::class, 'register']); 

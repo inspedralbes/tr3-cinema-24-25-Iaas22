@@ -37,8 +37,21 @@ class SessionController extends Controller
     
         return response()->json($sessions, Response::HTTP_OK);
     }
-    
+  
 
-    
+    public function getSessionDateByMovieId($movieId)
+{
+    $session = Session::where('movie_id', $movieId)->select('session_date')->first();
+
+    if (!$session) {
+        return response()->json(['message' => 'No hay sesión disponible para esta película.'], Response::HTTP_NOT_FOUND);
+    }
+
+    // Formatear la fecha directamente con date()
+    $formattedDate = date('Y-m-d', strtotime($session->session_date));
+
+    return response()->json(['session_date' => $formattedDate], Response::HTTP_OK);
+}
+  
 
 }
