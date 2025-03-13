@@ -45,6 +45,11 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    // ✅ Endpoint para comprobar si el token es válido
+    Route::get('/auth/check', function (Request $request) {
+        return response()->json(['status' => 'authenticated']);
+    });
+
     // ✅ Cierre de sesión
     Route::post('/logout', [AuthController::class, 'logout']);
 

@@ -4,10 +4,17 @@
       <h1>Lista de Películas</h1>
       <div class="actions">
         <div class="search-container">
-          <input v-if="searchVisible" v-model="searchQuery" type="text" placeholder="Buscar..." class="search-bar" />
+          <input 
+            v-if="searchVisible" 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="Buscar..." 
+            class="search-bar" 
+          />
           <button @click="toggleSearch" class="search-button">🔍</button>
         </div>
         <button @click="goToLogin" class="login-button">Iniciar sesión</button>
+        <button @click="handleLogout" class="logout-button">Cerrar sesión</button>
       </div>
     </nav>
 
@@ -47,7 +54,25 @@ const toggleSearch = () => {
 }
 
 const goToLogin = () => {
-  router.push('/login') // ✅ Redirige al login
+  router.push('/login')
+}
+
+// ✅ Logout + eliminar token + mensaje + redirigir a "/"
+const handleLogout = async () => {
+  try {
+    // ✅ Elimina todas las claves del localStorage relacionadas con la autenticación
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+
+    // ✅ Elimina el header de autorización de Axios
+    delete CommunicationManager.defaults.headers.common['Authorization']
+
+    alert('✅ Has cerrado sesión correctamente.') // ✅ MENSAJE DE ÉXITO
+    router.push('/') // ✅ Redirige a la página principal tras logout
+  } catch (error) {
+    console.error('❌ Error al cerrar sesión:', error)
+  }
 }
 
 const { data: movies, pending, error } = await useAsyncData('movies', () =>
@@ -94,7 +119,8 @@ const filteredMovies = computed(() => {
 }
 
 .search-button,
-.login-button {
+.login-button,
+.logout-button {
   background: #ff6600;
   color: white;
   border: none;
@@ -106,7 +132,8 @@ const filteredMovies = computed(() => {
 }
 
 .search-button:hover,
-.login-button:hover {
+.login-button:hover,
+.logout-button:hover {
   background: #e65c00;
 }
 

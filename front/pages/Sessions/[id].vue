@@ -41,7 +41,7 @@
             seat.status === 'reservada' 
               ? 'bg-red-500 text-white cursor-not-allowed' 
               : 'cursor-pointer hover:bg-green-500',
-            seat.row === 'F' ? 'border-yellow-400 border-2' : '' 
+            seat.row === 'F' ? 'border-blue-400 border-2' : '' 
           ]"
           @click="selectSeat(seat)"
           class="seat"
@@ -132,7 +132,6 @@ const reserveSeat = async () => {
   try {
     const isAuthenticated = await CommunicationManager.checkAuth();
     if (!isAuthenticated) {
-      // ✅ Mostrar mensaje sin input y redirigir al login
       alert('⚠️ Debes iniciar sesión para reservar una butaca.');
       router.push('/login');
       return;
@@ -173,7 +172,6 @@ watch(selectedSession, (newSession) => {
   if (newSession) loadSeats(newSession);
 });
 </script>
-
 
 <style scoped>
 /* ✅ Navbar */
@@ -218,6 +216,10 @@ watch(selectedSession, (newSession) => {
   background-color: #22c55e;
 }
 
+.border-blue-400 {
+  border-color: #3b82f6;
+}
+
 /* ✅ Modal */
 .modal-overlay {
   position: fixed;
@@ -243,19 +245,5 @@ watch(selectedSession, (newSession) => {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
-}
-
-.btn-reserve {
-  background-color: #3b82f6;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-}
-
-.btn-cancel {
-  background-color: #ef4444;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
 }
 </style>
