@@ -43,6 +43,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import CommunicationManager from '@/services/CommunicationManager'
+import axios from 'axios' 
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -65,8 +66,8 @@ const handleLogout = async () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
 
-    // ✅ Elimina el header de autorización de Axios
-    delete CommunicationManager.defaults.headers.common['Authorization']
+    // ✅ Elimina el header de autorización de Axios correctamente
+    delete axios.defaults.headers.common['Authorization']
 
     alert('✅ Has cerrado sesión correctamente.') // ✅ MENSAJE DE ÉXITO
     router.push('/') // ✅ Redirige a la página principal tras logout
@@ -74,6 +75,7 @@ const handleLogout = async () => {
     console.error('❌ Error al cerrar sesión:', error)
   }
 }
+
 
 const { data: movies, pending, error } = await useAsyncData('movies', () =>
   CommunicationManager.fetchMovies()
