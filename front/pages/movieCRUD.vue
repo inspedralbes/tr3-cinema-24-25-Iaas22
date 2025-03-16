@@ -16,12 +16,39 @@ const form = ref({
 const editing = ref(false)
 const currentId = ref(null)
 
+// ✅ Cloudinary config
+const CLOUD_NAME = 'dt5vjbgab'
+const UPLOAD_PRESET = 'cinema'
+
 // ✅ Obtener películas
 const fetchMovies = async () => {
   try {
     movies.value = await CommunicationManager.fetchMovies()
   } catch (error) {
     console.error('❌ Error al obtener películas:', error)
+  }
+}
+
+// ✅ Subir imagen a Cloudinary
+const uploadImage = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', UPLOAD_PRESET)
+
+  try {
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body: formData
+    })
+
+    const data = await response.json()
+    form.value.img = data.secure_url
+    console.log('✅ Imagen subida:', form.value.img)
+  } catch (error) {
+    console.error('❌ Error al subir imagen:', error)
   }
 }
 
@@ -90,7 +117,12 @@ onMounted(fetchMovies)
       <input v-model="form.actors" placeholder="Actores" required />
       <textarea v-model="form.synopsis" placeholder="Sinopsis" required></textarea>
       <input v-model="form.release_date" type="date" required />
-      <input v-model="form.img" placeholder="URL de la imagen" />
+
+      <!-- ✅ Carga de imagen -->
+      <input type="file" @change="uploadImage" />
+      <div v-if="form.img">
+        <img :src="form.img" alt="Imagen de la película" style="width: 100px; height: auto; margin-top: 10px;" />
+      </div>
 
       <button type="submit">{{ editing ? 'Actualizar' : 'Crear' }} Película</button>
       <button type="button" @click="resetForm">Cancelar</button>
@@ -99,7 +131,10 @@ onMounted(fetchMovies)
     <div v-if="movies.length">
       <ul>
         <li v-for="movie in movies" :key="movie.movie_id">
-          {{ movie.title }} ({{ movie.genre }}) - {{ movie.director }}
+          <div>
+            <strong>{{ movie.title }}</strong> ({{ movie.genre }}) - {{ movie.director }}
+            <img v-if="movie.img" :src="movie.img" alt="Imagen de la película" style="width: 50px; height: auto; margin-left: 10px;" />
+          </div>
           <button @click="editMovie(movie)">Editar</button>
           <button @click="deleteMovie(movie.movie_id)">Eliminar</button>
         </li>
