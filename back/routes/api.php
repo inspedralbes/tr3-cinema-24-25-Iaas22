@@ -57,6 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ✅ Reservar butaca (solo con token)
     Route::post('/reserve-seat', [ReservaController::class, 'reserveSeat']);
+    Route::post('/reservar-butacas', [ReservaController::class, 'reserveSeats']);
+
 
     // ✅ Rutas para reservas
     Route::post('/reservations', [ReservaController::class, 'store']);
