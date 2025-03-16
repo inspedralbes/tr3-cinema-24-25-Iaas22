@@ -77,6 +77,45 @@ const CommunicationManager = {
     return response.data;
   },
 
+  // ✅ Crear una nueva película (añadido)
+  async createMovie(movieData) {
+    try {
+      const response = await axios.post(`${API_URL}/movies`, movieData, {
+        headers: this.getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error al crear película:', error);
+      throw new Error(error.response?.data?.message || 'Error al crear película');
+    }
+  },
+
+  // ✅ Actualizar película (añadido)
+  async updateMovie(movieId, movieData) {
+    try {
+      const response = await axios.put(`${API_URL}/movies/${movieId}`, movieData, {
+        headers: this.getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error al actualizar película:', error);
+      throw new Error(error.response?.data?.message || 'Error al actualizar película');
+    }
+  },
+
+  // ✅ Eliminar película (añadido)
+  async deleteMovie(movieId) {
+    try {
+      const response = await axios.delete(`${API_URL}/movies/${movieId}`, {
+        headers: this.getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error al eliminar película:', error);
+      throw new Error(error.response?.data?.message || 'Error al eliminar película');
+    }
+  },
+
   // ✅ Obtener sesiones por ID de película
   async fetchSessionsByMovie(movieId) {
     const response = await axios.get(`${API_URL}/sessions/movie/${movieId}`);
@@ -111,26 +150,25 @@ const CommunicationManager = {
   },
 
   // ✅ Reservar múltiples asientos
-async reserveSeats(seatIds, sessionId) {
-  if (!(await this.checkAuth())) {
-    alert('⚠️ Debes iniciar sesión para reservar butacas.');
-    window.location.href = '/login';
-    return;
-  }
+  async reserveSeats(seatIds, sessionId) {
+    if (!(await this.checkAuth())) {
+      alert('⚠️ Debes iniciar sesión para reservar butacas.');
+      window.location.href = '/login';
+      return;
+    }
 
-  try {
-    const response = await axios.post(`${API_URL}/reservar-butacas`, {
-      seat_ids: seatIds,
-      session_id: sessionId,
-    });
-    
+    try {
+      const response = await axios.post(`${API_URL}/reservar-butacas`, {
+        seat_ids: seatIds,
+        session_id: sessionId,
+      });
 
-    return response.data;
-  } catch (error) {
-    console.error('❌ Error al reservar las butacas:', error);
-    throw new Error(error.response?.data?.message || 'Error al reservar las butacas');
-  }
-},
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error al reservar las butacas:', error);
+      throw new Error(error.response?.data?.message || 'Error al reservar las butacas');
+    }
+  },
 
   // ✅ Eliminar una reserva
   async cancelReservation(reservationId) {
