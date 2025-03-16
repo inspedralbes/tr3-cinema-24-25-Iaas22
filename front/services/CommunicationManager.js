@@ -88,7 +88,7 @@ async createMovie(movieData) {
   }
 },
 
-// ✅ Actualizar película
+// Actualizar película
 async updateMovie(movieId, movieData) {
   try {
     const response = await axios.put(`${API_URL}/movies/${movieId}`, movieData)
