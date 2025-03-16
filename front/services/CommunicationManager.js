@@ -110,6 +110,28 @@ const CommunicationManager = {
     }
   },
 
+  // ✅ Reservar múltiples asientos
+async reserveSeats(seatIds, sessionId) {
+  if (!(await this.checkAuth())) {
+    alert('⚠️ Debes iniciar sesión para reservar butacas.');
+    window.location.href = '/login';
+    return;
+  }
+
+  try {
+    const response = await axios.post(`${API_URL}/reservar-butacas`, {
+      seat_ids: seatIds,
+      session_id: sessionId,
+    });
+    
+
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al reservar las butacas:', error);
+    throw new Error(error.response?.data?.message || 'Error al reservar las butacas');
+  }
+},
+
   // ✅ Eliminar una reserva
   async cancelReservation(reservationId) {
     const response = await axios.delete(`${API_URL}/reservations/${reservationId}`);
