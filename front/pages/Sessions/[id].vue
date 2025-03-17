@@ -30,9 +30,9 @@
         🎯 Información de precios:
       </p>
       <ul class="list-disc list-inside text-blue-700 mt-2">
-        <li>Las butacas VIP (columna F) cuestan <strong>8 €</strong>.</li>
+        <li> Las butacas VIP (columna F) cuestan <strong>8 €</strong>.</li>
         <li>Las demás butacas cuestan <strong>6 €</strong>.</li>
-        <li><strong>Día del espectador:</strong> ¡Todas las butacas tienen <strong>2 € de descuento!</strong></li>
+        <li> <strong>Día del espectador:</strong> ¡Todas las butacas tienen <strong>2 € de descuento!</strong></li>
       </ul>
     </div>
 
@@ -83,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'nuxt/app';
 import CommunicationManager from '@/services/CommunicationManager';
 
@@ -135,7 +135,7 @@ const toggleSeat = (seat) => {
   }
 };
 
-// ✅ Confirmar reserva (corregido)
+// ✅ Confirmar reserva
 const confirmReservation = async () => {
   if (!selectedSeats.value.length) return;
 
@@ -150,16 +150,15 @@ const confirmReservation = async () => {
     });
 
     selectedSeats.value = [];
+    
+  
+  } catch (error) {
+    console.error('❌ Error al reservar las butacas:', error.message);
+    alert('❌ No se pudieron reservar las butacas.');
+  
+};}
 
-// ✅ Redirigir primero, y luego mostrar la alerta
-router.push('/login');
 
-
-} catch (error) {
-console.error('❌ Error al reservar las butacas:', error.message);
-alert('❌ No se pudieron reservar las butacas.');
-}
-};
 
 // ✅ Formatear asiento
 const formatSeat = (seatId) => {
