@@ -49,7 +49,6 @@ class ReservaController extends Controller
      */
     public function reserveSeat(Request $request)
     {
-        // ✅ Si el token es inválido o no existe, devolver mensaje de error
         if (!auth()->check()) {
             return response()->json(['error' => '⚠️ Token inválido o no proporcionado.'], 401);
         }
@@ -71,7 +70,6 @@ class ReservaController extends Controller
             return response()->json(['error' => 'La butaca ya está reservada'], 400);
         }
     
-        // ✅ Crear la reserva si está autenticado
         Reserva::create([
             'seat_id' => $seatId,
             'session_id' => $sessionId,
@@ -82,37 +80,45 @@ class ReservaController extends Controller
         return response()->json(['success' => '✅ Butaca reservada con éxito']);
     }
 
-    public function reserveSeats(Request $request)
+    /**
+     * Completar reserva y guardar compra
+     */
+    public function completeReservation(Request $request)
     {
-        // ✅ Verificar que el usuario está autenticado
         if (!auth()->check()) {
             return response()->json(['error' => '⚠️ Token inválido o no proporcionado.'], 401);
         }
-    
-        // ✅ Validar los datos de la solicitud
+
         $request->validate([
             'seat_ids' => 'required|array|max:10',
             'seat_ids.*' => 'exists:seats,seat_id',
-            'session_id' => 'required|exists:session,session_id'
+            'session_id' => 'required|exists:session,session_id',
+            'movie_id' => 'required|exists:movies,movie_id',
+            'name' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
+            'email' => 'required|email|max:255'
         ]);
-    
+
         $seatIds = $request->seat_ids;
         $sessionId = $request->session_id;
+        $movieId = $request->movie_id;
         $userId = auth()->id();
-    
-        // ✅ Verificar si alguna butaca ya está reservada
+        $name = $request->name;
+        $surname = $request->surname;
+        $email = $request->email;
+
         $existingReservations = Reserva::whereIn('seat_id', $seatIds)
                                         ->where('session_id', $sessionId)
                                         ->pluck('seat_id')
                                         ->toArray();
-    
+
         if (!empty($existingReservations)) {
             return response()->json([
                 'error' => '⚠️ Las siguientes butacas ya están reservadas:',
                 'butacas_reservadas' => $existingReservations
             ], 400);
         }
-    
+
         // ✅ Crear las reservas
         $reservations = array_map(function ($seatId) use ($sessionId, $userId) {
             return [
@@ -124,19 +130,23 @@ class ReservaController extends Controller
                 'updated_at' => now()
             ];
         }, $seatIds);
-    
+
         Reserva::insert($reservations);
-    
-        // ✅ Insertar en la tabla de compras
+
+        // ✅ Insertar en la tabla 'compras'
         $reservas = Reserva::whereIn('seat_id', $seatIds)
             ->where('session_id', $sessionId)
             ->get();
-    
-        $compras = $reservas->map(function ($reserva) use ($userId) {
+
+        $compras = $reservas->map(function ($reserva) use ($userId, $movieId, $name, $surname, $email) {
             $precio = Seat::where('seat_id', $reserva->seat_id)->value('price');
             return [
                 'user_id' => $userId,
                 'seat_id' => $reserva->seat_id,
+                'movie_id' => $movieId,
+                'name' => $name,
+                'apellidos' => $surname,
+                'email' => $email,
                 'precio' => $precio,
                 'compra_dia' => now()->format('Y-m-d'),
                 'compra_hora' => now()->format('H:i:s'),
@@ -144,23 +154,22 @@ class ReservaController extends Controller
                 'updated_at' => now()
             ];
         });
-    
+
         \DB::table('compras')->insert($compras->toArray());
-    
-        // ✅ Calcular el total de la compra
-        $total = \DB::table('compras')
-            ->where('user_id', $userId)
-            ->sum('precio');
-    
+
+        // ✅ Calcular total
+        $total = $compras->sum('precio');
+
         return response()->json([
-            'success' => '✅ Butacas reservadas con éxito',
+            'success' => '✅ Butacas reservadas y compra registrada con éxito',
             'butacas_reservadas' => $seatIds,
             'total' => $total
         ]);
     }
-    
 
-    
+    /**
+     * Obtener el precio total por usuario
+     */
     public function getTotalPriceByUser($userId)
     {
         $compras = \DB::table('reservas')

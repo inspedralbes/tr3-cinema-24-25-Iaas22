@@ -27,7 +27,6 @@ Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsB
 Route::get('/seatsStatus', [ReservaController::class, 'getSeatsWithStatus']);
 Route::get('/sessions/date/{movieId}', [SessionController::class, 'getSessionDateByMovieId']);
 
-
 // ✅ Rutas de autenticación (registro y login)
 Route::post('/register', [AuthController::class, 'register']); 
 Route::post('/login', [AuthController::class, 'login']); 
@@ -57,4 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reservations', [ReservaController::class, 'index']);
     Route::get('/reservations/{id}', [ReservaController::class, 'show']);
     Route::delete('/reservations/{id}', [ReservaController::class, 'destroy']);
+
+    // ✅ Nueva ruta para completar la reserva y guardar en la base de datos
+    Route::post('/reservar-completa', [ReservaController::class, 'completeReservation']);
 });
