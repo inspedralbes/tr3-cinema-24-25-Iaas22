@@ -6,6 +6,8 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SeatController;
+
 
 // ✅ Rutas públicas - Sin autenticación
 Route::get('/movies', [MovieController::class, 'index']);  // Obtener todas las películas
@@ -27,6 +29,8 @@ Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsB
 Route::get('/seatsStatus', [ReservaController::class, 'getSeatsWithStatus']);
 Route::get('/sessions/date/{movieId}', [SessionController::class, 'getSessionDateByMovieId']);
 
+Route::get('/seats', [SeatController::class, 'index']);
+Route::get('/seats/{id}', [SeatController::class, 'show']);
 
 // ✅ Rutas de autenticación (registro y login)
 Route::post('/register', [AuthController::class, 'register']); 
