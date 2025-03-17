@@ -9,16 +9,38 @@ class AddNameApellidosEmailToComprasTable extends Migration
     public function up()
     {
         Schema::table('compras', function (Blueprint $table) {
-            $table->string('name')->after('movie_id'); // Añade la columna name después de movie_id
-            $table->string('apellidos')->after('name'); // Añade la columna apellidos después de name
-            $table->string('email')->unique()->after('apellidos'); // Añade la columna email después de apellidos
+            if (!Schema::hasColumn('compras', 'name')) {
+                $table->string('name')->after('movie_id')->nullable(); // Permitir nulos para evitar conflictos
+            }
+
+            if (!Schema::hasColumn('compras', 'apellidos')) {
+                $table->string('apellidos')->after('name')->nullable();
+            }
+
+            if (!Schema::hasColumn('compras', 'email')) {
+                $table->string('email')->nullable(); // Sin 'unique' para evitar conflictos
+            } else {
+                // Si existe y es única, elimina la restricción
+                $table->dropUnique('compras_email_unique');
+                $table->string('email')->nullable()->change(); // Permitir nulos
+            }
         });
     }
 
     public function down()
     {
         Schema::table('compras', function (Blueprint $table) {
-            $table->dropColumn(['name', 'apellidos', 'email']); // Elimina las columnas en caso de rollback
+            if (Schema::hasColumn('compras', 'name')) {
+                $table->dropColumn('name');
+            }
+
+            if (Schema::hasColumn('compras', 'apellidos')) {
+                $table->dropColumn('apellidos');
+            }
+
+            if (Schema::hasColumn('compras', 'email')) {
+                $table->dropColumn('email');
+            }
         });
     }
 }
