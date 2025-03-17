@@ -32,7 +32,7 @@ class User extends Authenticatable
     ];
 
     // Método para cifrar la contraseña al guardar el usuario
-    public static function boot()
+    /*public static function boot()
     {
         parent::boot();
 
@@ -41,5 +41,5 @@ class User extends Authenticatable
                 $user->password = Hash::make($user->password); // Aquí solo ciframos la contraseña
             }
         });
-    }
+    }*/
 }

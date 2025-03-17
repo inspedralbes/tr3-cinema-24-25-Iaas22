@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    // ✅ Registro de usuario
+    // Registro de usuario
     public function register(Request $request)
     {
         $request->validate([
@@ -21,7 +21,7 @@ class AuthController extends Controller
             'birthday' => 'required|date',
         ]);
 
-        // ✅ Crear el usuario con la contraseña cifrada
+        // Crear el usuario con la contraseña cifrada
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -29,7 +29,7 @@ class AuthController extends Controller
             'birthday' => $request->birthday,
         ]);
 
-        // ✅ Generar token al registrarse automáticamente
+        // Generar token al registrarse automáticamente
         $token = $user->createToken('API Token')->plainTextToken;
 
         return response()->json([
@@ -38,50 +38,39 @@ class AuthController extends Controller
             'token' => $token,
         ], 201);
     }
+// Inicio de sesión
+public function login(Request $request)
+{
+    $credenciales = $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
 
-    // ✅ Login de usuario
-    public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string|min:8',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => 'Datos de acceso incorrectos',
-                'details' => $validator->errors()
-            ], 422);
-        }
-
-        $cliente = User::where('email', $request->email)->first();
-
-        if (!$cliente) {
-            return response()->json([
-                'error' => 'El usuario no existe'
-            ], 404);
-        }
-
-        if (!Hash::check($request->password, $cliente->password)) {
-            return response()->json([
-                'error' => 'Credenciales incorrectas'
-            ], 401);
-        }
-
-        // ✅ Generar token de acceso
-        $token = $cliente->createToken('API Token Login')->plainTextToken;
-
+    // Verificar las credenciales usando Auth::attempt
+    if (Auth::attempt($credenciales)) {
+        $user = Auth::user();
+        
+        $token = $user->createToken('API Token')->plainTextToken;
+        
         return response()->json([
-            'message' => 'Inicio de sesión exitoso.',
-            'user' => $cliente,
-            'token' => $token,
-        ], 200);
+            'message' => 'Inicio de sesión exitoso',
+            'user' => $user,
+             'token' => $token,
+        ]);
     }
 
-    // ✅ Logout de usuario
+    // Si las credenciales son incorrectas
+    return response()->json([
+        'message' => 'Credenciales inválidas'
+    ], 401);
+}
+
+
+   
+
+    // Logout de usuario
     public function logout(Request $request)
     {
-        // ✅ Eliminar solo el token activo
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
