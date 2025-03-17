@@ -32,13 +32,6 @@ Route::get('/sessions/date/{movieId}', [SessionController::class, 'getSessionDat
 Route::post('/register', [AuthController::class, 'register']); 
 Route::post('/login', [AuthController::class, 'login']); 
 
-// ✅ RUTA DE LOGIN PARA ERRORES DE AUTENTICACIÓN
-Route::get('/login', function () {
-    return response()->json([
-        'error' => 'No autenticado. Por favor, inicia sesión.'
-    ], 401);
-})->name('login');
-
 // ✅ Rutas protegidas por token con Sanctum
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -58,7 +51,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // ✅ Reservar butaca (solo con token)
     Route::post('/reserve-seat', [ReservaController::class, 'reserveSeat']);
     Route::post('/reservar-butacas', [ReservaController::class, 'reserveSeats']);
-
 
     // ✅ Rutas para reservas
     Route::post('/reservations', [ReservaController::class, 'store']);
