@@ -79,7 +79,58 @@ class ReservaController extends Controller
     
         return response()->json(['success' => '✅ Butaca reservada con éxito']);
     }
-
+    public function reserveSeats(Request $request)
+    {
+        // ✅ Verificar que el usuario está autenticado
+        if (!auth()->check()) {
+            return response()->json(['error' => '⚠️ Token inválido o no proporcionado.'], 401);
+        }
+    
+        // ✅ Validar los datos de la solicitud
+        $request->validate([
+            'seat_ids' => 'required|array|max:10', // ✅ Máximo de 10 butacas a la vez
+            'seat_ids.*' => 'exists:seats,seat_id', // ✅ Validar que las butacas existen
+            'session_id' => 'required|exists:session,session_id'
+        ]);
+    
+        $seatIds = $request->seat_ids;
+        $sessionId = $request->session_id;
+        $userId = auth()->id();
+    
+        // ✅ Verificar si alguna butaca ya está reservada
+        $existingReservations = Reserva::whereIn('seat_id', $seatIds)
+                                        ->where('session_id', $sessionId)
+                                        ->pluck('seat_id')
+                                        ->toArray();
+    
+        if (!empty($existingReservations)) {
+            return response()->json([
+                'error' => '⚠️ Las siguientes butacas ya están reservadas:',
+                'butacas_reservadas' => $existingReservations
+            ], 400);
+        }
+    
+        // ✅ Crear las reservas en una sola operación
+        $reservations = array_map(function ($seatId) use ($sessionId, $userId) {
+            return [
+                'seat_id' => $seatId,
+                'session_id' => $sessionId,
+                'user_id' => $userId,
+                'status' => 'reservada',
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }, $seatIds);
+    
+        Reserva::insert($reservations);
+    
+        return response()->json([
+            'success' => '✅ Butacas reservadas con éxito',
+            'butacas_reservadas' => $seatIds
+        ]);
+    }
+    
+        
     /**
      * Completar reserva y guardar compra
      */
@@ -198,4 +249,54 @@ class ReservaController extends Controller
             'total' => $total
         ]);
     }
+    /**
+ * Guardar datos del usuario en la base de datos
+ */
+public function saveUserData(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'surname' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+    ]);
+
+    $userId = auth()->id();
+
+    \DB::table('users')->where('id', $userId)->update([
+        'name' => $request->name,
+        'surname' => $request->surname,
+        'email' => $request->email,
+        'updated_at' => now(),
+    ]);
+
+    return response()->json(['success' => '✅ Datos de usuario guardados con éxito']);
+}
+
+/**
+ * Mostrar datos de la compra
+ */
+public function getPurchaseDetails($userId)
+{
+    $compras = \DB::table('compras')
+        ->join('movies', 'compras.movie_id', '=', 'movies.movie_id')
+        ->join('users', 'compras.user_id', '=', 'users.id')
+        ->where('compras.user_id', $userId)
+        ->select(
+            'movies.title as movie_name',
+            'users.name',
+            'users.surname',
+            'users.email',
+            \DB::raw('COUNT(compras.seat_id) as total_seats'),
+            \DB::raw('SUM(compras.precio) as total_price')
+        )
+        ->groupBy('movies.title', 'users.name', 'users.surname', 'users.email')
+        ->get();
+
+    if ($compras->isEmpty()) {
+        return response()->json(['error' => '❌ No hay datos de compra para este usuario'], 404);
+    }
+
+    return response()->json($compras);
+}
+
 }
