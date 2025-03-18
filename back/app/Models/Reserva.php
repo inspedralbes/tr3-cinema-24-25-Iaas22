@@ -9,13 +9,10 @@ class Reserva extends Model
 {
     use HasFactory;
 
-    // Indicar la tabla si el nombre no sigue la convención plural
     protected $table = 'reservas';
 
-    // Definir la clave primaria si no es `id`
     protected $primaryKey = 'reserva_id';
 
-    // Definir las columnas que son asignables en masa
     protected $fillable = [
         'seat_id', 
         'session_id', 
@@ -26,22 +23,34 @@ class Reserva extends Model
         'updated_at'
     ];
 
-    // Definir las relaciones con otras tablas
+    // Carga automática de relaciones importantes para evitar el problema de n+1
+    protected $with = ['seat', 'session', 'user', 'entrada'];
+
+    // Relación con Seat
     public function seat()
     {
         return $this->belongsTo(Seat::class, 'seat_id');
     }
 
+    // Relación con Session
     public function session()
     {
         return $this->belongsTo(Session::class, 'session_id');
     }
 
+    // Relación directa con Movie usando la relación con Session
+    public function movie()
+    {
+        return $this->session ? $this->session->movie : null;
+    }
+
+    // Relación con User
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    // Relación con Entrada
     public function entrada()
     {
         return $this->belongsTo(Entrada::class, 'entrada_id');

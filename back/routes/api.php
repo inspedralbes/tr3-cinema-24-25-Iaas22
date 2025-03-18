@@ -59,4 +59,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ✅ Nueva ruta para completar la reserva
     Route::post('/reservar-completa', [ReservaController::class, 'completeReservation']);
+    Route::get('/reservations/user/{userId}', [ReservaController::class, 'getReservationsByUser']);
+
 });

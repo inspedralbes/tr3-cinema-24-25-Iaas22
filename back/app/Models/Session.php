@@ -26,26 +26,36 @@ class Session extends Model
         'special_day' => 'boolean',
     ];
 
+    // Carga automática de la relación con Movie
+    protected $with = ['movie'];
+
+    // Relación con Movie
     public function movie()
     {
         return $this->belongsTo(Movie::class, 'movie_id');
     }
 
+    // Relación con Reserva
     public function reservas()
     {
         return $this->hasMany(Reserva::class, 'session_id');
     }
 
-    // ✅ Nueva relación con JOIN para obtener el estado desde reservas
+    // Relación con Seat (directa y más simple)
     public function seats()
     {
-        return $this->hasMany(Reserva::class, 'session_id')
-            ->join('seats', 'seats.seat_id', '=', 'reservas.seat_id')
-            ->select(
-                'seats.seat_id',
-                'seats.row',
-                'seats.seat_num',
-                \DB::raw('COALESCE(reservas.status, "disponible") as status') // ✅ Obtener el estado desde reservas
-            );
+        return $this->hasManyThrough(
+            Seat::class,
+            Reserva::class,
+            'session_id', // Foreign key on `reservas` table
+            'seat_id',    // Foreign key on `seats` table
+            'session_id', // Local key on `session` table
+            'seat_id'     // Local key on `reservas` table
+        )->select(
+            'seats.seat_id',
+            'seats.row',
+            'seats.seat_num',
+            \DB::raw('IFNULL(reservas.status, "disponible") as status')
+        );
     }
 }
