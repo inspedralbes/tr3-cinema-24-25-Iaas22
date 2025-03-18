@@ -143,3 +143,121 @@ onMounted(fetchMovies)
     <p v-else>No hay películas disponibles.</p>
   </div>
 </template>
+<style scoped>
+/* ✅ Estilo general */
+div {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  padding: 16px;
+  background-color: #f9f9f9;
+}
+
+/* ✅ Título */
+h2 {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+/* ✅ Formulario */
+form {
+  display: grid;
+  gap: 12px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+input,
+textarea,
+button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+/* ✅ Botones */
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+button[type='button'] {
+  background-color: #e74c3c;
+}
+
+button[type='button']:hover {
+  background-color: #c0392b;
+}
+
+/* ✅ Imagen de vista previa */
+img {
+  max-width: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* ✅ Lista de películas */
+ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+li img {
+  width: 50px;
+  height: auto;
+  margin-left: 12px;
+  border-radius: 6px;
+}
+
+li div {
+  display: flex;
+  align-items: center;
+}
+
+li button {
+  margin-left: 8px;
+}
+
+/* ✅ Diseño responsive */
+@media (max-width: 600px) {
+  form,
+  li {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  li img {
+    width: 100%;
+  }
+}
+</style>

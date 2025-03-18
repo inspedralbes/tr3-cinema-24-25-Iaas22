@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -6,32 +7,31 @@ use App\Models\Movie;
 
 class MovieController extends Controller
 {
-    // Obtener todas las películas desde la base de datos
+    // Obtener todas las películas desde la base de datos (sin restricción)
     public function index()
     {
         $movies = Movie::all(); // Obtiene todas las películas
         return response()->json($movies, 200);
     }
 
-
-public function show($id)
-{
-    try {
-        $movie = Movie::findOrFail($id); // Encuentra la película por ID
-        return response()->json($movie); // Devuelve los detalles de la película en formato JSON
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Película no encontrada'], 404);
-    }
-}
-
-
-    
-
-    // Crear una nueva película en la base de datos
-    public function store(Request $request)
+    public function show($id)
     {
         try {
-            // Validar los datos
+            $movie = Movie::findOrFail($id);
+            return response()->json($movie);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Película no encontrada'], 404);
+        }
+    }
+
+    // ✅ Solo admin puede crear una película
+    public function store(Request $request)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'No tienes permisos para crear películas'], 403);
+        }
+
+        try {
             $request->validate([
                 'title' => 'required|string|max:255',
                 'genre' => 'required|string|max:255',
@@ -40,20 +40,10 @@ public function show($id)
                 'actors' => 'required|string|max:255',
                 'synopsis' => 'required|string',
                 'release_date' => 'required|date',
-                'img' => 'nullable|string', // Imagen es opcional
+                'img' => 'nullable|string',
             ]);
 
-            // Crear la película en la base de datos
-            $movie = Movie::create([
-                'title' => $request->title,
-                'genre' => $request->genre,
-                'duration' => $request->duration,
-                'director' => $request->director,
-                'actors' => $request->actors,
-                'synopsis' => $request->synopsis,
-                'release_date' => $request->release_date,
-                'img' => $request->img, // Imagen es opcional
-            ]);
+            $movie = Movie::create($request->all());
 
             return response()->json([
                 'message' => 'Película creada con éxito',
@@ -61,28 +51,24 @@ public function show($id)
             ], 201);
 
         } catch (\Exception $e) {
-            // Loggear el error para poder diagnosticarlo
             \Log::error("Error al crear la película: " . $e->getMessage());
-
-            // Retornar un mensaje de error
-            return response()->json([
-                'error' => 'Hubo un error al procesar la solicitud.',
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['error' => 'Hubo un error al procesar la solicitud.'], 500);
         }
     }
 
-    // Editar una película en la base de datos
+    // ✅ Solo admin puede actualizar una película
     public function update(Request $request, $id)
     {
-        // Buscar la película por ID
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'No tienes permisos para actualizar películas'], 403);
+        }
+
         $movie = Movie::find($id);
 
         if (!$movie) {
             return response()->json(['error' => 'Película no encontrada'], 404);
         }
 
-        // Validar los datos
         $request->validate([
             'title' => 'sometimes|string|max:255',
             'genre' => 'sometimes|string|max:255',
@@ -94,7 +80,6 @@ public function show($id)
             'img' => 'nullable|string',
         ]);
 
-        // Actualizar los campos que se han enviado
         $movie->update($request->all());
 
         return response()->json([
@@ -103,9 +88,13 @@ public function show($id)
         ], 200);
     }
 
-    // Eliminar una película de la base de datos
+    // ✅ Solo admin puede eliminar una película
     public function destroy($id)
     {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'No tienes permisos para eliminar películas'], 403);
+        }
+
         $movie = Movie::find($id);
 
         if (!$movie) {

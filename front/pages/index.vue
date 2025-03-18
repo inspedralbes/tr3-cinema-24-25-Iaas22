@@ -13,6 +13,16 @@
           />
           <button @click="toggleSearch" class="search-button">🔍</button>
         </div>
+
+        <!-- ✅ Mostrar botón solo si el usuario es admin -->
+        <button 
+          v-if="isAdmin" 
+          @click="goToAdminPanel" 
+          class="admin-button"
+        >
+          Panel de Admin
+        </button>
+
         <button @click="goToLogin" class="login-button">Iniciar sesión</button>
         <button @click="handleLogout" class="logout-button">Cerrar sesión</button>
       </div>
@@ -40,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import CommunicationManager from '@/services/CommunicationManager'
 import axios from 'axios' 
@@ -48,6 +58,16 @@ import axios from 'axios'
 const router = useRouter()
 const searchQuery = ref('')
 const searchVisible = ref(false)
+
+// ✅ Variable para almacenar si el usuario es admin
+const isAdmin = ref(false)
+
+onMounted(() => {
+  const user = JSON.parse(localStorage.getItem('user'))
+  if (user?.role === 'admin') {
+    isAdmin.value = true
+  }
+})
 
 const toggleSearch = () => {
   searchVisible.value = !searchVisible.value
@@ -58,24 +78,23 @@ const goToLogin = () => {
   router.push('/login')
 }
 
-// ✅ Logout + eliminar token + mensaje + redirigir a "/"
+// ✅ Redirigir al archivo "movieCRUD.vue"
+const goToAdminPanel = () => {
+  router.push('/movieCRUD')
+}
+
 const handleLogout = async () => {
   try {
-    // ✅ Elimina todas las claves del localStorage relacionadas con la autenticación
     localStorage.removeItem('auth_token')
-    localStorage.removeItem('token')
     localStorage.removeItem('user')
-
-    // ✅ Elimina el header de autorización de Axios correctamente
     delete axios.defaults.headers.common['Authorization']
 
-    alert('✅ Has cerrado sesión correctamente.') // ✅ MENSAJE DE ÉXITO
-    router.push('/') // ✅ Redirige a la página principal tras logout
+    alert('✅ Has cerrado sesión correctamente.')
+    router.push('/')
   } catch (error) {
     console.error('❌ Error al cerrar sesión:', error)
   }
 }
-
 
 const { data: movies, pending, error } = await useAsyncData('movies', () =>
   CommunicationManager.fetchMovies()
@@ -107,12 +126,6 @@ const filteredMovies = computed(() => {
   gap: 10px;
 }
 
-.search-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 .search-bar {
   padding: 5px;
   font-size: 1rem;
@@ -122,7 +135,8 @@ const filteredMovies = computed(() => {
 
 .search-button,
 .login-button,
-.logout-button {
+.logout-button,
+.admin-button {
   background: #ff6600;
   color: white;
   border: none;
@@ -135,7 +149,8 @@ const filteredMovies = computed(() => {
 
 .search-button:hover,
 .login-button:hover,
-.logout-button:hover {
+.logout-button:hover,
+.admin-button:hover {
   background: #e65c00;
 }
 
@@ -171,10 +186,10 @@ const filteredMovies = computed(() => {
 }
 
 .movie-card img {
-  width: 100%;
-  height: auto;
+  width: 100%; /* Esto mantiene el ancho al 100% del contenedor */
+  height: 300px; /* Altura fija para que todas las imágenes tengan el mismo tamaño */
   border-radius: 8px;
-  object-fit: cover;
+  object-fit: cover; /* Cubre el área manteniendo la proporción sin deformar */
 }
 
 .error {

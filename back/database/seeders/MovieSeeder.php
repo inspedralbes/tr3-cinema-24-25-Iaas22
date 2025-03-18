@@ -18,7 +18,7 @@ class MovieSeeder extends Seeder
                 'actors' => 'Robert Downey Jr., Chris Evans, Mark Ruffalo',
                 'synopsis' => 'The Avengers assemble once again to undo the damage caused by Thanos.',
                 'release_date' => '2019-04-26',
-                'img' => 'https://path_to_image.jpg',
+                'img' => 'https://res.cloudinary.com/dt5vjbgab/image/upload/v1742284558/bmfsolxz4tjtwk3rxsyx.jpg',
             ],
             [
                 'title' => 'The Lion King',
@@ -28,7 +28,7 @@ class MovieSeeder extends Seeder
                 'actors' => 'Donald Glover, Beyoncé, James Earl Jones',
                 'synopsis' => 'A young lion prince flees his kingdom only to learn the true meaning of responsibility and bravery.',
                 'release_date' => '2019-07-19',
-                'img' => 'https://path_to_image.jpg',
+                'img' => 'https://res.cloudinary.com/dt5vjbgab/image/upload/v1742284621/xs6qtjhdvol8vffsrwhe.jpg',
             ],
             [
                 'title' => 'Inception',
@@ -38,7 +38,7 @@ class MovieSeeder extends Seeder
                 'actors' => 'Leonardo DiCaprio, Joseph Gordon-Levitt, Ellen Page',
                 'synopsis' => 'A thief who enters the dreams of others to steal secrets from their subconscious is given the task of planting an idea in the mind of a CEO.',
                 'release_date' => '2010-07-16',
-                'img' => 'https://path_to_image.jpg',
+                'img' => 'https://res.cloudinary.com/dt5vjbgab/image/upload/v1742284669/kilxkzipwfzefwlllld4.jpg',
             ],
             [
                 'title' => 'The Dark Knight',
@@ -48,7 +48,7 @@ class MovieSeeder extends Seeder
                 'actors' => 'Christian Bale, Heath Ledger, Aaron Eckhart',
                 'synopsis' => 'Batman faces off against the Joker, a criminal mastermind who wants to create chaos in Gotham City.',
                 'release_date' => '2008-07-18',
-                'img' => 'https://path_to_image.jpg',
+                'img' => 'https://res.cloudinary.com/dt5vjbgab/image/upload/v1742284893/peqvwjrdtqk8grd4li2w.jpg',
             ],
             [
                 'title' => 'Forrest Gump',
@@ -58,7 +58,7 @@ class MovieSeeder extends Seeder
                 'actors' => 'Tom Hanks, Robin Wright, Gary Sinise',
                 'synopsis' => 'The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold from the perspective of an Alabama man with an extraordinary life.',
                 'release_date' => '1994-07-06',
-                'img' => 'https://path_to_image.jpg',
+                'img' => 'https://res.cloudinary.com/dt5vjbgab/image/upload/v1742284946/pixrc9pc7jpupmtj6bk1.jpg',
             ],
             [
                 'title' => 'Titanic',
