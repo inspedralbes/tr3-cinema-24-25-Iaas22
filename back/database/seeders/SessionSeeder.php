@@ -14,7 +14,7 @@ class SessionSeeder extends Seeder
         // Insertar sesiones para movie_id = 1
         DB::table('session')->insert([
             [
-                'movie_id' => 4,
+                'movie_id' => 1,
                 'session_time' => '16:00:00',
                 'session_date' => '2025-03-06',
                 'special_day' => 0,
@@ -22,7 +22,7 @@ class SessionSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'movie_id' => 4,
+                'movie_id' => 1,
                 'session_time' => '18:00:00',
                 'session_date' => '2025-03-06',
                 'special_day' => 0,
