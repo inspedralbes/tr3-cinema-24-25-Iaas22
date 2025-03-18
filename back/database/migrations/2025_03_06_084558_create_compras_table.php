@@ -23,6 +23,9 @@ class CreateComprasTable extends Migration
             $table->decimal('precio', 8, 2);  // Precio total de la compra (puede ser el precio de varias entradas)
             $table->date('compra_dia');  // Día de la compra
             $table->time('compra_hora');  // Hora de la compra
+            $table->string('name')->nullable();  // Nombre del comprador (puede ser nulo)
+            $table->string('apellidos')->nullable();  // Apellidos del comprador (puede ser nulo)
+            $table->string('email')->nullable();  // Correo electrónico del comprador (puede ser nulo)
             $table->timestamps();  // Fechas de creación y actualización
         });
     }
@@ -32,4 +35,3 @@ class CreateComprasTable extends Migration
         Schema::dropIfExists('compras');
     }
 }
-?>
