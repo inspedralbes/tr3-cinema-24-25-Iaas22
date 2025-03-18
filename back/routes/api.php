@@ -8,8 +8,8 @@ use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\SessionController;
 
 // ✅ Rutas públicas - Sin autenticación
-Route::get('/movies', [MovieController::class, 'index']);  // Obtener todas las películas
-Route::get('/movies/{id}', [MovieController::class, 'show']); // Obtener detalles de una película
+Route::get('/movies', [MovieController::class, 'index']);  
+Route::get('/movies/{id}', [MovieController::class, 'show']); 
 
 // ✅ Rutas para sesiones y reservas sin autenticación
 Route::get('/seats', [ReservaController::class, 'index']);
@@ -43,9 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // ✅ Crear, actualizar y eliminar películas (solo admin)
-    Route::post('/movies', [MovieController::class, 'store']);  // Crear una película
-    Route::put('/movies/{id}', [MovieController::class, 'update']); // Actualizar una película
-    Route::delete('/movies/{id}', [MovieController::class, 'destroy']); // Eliminar una película
+    Route::post('/movies', [MovieController::class, 'store']);
+    Route::put('/movies/{id}', [MovieController::class, 'update']);
+    Route::delete('/movies/{id}', [MovieController::class, 'destroy']);
 
     // ✅ Reservar butaca
     Route::post('/reserve-seat', [ReservaController::class, 'reserveSeat']);
@@ -61,4 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reservar-completa', [ReservaController::class, 'completeReservation']);
     Route::get('/reservations/user/{userId}', [ReservaController::class, 'getReservationsByUser']);
 
+    // ✅ 🔥 **Ruta corregida para cancelar reserva (sin conflicto)**
+    Route::delete('/cancel-reservation/{seatId}', [ReservaController::class, 'cancelReservation']);
 });

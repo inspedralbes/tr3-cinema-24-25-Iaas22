@@ -172,17 +172,36 @@ const CommunicationManager = {
     }
   },
 
-  // ✅ Eliminar una reserva
-  async cancelReservation(reservationId) {
-    const response = await axios.delete(`${API_URL}/reservations/${reservationId}`);
-    return response.data;
-  },
+  async cancelReservation(seatId) {
+    try {
+      const response = await axios.delete(`${API_URL}/cancel-reservation/${seatId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al cancelar la reserva:', error);
+      throw error;
+    }
+  },   
 
   // ✅ Obtener historial de reservas
   async fetchReservations() {
     const response = await axios.get(`${API_URL}/reservations`);
     return response.data;
   },
+  
+  async fetchReservationsByUser() {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.id) {
+        throw new Error('No hay usuario autenticado');
+      }
+  
+      const response = await axios.get(`${API_URL}/reservations/user/${user.id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener las reservas:', error);
+      throw error;
+    }
+  },  
 
   // ✅ Obtener precio de butaca por ID
   async getSeatPriceById(seatId) {

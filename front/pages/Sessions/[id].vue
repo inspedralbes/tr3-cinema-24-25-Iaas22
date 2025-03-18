@@ -3,7 +3,37 @@
     <!-- ✅ Navbar -->
     <nav class="navbar">
       <h1 class="title">Cine de Película</h1>
+      <button @click="toggleCart" class="btn-cart">
+        🛒 Ver Cesta ({{ reservations.length }})
+      </button>
     </nav>
+
+    <!-- ✅ Sidebar para carrito -->
+    <div :class="['sidebar', cartOpen ? 'translate-x-0' : 'translate-x-full']">
+      <div class="sidebar-content">
+        <button @click="toggleCart" class="close-btn">❌</button>
+        <h3 class="text-lg font-semibold mb-2">🛒 Cesta de reservas:</h3>
+        <ul class="space-y-2">
+          <li 
+            v-for="reservation in reservations" 
+            :key="reservation.seat_id" 
+            class="flex justify-between items-center border-b py-2"
+          >
+            <div>
+              🎬 <strong>{{ reservation.movie }}</strong> <br>
+              📅 {{ formatDate(reservation.date) }} - 🕒 {{ reservation.time }}<br>
+              🎯 Butaca: {{ reservation.row }}{{ reservation.seat_num }} ({{ reservation.type }})
+            </div>
+            <button 
+              @click="cancelReservation(reservation.seat_id)"
+              class="text-red-500 hover:text-red-700 font-bold"
+            >
+              ❌ Cancelar
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
 
     <!-- ✅ Select para elegir sesión -->
     <div class="mt-4">
@@ -116,6 +146,44 @@ const loadSeats = async (sessionId) => {
     loadingSeats.value = false;
   }
 };
+
+const reservations = ref([]);
+const cartOpen = ref(false); // ✅ Nueva ref para controlar el carrito
+
+// ✅ Función para abrir/cerrar el carrito
+const toggleCart = () => {
+  cartOpen.value = !cartOpen.value;
+};
+
+const fetchReservations = async () => {
+  try {
+    // 🔑 ID del usuario autenticado
+    const userId = 1; // Cambiar esto para que use el ID real del usuario autenticado
+    reservations.value = await CommunicationManager.fetchReservationsByUser();
+
+  } catch (error) {
+    console.error('❌ Error al cargar las reservas:', error.message);
+  }
+};
+
+const cancelReservation = async (seatId) => {
+  if (!confirm('¿Estás seguro de que deseas cancelar esta reserva?')) return;
+
+  try {
+    // Endpoint para cancelar la reserva (opcional, si no existe debes crearlo)
+    await CommunicationManager.cancelReservation(seatId);
+    reservations.value = reservations.value.filter(r => r.seat_id !== seatId);
+  } catch (error) {
+    console.error('❌ Error al cancelar la reserva:', error.message);
+    alert('❌ No se pudo cancelar la reserva.');
+  }
+};
+
+// ✅ Cargar reservas al montar el componente
+onMounted(() => {
+  fetchReservations();
+});
+
 
 // ✅ Alternar selección de butacas
 const toggleSeat = (seat) => {
@@ -233,4 +301,58 @@ watch(selectedSession, (newSession) => {
 .border-blue-400 {
   border-color: #3b82f6;
 }
+
+.btn-cart {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-cart:hover {
+  background-color: #2563eb;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background-color: #f9fafb;
+  border-left: 1px solid #e5e7eb;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: -4px 0 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+  z-index: 50;
+}
+
+.translate-x-full {
+  transform: translateX(100%);
+}
+
+.translate-x-0 {
+  transform: translateX(0);
+}
+
+.close-btn {
+  background-color: #ef4444;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: #dc2626;
+}
+
 </style>

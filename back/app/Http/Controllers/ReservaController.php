@@ -73,6 +73,23 @@ class ReservaController extends Controller
 
         return response()->json($formattedReservations);
     }
+// ReservaController.php
+public function cancelReservation($seatId)
+{
+    $userId = auth()->id();
+
+    $reservation = Reserva::where('seat_id', $seatId)
+        ->where('user_id', $userId)
+        ->first();
+
+    if (!$reservation) {
+        return response()->json(['error' => 'Reserva no encontrada'], 404);
+    }
+
+    $reservation->delete();
+
+    return response()->json(['success' => '✅ Reserva cancelada con éxito']);
+}
 
     /**
      * Reservar una butaca.
