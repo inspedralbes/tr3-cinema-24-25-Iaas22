@@ -79,7 +79,56 @@ class ReservaController extends Controller
     
         return response()->json(['success' => '✅ Butaca reservada con éxito']);
     }
-
+    public function reserveSeats(Request $request)
+    {
+        // ✅ Verificar que el usuario está autenticado
+        if (!auth()->check()) {
+            return response()->json(['error' => '⚠️ Token inválido o no proporcionado.'], 401);
+        }
+    
+        // ✅ Validar los datos de la solicitud
+        $request->validate([
+            'seat_ids' => 'required|array|max:10', // ✅ Máximo de 10 butacas a la vez
+            'seat_ids.*' => 'exists:seats,seat_id', // ✅ Validar que las butacas existen
+            'session_id' => 'required|exists:session,session_id'
+        ]);
+    
+        $seatIds = $request->seat_ids;
+        $sessionId = $request->session_id;
+        $userId = auth()->id();
+    
+        // ✅ Verificar si alguna butaca ya está reservada
+        $existingReservations = Reserva::whereIn('seat_id', $seatIds)
+                                        ->where('session_id', $sessionId)
+                                        ->pluck('seat_id')
+                                        ->toArray();
+    
+        if (!empty($existingReservations)) {
+            return response()->json([
+                'error' => '⚠️ Las siguientes butacas ya están reservadas:',
+                'butacas_reservadas' => $existingReservations
+            ], 400);
+        }
+    
+        // ✅ Crear las reservas en una sola operación
+        $reservations = array_map(function ($seatId) use ($sessionId, $userId) {
+            return [
+                'seat_id' => $seatId,
+                'session_id' => $sessionId,
+                'user_id' => $userId,
+                'status' => 'reservada',
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }, $seatIds);
+    
+        Reserva::insert($reservations);
+    
+        return response()->json([
+            'success' => '✅ Butacas reservadas con éxito',
+            'butacas_reservadas' => $seatIds
+        ]);
+    }
     /**
      * Completar reserva y guardar compra
      */
