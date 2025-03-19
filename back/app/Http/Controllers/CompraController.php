@@ -10,61 +10,56 @@ use Illuminate\Support\Facades\DB;
 
 class CompraController extends Controller
 {
-    // 🛒 Comprar un solo asiento
     public function buySeat(Request $request)
-    {
-        try {
-            // Validación de datos
-            $request->validate([
-                'seat_id' => 'required|exists:seats,seat_id',
-                'user_id' => 'required|exists:users,id',
-                'movie_id' => 'required|exists:movies,movie_id',
-                'name' => 'required|string',
-                'apellidos' => 'required|string',
-                'email' => 'required|email'
-            ]);
+{
+    try {
+        // Buscar el asiento
+        $seat = Seat::where('seat_id', $request->seat_id)->firstOrFail();
 
-            // Verificar si el asiento ya está reservado
-            $seat = Seat::where('seat_id', $request->seat_id)->firstOrFail();
-            if (Compra::where('seat_id', $seat->seat_id)->exists()) {
-                return response()->json(['error' => 'El asiento ya está reservado'], 400);
-            }
+        // Crear la compra
+        $compra = Compra::create([
+            'user_id' => $request->user_id,
+            'seat_id' => $seat->seat_id,
+            'movie_id' => $request->movie_id,
+            'precio' => $seat->price,
+            'compra_dia' => now()->format('Y-m-d'),
+            'compra_hora' => now()->format('H:i:s'),
+            'name' => $request->name ?? null,
+            'apellidos' => $request->apellidos ?? null,
+            'email' => $request->email ?? null,
+        ]);
 
-            // Crear la compra
-            $compra = Compra::create([
-                'user_id' => $request->user_id,
-                'seat_id' => $seat->seat_id,
-                'movie_id' => $request->movie_id,
-                'precio' => $seat->price,
-                'compra_dia' => now()->format('Y-m-d'),
-                'compra_hora' => now()->format('H:i:s'),
-                'name' => $request->name,
-                'apellidos' => $request->apellidos,
-                'email' => $request->email,
-            ]);
+        // ✅ Actualizar el estado de la reserva a 'confirmada'
+        \DB::table('reservas')
+            ->where('seat_id', $seat->seat_id)
+            ->update(['status' => 'confirmada']);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Compra realizada con éxito',
-                'data' => $compra
-            ], 201);
-    
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Compra realizada con éxito y reserva confirmada.',
+            'data' => $compra
+        ], 201);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 400);
     }
+}
 
-    public function buyMultipleSeats(Request $request)
+public function buyMultipleSeats(Request $request)
 {
     $request->validate([
         'reservas' => 'required|array|min:1',
         'reservas.*.seat_id' => 'required|exists:seats,seat_id',
         'reservas.*.user_id' => 'required|exists:users,id',
-        'reservas.*.movie_id' => 'required|exists:movies,movie_id',
+        'reservas.*.movie_id' => 'required|exists:movies,movie_id', 
         'reservas.*.name' => 'required|string',
         'reservas.*.apellidos' => 'required|string',
         'reservas.*.email' => 'required|email'
     ]);
+    
 
     $reservas = $request->input('reservas');
     $reservasCreadas = [];
@@ -80,7 +75,7 @@ class CompraController extends Controller
                 throw new \Exception("El asiento {$seat->seat_id} ya está reservado");
             }
 
-            // Crear la compra
+            // ✅ Crear la compra
             $compra = Compra::create([
                 'user_id' => $reserva['user_id'],
                 'seat_id' => $reserva['seat_id'],
@@ -93,8 +88,15 @@ class CompraController extends Controller
                 'email' => $reserva['email'],
             ]);
 
+            // ✅ Acumular el precio total
+            $totalPrecio += $seat->price;
+
+            // ✅ Actualizar el estado de la reserva a 'confirmada'
+            \DB::table('reservas')
+                ->where('seat_id', $seat->seat_id)
+                ->update(['status' => 'confirmada']);
+
             $reservasCreadas[] = $compra;
-            $totalPrecio += $seat->price; // ✅ Acumular el precio
         }
 
         DB::commit(); // ✅ Confirmar la transacción
@@ -110,10 +112,11 @@ class CompraController extends Controller
 
         return response()->json([
             'success' => false,
-            'message' => 'Error al comrpar las reservas',
+            'message' => 'Error al comprar las reservas',
             'error' => $e->getMessage()
         ], 500);
     }
 }
+
 
 }
