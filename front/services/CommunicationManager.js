@@ -12,22 +12,36 @@ if (typeof window !== 'undefined') {
 
 const CommunicationManager = {
   // ✅ Iniciar sesión
-  async login(email, password) {
-    const response = await axios.post(`${API_URL}/login`, { email, password });
-    const token = response.data.token;
-    const user = response.data.user;
+  // ✅ Iniciar sesión
+async login(email, password) {
+  try {
+      const response = await axios.post(`${API_URL}/login`, { email, password });
+      const token = response.data.token;
+      const user = response.data.user;
 
-    if (typeof window !== 'undefined' && token) {
-      localStorage.setItem('auth_token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
+      if (typeof window !== 'undefined' && token) {
+          // Guardar el token en localStorage para futuras solicitudes
+          localStorage.setItem('auth_token', token);
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
 
-    if (typeof window !== 'undefined' && user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    }
+      if (typeof window !== 'undefined' && user) {
+          // ✅ Guardar datos importantes en localStorage
+          localStorage.setItem('user', JSON.stringify(user));
+          localStorage.setItem('user_id', user.id); // 🏆 Guardar el user_id directamente
+          localStorage.setItem('user_name', user.name);
+          localStorage.setItem('user_email', user.email);
+      }
 
-    return response.data;
-  },
+      console.log('✅ Login exitoso. Usuario almacenado:', user);
+
+      return response.data;
+  } catch (error) {
+      console.error('❌ Error al iniciar sesión:', error.response?.data?.message || error.message);
+      throw new Error(error.response?.data?.message || 'Error al iniciar sesión');
+  }
+},
+
 
   // ✅ Registrar usuario
   async register(userData) {
