@@ -64,4 +64,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/comprar', [CompraController::class, 'buySeat']); // 🔥 Comprar butaca
     Route::get('/compras/user/{userId}', [CompraController::class, 'getComprasByUser']); // 🔥 Obtener compras de usuario
     Route::get('/compras/total/{userId}', [CompraController::class, 'getTotalComprasByUser']); // 🔥 Obtener total de compras
+    Route::post('/comprar-multiple', [CompraController::class, 'buyMultipleSeats']);
+
 });
