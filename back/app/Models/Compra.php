@@ -9,7 +9,18 @@ class Compra extends Model
 {
     use HasFactory;
 
-    // Definir las relaciones
+    protected $fillable = [
+        'user_id',
+        'seat_id',
+        'movie_id',
+        'precio',
+        'compra_dia', // ✅ Añadir aquí
+        'compra_hora',
+        'name',
+        'apellidos',
+        'email',
+    ];
+
     // Relación con la tabla `User`
     public function user()
     {
@@ -21,5 +32,10 @@ class Compra extends Model
     {
         return $this->belongsTo(Seat::class, 'seat_id');
     }
+
+    // Relación con la tabla `Movie`
+    public function movie()
+    {
+        return $this->belongsTo(Movie::class, 'movie_id');
+    }
 }
-?>

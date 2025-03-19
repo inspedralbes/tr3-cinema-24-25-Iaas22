@@ -6,6 +6,7 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\CompraController; // ✅ Importamos el nuevo controlador de compra
 
 // ✅ Rutas públicas - Sin autenticación
 Route::get('/movies', [MovieController::class, 'index']);  
@@ -56,11 +57,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reservations', [ReservaController::class, 'index']);
     Route::get('/reservations/{id}', [ReservaController::class, 'show']);
     Route::delete('/reservations/{id}', [ReservaController::class, 'destroy']);
-
-    // ✅ Nueva ruta para completar la reserva
-    Route::post('/reservar-completa', [ReservaController::class, 'completeReservation']);
     Route::get('/reservations/user/{userId}', [ReservaController::class, 'getReservationsByUser']);
-
-    // ✅ 🔥 **Ruta corregida para cancelar reserva (sin conflicto)**
     Route::delete('/cancel-reservation/{seatId}', [ReservaController::class, 'cancelReservation']);
+
+    // ✅ **🚨 NUEVAS RUTAS PARA COMPRAS**  
+    Route::post('/comprar', [CompraController::class, 'buySeat']); // 🔥 Comprar butaca
+    Route::get('/compras/user/{userId}', [CompraController::class, 'getComprasByUser']); // 🔥 Obtener compras de usuario
+    Route::get('/compras/total/{userId}', [CompraController::class, 'getTotalComprasByUser']); // 🔥 Obtener total de compras
 });

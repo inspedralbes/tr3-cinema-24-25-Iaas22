@@ -11,9 +11,9 @@ class UsersSeeder extends Seeder
     {
         // Usuario normal de ejemplo
         User::create([
-            'name' => 'ejemplo',
-            'email' => 'ejemplo.perez@gmail.com',
-            'password' => bcrypt('password123'),
+            'name' => 'ias',
+            'email' => 'ias@gmail.com',
+            'password' => bcrypt('123456789'),
             'birthday' => '1990-05-15',
             'created_at' => now(),
             'updated_at' => now(),
