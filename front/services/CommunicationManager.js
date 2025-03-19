@@ -164,7 +164,44 @@ async login(email, password) {
       throw new Error(error.response?.data?.message || 'Error al reservar la butaca');
     }
   },
+// Función para comprar un asiento manualmente (nombre, apellidos y email introducidos por el usuario)
+async buySeatManually(seatId, movieId, name, lastName, email) {
+  try {
+    // Obtener los detalles del asiento con seatId
+    const seatResponse = await axios.get(`${API_URL}/seats/${seatId}`);
+    const seat = seatResponse.data;
 
+    // Obtener los detalles de la película con movieId
+    const movieResponse = await axios.get(`${API_URL}/movies/${movieId}`);
+    const movie = movieResponse.data;
+
+    // Obtener el usuario autenticado desde localStorage
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.id) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    // Crear el objeto con la información para la compra
+    const purchaseData = {
+      seat_id: seatId,
+      movie_id: movieId,
+      user_id: user.id, // Obtener el user_id desde localStorage
+      name: name, // El nombre que el usuario introduce manualmente
+      apellidos: lastName, // Los apellidos que el usuario introduce manualmente
+      email: email, // El email que el usuario introduce manualmente
+      precio: seat.price, // El precio del asiento
+    };
+
+    // Realizar la compra llamando al backend
+    const response = await axios.post(`${API_URL}/buy-seat`, purchaseData);
+
+    console.log('✅ Compra realizada con éxito:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al comprar la reserva:', error);
+    throw new Error(error.response?.data?.message || 'Error al comprar la reserva');
+  }
+},
   // ✅ Reservar múltiples asientos
   async reserveSeats(seatIds, sessionId) {
     if (!(await this.checkAuth())) {
