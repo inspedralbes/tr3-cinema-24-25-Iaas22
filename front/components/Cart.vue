@@ -10,23 +10,44 @@
             class="flex justify-between items-center border-b py-2"
           >
             <div>
-              🎬 <strong>{{ reservation.movie }}</strong> <br>
-              📅 {{ formatDate(reservation.date) }} - 🕒 {{ reservation.time }}<br>
+              🎬 <strong>{{ reservation.movie }}</strong>
+              <br>
+              📅 {{ formatDate(reservation.date) }} - 🕒 {{ reservation.time }}
+              <br>
               🎯 Butaca: {{ reservation.row }}{{ reservation.seat_num }} ({{ reservation.type }})
             </div>
-            <button 
-              @click="$emit('cancel-reservation', reservation.seat_id)"
-              class="text-red-500 hover:text-red-700 font-bold"
-            >
-              ❌ Cancelar
-            </button>
+            <div class="flex items-center space-x-2">
+              <!-- Botón cancelar -->
+              <button 
+                @click="$emit('cancel-reservation', reservation.seat_id)"
+                class="text-red-500 hover:text-red-700 font-bold"
+              >
+                ❌
+              </button>
+              <!-- Cuadro de selección -->
+              <div 
+                class="select-box" 
+                @click="toggleSelection(reservation.seat_id)"
+              >
+                <span v-if="selectedReservations.includes(reservation.seat_id)">✔️</span>
+              </div>
+            </div>
           </li>
         </ul>
+        <!-- Botón comprar al final -->
+        <button 
+          @click="$emit('purchase', selectedReservations)" 
+          class="purchase-btn"
+        >
+          🛒 Comprar
+        </button>
       </div>
     </div>
   </template>
   
   <script setup>
+  import { ref } from 'vue';
+  
   defineProps({
     reservations: {
       type: Array,
@@ -38,7 +59,20 @@
     }
   });
   
-  defineEmits(['toggle-cart', 'cancel-reservation']);
+  defineEmits(['toggle-cart', 'cancel-reservation', 'purchase']);
+  
+  // Estado para las reservas seleccionadas
+  const selectedReservations = ref([]);
+  
+  const toggleSelection = (seatId) => {
+    if (selectedReservations.value.includes(seatId)) {
+      // Si ya está seleccionado, lo quitamos
+      selectedReservations.value = selectedReservations.value.filter(id => id !== seatId);
+    } else {
+      // Si no está seleccionado, lo añadimos
+      selectedReservations.value.push(seatId);
+    }
+  };
   
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -89,6 +123,55 @@
   
   .close-btn:hover {
     background-color: #dc2626;
+  }
+  
+  /* Cuadro de selección */
+  .select-box {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #10b981;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    background-color: #ffffff;
+  }
+  
+  .select-box:hover {
+    background-color: #d1fae5;
+  }
+  
+  .select-box span {
+    font-size: 1rem;
+    color: #10b981;
+  }
+  
+  /* Si está seleccionado */
+  .select-box.selected {
+    background-color: #10b981;
+    color: white;
+  }
+  
+  /* Botón de compra */
+  .purchase-btn {
+    width: 120px;
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 0;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-bottom: 50px;
+  }
+  
+  .purchase-btn:hover {
+    background-color: #2563eb;
   }
   </style>
   
