@@ -8,38 +8,20 @@
       </button>
     </nav>
 
-    <!-- ✅ Sidebar para carrito -->
-    <div :class="['sidebar', cartOpen ? 'translate-x-0' : 'translate-x-full']">
-      <div class="sidebar-content">
-        <button @click="toggleCart" class="close-btn">❌</button>
-        <h3 class="text-lg font-semibold mb-2">🛒 Cesta de reservas:</h3>
-        <ul class="space-y-2">
-          <li 
-            v-for="reservation in reservations" 
-            :key="reservation.seat_id" 
-            class="flex justify-between items-center border-b py-2"
-          >
-            <div>
-              🎬 <strong>{{ reservation.movie }}</strong> <br>
-              📅 {{ formatDate(reservation.date) }} - 🕒 {{ reservation.time }}<br>
-              🎯 Butaca: {{ reservation.row }}{{ reservation.seat_num }} ({{ reservation.type }})
-            </div>
-            <button 
-              @click="cancelReservation(reservation.seat_id)"
-              class="text-red-500 hover:text-red-700 font-bold"
-            >
-              ❌ Cancelar
-            </button>
-          </li>
-        </ul>
-      </div>
-    </div>
+    <!-- ✅ Sidebar como componente externo -->
+    <Cart 
+      :reservations="reservations"
+      :cartOpen="cartOpen"
+      @toggle-cart="toggleCart"
+      @cancel-reservation="cancelReservation"
+    />
 
     <!-- ✅ Select para elegir sesión -->
     <div class="mt-4">
       <h2 class="text-xl font-bold mb-2">Selecciona tu sesión</h2>
       <select 
         v-model="selectedSession" 
+        @change="onSessionChange"
         class="w-full p-3 border rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
       >
         <option value="" disabled>Elige una sesión</option>
@@ -54,113 +36,115 @@
       </select>
     </div>
 
-    <!-- ✅ Información sobre precios y descuentos -->
-    <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-md">
-      <p class="text-blue-800 font-semibold">
-        🎯 Información de precios:
-      </p>
-      <ul class="list-disc list-inside text-blue-700 mt-2">
-        <li> Las butacas VIP (columna F) cuestan <strong>8 €</strong>.</li>
-        <li>Las demás butacas cuestan <strong>6 €</strong>.</li>
-        <li> <strong>Día del espectador:</strong> ¡Todas las butacas tienen <strong>2 € de descuento!</strong></li>
-      </ul>
-    </div>
+   <!-- ✅ Mostrar butacas disponibles -->
+<div v-if="seats.length" class="mt-4">
+  <h3 class="text-lg font-semibold mb-2">Butacas:</h3>
+  <!-- ✅ Texto de información -->
+<div class="mt-4 text-sm text-gray-600">
+  <ul class="list-disc list-inside">
+    <li>🎯 El Día del Espectador, todas las entradas tienen un descuento de 2€.</li>
+    <li>💺 La fila VIP (F) normalmente cuesta 8€.</li>
+    <li>🎟️ Las demás filas tienen un precio de 6€.</li>
+  </ul>
+</div>
 
-    <!-- ✅ Mostrar butacas disponibles -->
-    <div v-if="seats.length" class="mt-4">
-      <h3 class="text-lg font-semibold mb-2">Butacas:</h3>
-      <div class="seats-container">
-        <span 
-          v-for="seat in seats" 
-          :key="seat.seat_id"
-          :class="[ 
-            seat.status === 'reservada' ? 'bg-red-500 text-white cursor-not-allowed' : 'cursor-pointer hover:bg-green-500',
-            seat.row === 'F' ? 'border-blue-400 border-2' : '',
-            selectedSeats.includes(seat.seat_id) ? 'bg-green-400' : ''
-          ]"
-          @click="toggleSeat(seat)"
-          class="seat"
-        >
-          {{ seat.row }}{{ seat.seat_num }}
-        </span>
-      </div>
-    </div>
+  <div class="seats-container">
+    <span 
+      v-for="seat in seats" 
+      :key="seat.seat_id"
+      :class="[ 
+        seat.status === 'reservada' ? 'bg-red-500 text-white cursor-not-allowed' : 'cursor-pointer hover:bg-green-500',
+        seat.row === 'F' ? 'border-blue-400 border-2' : '',
+        selectedSeats.includes(seat.seat_id) ? 'bg-green-400' : ''
+      ]"
+      @click="toggleSeat(seat)"
+      class="seat"
+    >
+      {{ seat.row }}{{ seat.seat_num }}
+    </span>
+  </div>
 
-    <!-- ✅ Confirmar reserva -->
-    <div v-if="selectedSeats.length" class="mt-4">
-      <h3 class="text-lg font-semibold mb-2">Butacas seleccionadas:</h3>
-      <div>
-        {{ selectedSeats.map(seatId => formatSeat(seatId)).join(', ') }}
-      </div>
-      <button 
-        class="btn-reserve mt-4" 
-        @click="confirmReservation"
-      >
-        Reservar ({{ selectedSeats.length }}/10)
-      </button>
-    </div>
-
-    <!-- ✅ Mostrar mensaje solo si no hay butacas y no se están cargando -->
-    <div v-if="selectedSession && seats.length === 0 && !loadingSeats" class="mt-4 text-gray-500">
-      No hay butacas disponibles para esta sesión.
-    </div>
-
-    <!-- ✅ Mostrar indicador de carga mientras se cargan las butacas -->
-    <div v-if="loadingSeats" class="mt-4 text-gray-500">
-      🔄 Cargando butacas...
-    </div>
+  <!-- ✅ Botón de reservar -->
+  <div class="mt-4 text-center">
+    <button 
+      v-if="selectedSeats.length" 
+      @click="reserveSeats" 
+      class="btn-reserve"
+    >
+      🎟️ Reservar Butacas ({{ selectedSeats.length }})
+    </button>
+  </div>
+</div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useRouter, useRoute } from 'nuxt/app';
+import { ref, onMounted } from 'vue';
 import CommunicationManager from '@/services/CommunicationManager';
+import Cart from '@/components/Cart.vue';
 
 const sessions = ref([]);
 const selectedSession = ref('');
 const seats = ref([]);
 const selectedSeats = ref([]);
-const loadingSeats = ref(false);
-const router = useRouter();
-
-// ✅ Obtener sesiones por película
-const fetchSessionsByMovie = async (movieId) => {
-  try {
-    if (!movieId) return;
-    sessions.value = await CommunicationManager.fetchSessionsByMovie(movieId);
-  } catch (error) {
-    console.error('❌ Error al obtener sesiones:', error.message);
-  }
-};
-
-// ✅ Cargar butacas por sesión
-const loadSeats = async (sessionId) => {
-  if (!sessionId) return;
-  loadingSeats.value = true;
-  try {
-    seats.value = await CommunicationManager.fetchSeatsBySession(sessionId);
-  } catch (error) {
-    console.error('❌ Error al obtener butacas:', error.message);
-  } finally {
-    loadingSeats.value = false;
-  }
-};
-
 const reservations = ref([]);
-const cartOpen = ref(false); // ✅ Nueva ref para controlar el carrito
+const cartOpen = ref(false);
 
-// ✅ Función para abrir/cerrar el carrito
 const toggleCart = () => {
   cartOpen.value = !cartOpen.value;
 };
+const fetchSessions = async () => {
+  try {
+    // Necesitas pasar el ID de la película
+    const movieId = 1; // (Ejemplo, reemplaza con el ID real)
+    const response = await CommunicationManager.fetchSessionsByMovie(movieId);
+    sessions.value = response;
+  } catch (error) {
+    console.error('❌ Error al cargar las sesiones:', error.message);
+  }
+};
+
+const fetchSeats = async (sessionId) => {
+  try {
+    if (!sessionId) throw new Error('ID de sesión no proporcionado');
+    const response = await CommunicationManager.fetchSeatsBySession(sessionId);
+    seats.value = response;
+  } catch (error) {
+    console.error('❌ Error al cargar las butacas:', error.message);
+  }
+};
+const reserveSeats = async () => {
+  if (!selectedSession.value) {
+    alert('⚠️ Primero debes seleccionar una sesión.');
+    return;
+  }
+
+  if (!selectedSeats.value.length) {
+    alert('⚠️ No hay butacas seleccionadas.');
+    return;
+  }
+
+  try {
+    // ✅ Llamada directa a CommunicationManager
+    await CommunicationManager.reserveSeats(selectedSeats.value, selectedSession.value);
+
+    alert('✅ ¡Reserva completada con éxito!');
+
+    // 👉 Limpiar la selección y actualizar las butacas
+    selectedSeats.value = [];
+    await fetchSeats(selectedSession.value);
+    await fetchReservations(); // 🔄 Actualiza la cesta de reservas
+  } catch (error) {
+    console.error('❌ Error al reservar las butacas:', error);
+    alert(`❌ Error: ${error.message}`);
+  }
+};
+
 
 const fetchReservations = async () => {
   try {
-    // 🔑 ID del usuario autenticado
-    const userId = 1; // Cambiar esto para que use el ID real del usuario autenticado
-    reservations.value = await CommunicationManager.fetchReservationsByUser();
-
+    const response = await CommunicationManager.fetchReservationsByUser();
+    reservations.value = response;
   } catch (error) {
     console.error('❌ Error al cargar las reservas:', error.message);
   }
@@ -168,73 +152,32 @@ const fetchReservations = async () => {
 
 const cancelReservation = async (seatId) => {
   if (!confirm('¿Estás seguro de que deseas cancelar esta reserva?')) return;
-
   try {
-    // Endpoint para cancelar la reserva (opcional, si no existe debes crearlo)
     await CommunicationManager.cancelReservation(seatId);
     reservations.value = reservations.value.filter(r => r.seat_id !== seatId);
   } catch (error) {
     console.error('❌ Error al cancelar la reserva:', error.message);
-    alert('❌ No se pudo cancelar la reserva.');
   }
 };
 
-// ✅ Cargar reservas al montar el componente
-onMounted(() => {
-  fetchReservations();
-});
-
-
-// ✅ Alternar selección de butacas
 const toggleSeat = (seat) => {
-  if (seat.status === 'reservada') {
-    alert('🚫 Esta butaca ya está reservada.');
-    return;
-  }
+  if (seat.status === 'reservada') return;
 
   if (selectedSeats.value.includes(seat.seat_id)) {
     selectedSeats.value = selectedSeats.value.filter(id => id !== seat.seat_id);
   } else {
-    if (selectedSeats.value.length < 10) {
-      selectedSeats.value.push(seat.seat_id);
-    } else {
-      alert('🚫 Solo puedes reservar hasta 10 butacas.');
-    }
+    selectedSeats.value.push(seat.seat_id);
   }
 };
 
-// ✅ Confirmar reserva
-const confirmReservation = async () => {
-  if (!selectedSeats.value.length) return;
-
-  try {
-    await CommunicationManager.reserveSeats(selectedSeats.value, selectedSession.value);
-
-    // ✅ Actualizar estado de butacas reservadas
-    seats.value.forEach(seat => {
-      if (selectedSeats.value.includes(seat.seat_id)) {
-        seat.status = 'reservada';
-      }
-    });
-
-    selectedSeats.value = [];
-    
-  
-  } catch (error) {
-    console.error('❌ Error al reservar las butacas:', error.message);
-    alert('❌ No se pudieron reservar las butacas.');
-  
-};}
-
-
-
-// ✅ Formatear asiento
-const formatSeat = (seatId) => {
-  const seat = seats.value.find(s => s.seat_id === seatId);
-  return seat ? `${seat.row}${seat.seat_num}` : '';
+// ✅ Ahora el evento `@change` controla la carga de butacas
+const onSessionChange = () => {
+  if (selectedSession.value) {
+    console.log('➡️ Cargando butacas para sesión:', selectedSession.value);
+    fetchSeats(selectedSession.value);
+  }
 };
 
-// ✅ Formatear fecha
 const formatDate = (dateString) => {
   if (!dateString) return '';
   return new Date(dateString).toLocaleDateString('es-ES', {
@@ -245,114 +188,103 @@ const formatDate = (dateString) => {
   });
 };
 
-// ✅ Obtener las sesiones al montar el componente
 onMounted(() => {
-  const movieId = useRoute().params.id;
-  if (movieId) fetchSessionsByMovie(movieId);
-});
-
-// ✅ Cargar las butacas al cambiar la sesión seleccionada
-watch(selectedSession, (newSession) => {
-  if (newSession) loadSeats(newSession);
+  fetchSessions(); // ✅ Carga inicial de sesiones
+  fetchReservations(); // ✅ Carga inicial de reservas
 });
 </script>
 
 <style scoped>
 .navbar {
-  background-color: #333;
-  color: white;
+  background-color: #1e3a8a;
   padding: 1rem;
+  color: white;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
 .title {
   font-size: 1.5rem;
+  font-weight: bold;
 }
 
+.btn-cart {
+  background-color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-cart:hover {
+  background-color: #2563eb;
+}
 .seats-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr); /* 10 columnas */
+  gap: 20px; /* Más espacio entre las butacas */
+  justify-content: center; /* Centrar horizontalmente */
+  align-items: center; /* Centrar verticalmente */
+  margin: 0 auto; /* Asegurar que esté centrado */
+  max-width: calc(10 * 40px + 9 * 4px);
+  margin-bottom: 50px; 
+
 }
 
 .seat {
-  width: 50px;
-  height: 50px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  width: 40px;
+  height: 40px;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
   cursor: pointer;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+.seat:hover {
+  background-color: #86efac;
+  transform: scale(1.1);
+}
+
+.bg-green-400 {
+  background-color: #34d399;
 }
 
 .bg-red-500 {
   background-color: #ef4444;
-}
-
-.bg-green-400 {
-  background-color: #22c55e;
+  color: white;
 }
 
 .border-blue-400 {
   border-color: #3b82f6;
 }
 
-.btn-cart {
+.btn-reserve {
   background-color: #3b82f6;
+  padding: 0.75rem 1.5rem;
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.btn-cart:hover {
-  background-color: #2563eb;
-}
-
-.sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 300px;
-  height: 100%;
-  background-color: #f9fafb;
-  border-left: 1px solid #e5e7eb;
-  padding: 20px;
-  overflow-y: auto;
-  box-shadow: -4px 0 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
-  z-index: 50;
-}
-
-.translate-x-full {
-  transform: translateX(100%);
-}
-
-.translate-x-0 {
-  transform: translateX(0);
-}
-
-.close-btn {
-  background-color: #ef4444;
-  color: white;
-  padding: 0.3rem 0.8rem;
-  border-radius: 6px;
   font-size: 1rem;
+  border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  margin-bottom: 1rem;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.1s ease;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+  align-items: center;
+  right: 200px;
 }
 
-.close-btn:hover {
-  background-color: #dc2626;
+.btn-reserve:hover {
+  background-color: #2563eb;
+  transform: scale(1.05);
 }
+
 
 </style>
