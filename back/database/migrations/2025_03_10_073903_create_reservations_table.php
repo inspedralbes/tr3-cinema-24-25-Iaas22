@@ -13,6 +13,14 @@ class CreateReservationsTable extends Migration
             $table->unsignedBigInteger('seat_id'); // Relación con la butaca
             $table->unsignedBigInteger('session_id'); // Relación con la sesión
             $table->unsignedBigInteger('user_id')->nullable(); // Relación con el usuario (opcional)
+            $table->decimal('precio', 8, 2)->nullable();  // Precio total de la compra (puede ser el precio de varias entradas)
+            $table->date('compra_dia')->nullable();  // Día de la compra
+            $table->time('compra_hora')->nullable();  // Hora de la compra
+            $table->string('name')->nullable();  // Nombre del comprador (puede ser nulo)
+            $table->string('apellidos')->nullable();  // Apellidos del comprador (puede ser nulo)
+            $table->string('email')->nullable();  // Correo electrónico del comprador (puede ser nulo)
+            $table->enum('status', ['reservada', 'confirmada'])->default('reservada'); // Estado de la reserva
+            $table->timestamps(); // Fechas de creación y actualización
 
             // Claves foráneas
             $table->foreign('seat_id')
@@ -29,10 +37,6 @@ class CreateReservationsTable extends Migration
                   ->references('id')
                   ->on('users')
                   ->onDelete('cascade');
-
-            // Cambiar la columna 'status' para que pueda tener dos valores
-            $table->enum('status', ['reservada', 'confirmada'])->default('reservada'); // Estado de la reserva
-            $table->timestamps(); // Fechas de creación y actualización
         });
     }
 

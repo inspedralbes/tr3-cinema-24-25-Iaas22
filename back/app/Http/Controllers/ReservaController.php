@@ -197,4 +197,61 @@ public function cancelReservation($seatId)
             'total' => $total
         ]);
     }
+   
+    public function confirmReservation(Request $request)
+    {
+        // Validar los datos del request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'seat_ids' => 'required|array|min:1',
+            'seat_ids.*' => 'exists:seats,seat_id',
+        ]);
+    
+        // Obtener el usuario autenticado
+        $userId = auth()->id();
+    
+        // Obtener los datos de los asientos
+        $seats = Seat::whereIn('seat_id', $request->seat_ids)->get();
+    
+        // Calcular el total y obtener el precio por asiento
+        $total = 0;
+        $seatsWithPrices = [];
+    
+        foreach ($seats as $seat) {
+            $precio = $seat->type === 'vip' ? 8 : 6; // 8 para VIP, 6 para normal
+            $total += $precio;
+    
+            $seatsWithPrices[] = [
+                'seat_id' => $seat->seat_id,
+                'precio' => $precio
+            ];
+        }
+    
+        // Actualizar las reservas con estado 'confirmada' y guardar el precio en la base de datos
+        foreach ($seatsWithPrices as $seatWithPrice) {
+            Reserva::where('seat_id', $seatWithPrice['seat_id'])
+                ->where('user_id', $userId)
+                ->update([
+                    'status' => 'confirmada',
+                    'name' => $request->name,
+                    'apellidos' => $request->apellidos,
+                    'email' => $request->email,
+                    'precio' => $seatWithPrice['precio'], // Guardar el precio calculado en la base de datos
+                    'compra_dia' => now()->toDateString(), // Fecha de la compra
+                    'compra_hora' => now()->toTimeString(), // Hora de la compra
+                    'updated_at' => now()
+                ]);
+        }
+    
+        // Devolver la respuesta con la información de la compra
+        return response()->json([
+            'success' => '✅ Reserva confirmada con éxito',
+            'total' => $total,
+            'seats' => $seatsWithPrices,
+        ]);
+    }
+    
+
 }
