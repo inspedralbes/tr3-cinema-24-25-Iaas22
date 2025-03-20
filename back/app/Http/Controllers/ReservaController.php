@@ -201,14 +201,15 @@ public function cancelReservation($seatId)
    
     public function confirmReservation(Request $request)
     {
-        // Validar los datos del request
         $request->validate([
             'name' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'seat_ids' => 'required|array|min:1',
             'seat_ids.*' => 'exists:seats,seat_id',
+            'session_id' => 'required|integer', // Ahora es un número
         ]);
+        
     
         // Obtener el usuario autenticado
         $userId = auth()->id();
@@ -230,22 +231,24 @@ public function cancelReservation($seatId)
             ];
         }
     
-        // Actualizar las reservas con estado 'confirmada' y guardar el precio en la base de datos
         foreach ($seatsWithPrices as $seatWithPrice) {
             Reserva::where('seat_id', $seatWithPrice['seat_id'])
                 ->where('user_id', $userId)
+                ->where('status', 'reservada') // Solo si está reservada
+                ->where('session_id', $request->session_id) // Coincidir con el session_id
                 ->update([
                     'status' => 'confirmada',
                     'name' => $request->name,
                     'apellidos' => $request->apellidos,
                     'email' => $request->email,
-                    'precio' => $seatWithPrice['precio'], // Guardar el precio calculado en la base de datos
-                    'compra_dia' => now()->toDateString(), // Fecha de la compra
-                    'compra_hora' => now()->toTimeString(), // Hora de la compra
+                    'precio' => $seatWithPrice['precio'],
+                    'session_id' => $request->session_id,
+                    'compra_dia' => now()->toDateString(),
+                    'compra_hora' => now()->toTimeString(),
                     'updated_at' => now()
                 ]);
         }
-    
+        
         // Devolver la respuesta con la información de la compra
         return response()->json([
             'success' => '✅ Reserva confirmada con éxito',
