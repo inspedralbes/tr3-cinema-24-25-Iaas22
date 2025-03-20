@@ -209,7 +209,6 @@ public function cancelReservation($seatId)
             'seat_ids.*' => 'exists:seats,seat_id',
             'session_id' => 'required|integer', // Ahora es un número
         ]);
-        
     
         // Obtener el usuario autenticado
         $userId = auth()->id();
@@ -248,14 +247,16 @@ public function cancelReservation($seatId)
                     'updated_at' => now()
                 ]);
         }
-        
+    
         // Devolver la respuesta con la información de la compra
         return response()->json([
             'success' => '✅ Reserva confirmada con éxito',
             'total' => $total,
+            'session_id' => $request->session_id, // Mostrar el session_id
             'seats' => $seatsWithPrices,
         ]);
     }
+    
     
 
 }
