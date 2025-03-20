@@ -75,37 +75,58 @@
     </button>
   </div>
 </div>
-  
-    <div v-if="showConfirmationForm" class="mt-6 bg-gray-100 p-6 rounded-lg shadow-md">
-      <h2 class="text-xl font-bold mb-4">Confirmar Reserva</h2>
-      <form @submit.prevent="handleConfirmReservation">
-        <input 
-          type="text"
-          v-model="confirmationData.name"
-          placeholder="Nombre"
-          required
-          class="input-field"
-        />
-        <input 
-          type="text"
-          v-model="confirmationData.lastName"
-          placeholder="Apellidos"
-          required
-          class="input-field"
-        />
-        <input 
-          type="email"
-          v-model="confirmationData.email"
-          placeholder="Correo electrónico"
-          required
-          class="input-field"
-        />
+ <!-- ✅ Formulario de confirmación como popup -->
+<div v-if="showConfirmationForm" class="modal-container">
+  <div class="modal-content">
+    <button @click="showConfirmationForm = false" class="close-btn">✖️</button>
+    <h2 class="text-xl font-bold mb-4">Confirmar Reserva</h2>
 
-        <button type="submit" class="btn-confirm">
-          ✅ Confirmar Reserva
-        </button>
-      </form>
+    <!-- ✅ Mostrar información de la reserva -->
+    <div class="mb-4">
+      <p><strong>🎬 Película:</strong> {{ confirmationData.movieTitle }}</p>
+      <p><strong>🕒 Hora:</strong> {{ confirmationData.sessionTime }}</p>
+      <p><strong>📅 Fecha:</strong> {{ formatDate(confirmationData.sessionDate) }}</p>
+      <p><strong>💺 Butacas:</strong></p>
+      <ul>
+        <li 
+          v-for="seat in confirmationData.seats" 
+          :key="seat.seatNum"
+        >
+          Fila {{ seat.row }}, Asiento {{ seat.seatNum }} – {{ seat.price }}€
+        </li>
+      </ul>
     </div>
+
+    <!-- ✅ Formulario de usuario -->
+    <form @submit.prevent="handleConfirmReservation">
+      <input 
+        type="text"
+        v-model="confirmationData.name"
+        placeholder="Nombre"
+        required
+        class="input-field"
+      />
+      <input 
+        type="text"
+        v-model="confirmationData.lastName"
+        placeholder="Apellidos"
+        required
+        class="input-field"
+      />
+      <input 
+        type="email"
+        v-model="confirmationData.email"
+        placeholder="Correo electrónico"
+        required
+        class="input-field"
+      />
+
+      <button type="submit" class="btn-confirm">
+        ✅ Confirmar Reserva
+      </button>
+    </form>
+  </div>
+</div>
   </div>
 </template>
 
@@ -157,6 +178,7 @@ const fetchSeats = async (sessionId) => {
     console.error('❌ Error al cargar las butacas:', error.message);
   }
 };
+
 const reserveSeats = async () => {
   if (!selectedSession.value) {
     alert('⚠️ Primero debes seleccionar una sesión.');
@@ -169,16 +191,29 @@ const reserveSeats = async () => {
   }
 
   try {
-    // ✅ Llamada directa a CommunicationManager
     await CommunicationManager.reserveSeats(selectedSeats.value, selectedSession.value);
 
     alert('✅ ¡Reserva completada con éxito!');
 
-    // 👉 Llenar el formulario con datos de la reserva
+    // 👉 Obtener detalles de la película y butacas
+    const session = sessions.value.find(s => s.session_id === selectedSession.value);
+    const selectedSeatsDetails = selectedSeats.value.map(seatId => {
+      const seat = seats.value.find(s => s.seat_id === seatId);
+      return {
+        row: seat.row,
+        seatNum: seat.seat_num,
+        price: seat.row === 'F' ? 8 : 6 // Precio basado en la fila
+      };
+    });
+
     confirmationData.value = {
       sessionId: selectedSession.value,
-      reservaId: Math.floor(Math.random() * 1000), // Simulación de ID de reserva
+      reservaId: Math.floor(Math.random() * 1000),
       seatIds: [...selectedSeats.value],
+      movieTitle: session.movie.title,
+      sessionTime: session.session_time,
+      sessionDate: session.session_date,
+      seats: selectedSeatsDetails,
       name: '',
       lastName: '',
       email: ''
@@ -189,12 +224,14 @@ const reserveSeats = async () => {
     // 👉 Limpiar la selección y actualizar las butacas
     selectedSeats.value = [];
     await fetchSeats(selectedSession.value);
-    await fetchReservations(); // 🔄 Actualiza la cesta de reservas
+    await fetchReservations();
+
   } catch (error) {
     console.error('❌ Error al reservar las butacas:', error);
     alert(`❌ Error: ${error.message}`);
   }
 };
+
 const handleConfirmReservation = async () => {
   try {
     if (
@@ -382,5 +419,101 @@ onMounted(() => {
   transform: scale(1.05);
 }
 
+/* ✅ Fondo oscuro semi-transparente */
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro con opacidad */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: fade-in 0.3s ease;
+}
+
+/* ✅ Contenido del popup */
+.modal-content {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: scale-up 0.3s ease;
+}
+
+/* ✅ Botón de cerrar */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* ✅ Campos de entrada */
+.input-field {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.2s ease;
+  font-size: 1rem;
+}
+
+.input-field:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+/* ✅ Botón de confirmar */
+.btn-confirm {
+  background-color: #3b82f6;
+  padding: 0.75rem;
+  width: 100%;
+  color: white;
+  font-size: 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-confirm:hover {
+  background-color: #2563eb;
+}
+
+/* ✅ Animación de apertura */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-up {
+  from {
+    transform: scale(0.9);
+  }
+  to {
+    transform: scale(1);
+  }
+}
 
 </style>
