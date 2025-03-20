@@ -51,13 +51,13 @@ class ReservaController extends Controller
     {
         $reservations = Reserva::with(['seat', 'session.movie'])
             ->where('user_id', $userId)
-            ->where('status', 'reservada') // Filtrar solo las reservas con estado 'reservada'
+            ->where('status', 'reservada')
             ->get();
-    
+
         if ($reservations->isEmpty()) {
             return response()->json(['error' => 'No hay reservas para este usuario'], 404);
         }
-    
+
         $formattedReservations = $reservations->map(function ($reservation) {
             return [
                 'seat_id' => $reservation->seat->seat_id,
@@ -71,26 +71,29 @@ class ReservaController extends Controller
                 'time' => $reservation->session->session_time ?? null
             ];
         });
-    
+
         return response()->json($formattedReservations);
     }
-    
-public function cancelReservation($seatId)
-{
-    $userId = auth()->id();
 
-    $reservation = Reserva::where('seat_id', $seatId)
-        ->where('user_id', $userId)
-        ->first();
+    /**
+     * Cancelar una reserva por seat_id.
+     */
+    public function cancelReservation($seatId)
+    {
+        $userId = auth()->id();
 
-    if (!$reservation) {
-        return response()->json(['error' => 'Reserva no encontrada'], 404);
+        $reservation = Reserva::where('seat_id', $seatId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$reservation) {
+            return response()->json(['error' => 'Reserva no encontrada'], 404);
+        }
+
+        $reservation->delete();
+
+        return response()->json(['success' => '✅ Reserva cancelada con éxito']);
     }
-
-    $reservation->delete();
-
-    return response()->json(['success' => '✅ Reserva cancelada con éxito']);
-}
 
     /**
      * Reservar una butaca.
@@ -99,24 +102,22 @@ public function cancelReservation($seatId)
     {
         $request->validate([
             'seat_id' => 'required|exists:seats,seat_id',
-            'session_id' => 'required|exists:session,session_id'
+            'session_id' => 'required|exists:sessions,session_id'
         ]);
 
-        $seatId = $request->seat_id;
-        $sessionId = $request->session_id;
         $userId = auth()->id();
 
-        $existingReservation = Reserva::where('seat_id', $seatId)
-            ->where('session_id', $sessionId)
+        $exists = Reserva::where('seat_id', $request->seat_id)
+            ->where('session_id', $request->session_id)
             ->exists();
 
-        if ($existingReservation) {
+        if ($exists) {
             return response()->json(['error' => 'La butaca ya está reservada'], 400);
         }
 
         Reserva::create([
-            'seat_id' => $seatId,
-            'session_id' => $sessionId,
+            'seat_id' => $request->seat_id,
+            'session_id' => $request->session_id,
             'user_id' => $userId,
             'status' => 'reservada'
         ]);
@@ -132,29 +133,26 @@ public function cancelReservation($seatId)
         $request->validate([
             'seat_ids' => 'required|array|max:10',
             'seat_ids.*' => 'exists:seats,seat_id',
-            'session_id' => 'required|exists:session,session_id'
+            'session_id' => 'required|exists:sessions,session_id'
         ]);
 
-        $seatIds = $request->seat_ids;
-        $sessionId = $request->session_id;
         $userId = auth()->id();
 
-        $existingReservations = Reserva::whereIn('seat_id', $seatIds)
-            ->where('session_id', $sessionId)
-            ->pluck('seat_id')
-            ->toArray();
+        $existingSeats = Reserva::whereIn('seat_id', $request->seat_ids)
+            ->where('session_id', $request->session_id)
+            ->pluck('seat_id');
 
-        if ($existingReservations) {
+        if ($existingSeats->isNotEmpty()) {
             return response()->json([
                 'error' => '⚠️ Algunas butacas ya están reservadas.',
-                'butacas_reservadas' => $existingReservations
+                'butacas_reservadas' => $existingSeats
             ], 400);
         }
 
-        $reservations = collect($seatIds)->map(function ($seatId) use ($sessionId, $userId) {
+        $reservations = collect($request->seat_ids)->map(function ($seatId) use ($request, $userId) {
             return [
                 'seat_id' => $seatId,
-                'session_id' => $sessionId,
+                'session_id' => $request->session_id,
                 'user_id' => $userId,
                 'status' => 'reservada',
                 'created_at' => now(),
@@ -164,41 +162,12 @@ public function cancelReservation($seatId)
 
         Reserva::insert($reservations->toArray());
 
-        return response()->json([
-            'success' => '✅ Butacas reservadas con éxito',
-            'butacas_reservadas' => $seatIds
-        ]);
+        return response()->json(['success' => '✅ Butacas reservadas con éxito']);
     }
 
     /**
-     * Obtener el precio total por usuario.
+     * Confirmar una reserva.
      */
-    public function getTotalPriceByUser($userId)
-    {
-        $reservas = Reserva::with('seat')
-            ->where('user_id', $userId)
-            ->get();
-
-        if ($reservas->isEmpty()) {
-            return response()->json(['error' => 'No hay reservas para este usuario'], 404);
-        }
-
-        $isDiaDelEspectador = now()->dayOfWeek === 3;
-
-        $total = $reservas->sum(function ($reserva) use ($isDiaDelEspectador) {
-            $precioNormal = $reserva->seat->type === 'vip' ? 8 : 6;
-            $precioConDescuento = $isDiaDelEspectador 
-                ? ($reserva->seat->type === 'vip' ? 6 : 4)
-                : $precioNormal;
-
-            return $precioConDescuento;
-        });
-
-        return response()->json([
-            'total' => $total
-        ]);
-    }
-   
     public function confirmReservation(Request $request)
     {
         $request->validate([
@@ -207,56 +176,49 @@ public function cancelReservation($seatId)
             'email' => 'required|email|max:255',
             'seat_ids' => 'required|array|min:1',
             'seat_ids.*' => 'exists:seats,seat_id',
-            'session_id' => 'required|integer', // Ahora es un número
+            'session_id' => 'required|integer',
+            'reserva_id' => 'required|integer|exists:reservas,reserva_id'
         ]);
-    
-        // Obtener el usuario autenticado
+
         $userId = auth()->id();
-    
-        // Obtener los datos de los asientos
+
         $seats = Seat::whereIn('seat_id', $request->seat_ids)->get();
-    
-        // Calcular el total y obtener el precio por asiento
+
         $total = 0;
         $seatsWithPrices = [];
-    
+
         foreach ($seats as $seat) {
-            $precio = $seat->type === 'vip' ? 8 : 6; // 8 para VIP, 6 para normal
+            $precio = $seat->type === 'vip' ? 8 : 6;
             $total += $precio;
-    
+
             $seatsWithPrices[] = [
                 'seat_id' => $seat->seat_id,
                 'precio' => $precio
             ];
         }
-    
-        foreach ($seatsWithPrices as $seatWithPrice) {
-            Reserva::where('seat_id', $seatWithPrice['seat_id'])
+
+        foreach ($seatsWithPrices as $seat) {
+            Reserva::where('reserva_id', $request->reserva_id)
+                ->where('seat_id', $seat['seat_id'])
                 ->where('user_id', $userId)
-                ->where('status', 'reservada') // Solo si está reservada
-                ->where('session_id', $request->session_id) // Coincidir con el session_id
+                ->where('status', 'reservada')
+                ->where('session_id', $request->session_id)
                 ->update([
                     'status' => 'confirmada',
                     'name' => $request->name,
                     'apellidos' => $request->apellidos,
                     'email' => $request->email,
-                    'precio' => $seatWithPrice['precio'],
-                    'session_id' => $request->session_id,
+                    'precio' => $seat['precio'],
                     'compra_dia' => now()->toDateString(),
-                    'compra_hora' => now()->toTimeString(),
-                    'updated_at' => now()
+                    'compra_hora' => now()->toTimeString()
                 ]);
         }
-    
-        // Devolver la respuesta con la información de la compra
+
         return response()->json([
             'success' => '✅ Reserva confirmada con éxito',
             'total' => $total,
-            'session_id' => $request->session_id, // Mostrar el session_id
             'seats' => $seatsWithPrices,
+            'reserva_id' => $request->reserva_id
         ]);
     }
-    
-    
-
 }
