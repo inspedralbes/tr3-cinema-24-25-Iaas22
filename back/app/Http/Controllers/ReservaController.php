@@ -51,12 +51,13 @@ class ReservaController extends Controller
     {
         $reservations = Reserva::with(['seat', 'session.movie'])
             ->where('user_id', $userId)
+            ->where('status', 'reservada') // Filtrar solo las reservas con estado 'reservada'
             ->get();
-
+    
         if ($reservations->isEmpty()) {
             return response()->json(['error' => 'No hay reservas para este usuario'], 404);
         }
-
+    
         $formattedReservations = $reservations->map(function ($reservation) {
             return [
                 'seat_id' => $reservation->seat->seat_id,
@@ -70,10 +71,10 @@ class ReservaController extends Controller
                 'time' => $reservation->session->session_time ?? null
             ];
         });
-
+    
         return response()->json($formattedReservations);
     }
-// ReservaController.php
+    
 public function cancelReservation($seatId)
 {
     $userId = auth()->id();
