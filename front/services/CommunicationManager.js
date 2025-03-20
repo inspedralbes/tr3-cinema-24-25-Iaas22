@@ -11,8 +11,7 @@ if (typeof window !== 'undefined') {
 }
 
 const CommunicationManager = {
-  // ✅ Iniciar sesión
-  // ✅ Iniciar sesión
+ 
 async login(email, password) {
   try {
       const response = await axios.post(`${API_URL}/login`, { email, password });
@@ -278,6 +277,53 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
     return response.data;
   },
 
+  async confirmReservation(sessionId, reservaId, seatIds, name, lastName, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.id) {
+        throw new Error('Usuario no autenticado');
+      }
+  
+      if (!name || !lastName || !email || !sessionId || !seatIds.length) {
+        console.error('🚨 Faltan datos en la solicitud:', { name, lastName, email, sessionId, seatIds });
+        throw new Error('Faltan datos para confirmar la reserva');
+      }
+  
+      const requestBody = {
+        session_id: Number(sessionId),
+        reserva_id: Number(reservaId),
+        seat_ids: seatIds.map(id => Number(id)),
+        user_id: user.id, 
+        name,
+        apellidos: lastName,
+        email,
+        precio: seatIds.length * 6,
+        compra_dia: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+        compra_hora: new Date().toTimeString().split(' ')[0], // HH:MM:SS
+        status: 'confirmada'
+      };
+  
+      console.log('📤 Enviando solicitud:', requestBody);
+  
+      // 🔥 Toma el token correcto del localStorage
+      const token = localStorage.getItem('auth_token');
+      if (!token) throw new Error('⚠️ No hay token disponible');
+      
+      const response = await axios.post(`${API_URL}/confirmar-reserva`, requestBody, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // 👈 Usa solo `auth_token`
+        },
+      });
+      
+      console.log('✅ Reserva confirmada:', response.data);
+      return response.data;
+  
+    } catch (error) {
+      console.error('❌ Error al confirmar la reserva:', error);
+      throw new Error(error.response?.data?.message || 'Error al confirmar la reserva');
+    }
+  },  
   // ✅ Obtener configuración base de la API
   getApiBase() {
     return API_URL;

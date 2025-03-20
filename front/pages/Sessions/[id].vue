@@ -75,6 +75,37 @@
     </button>
   </div>
 </div>
+  
+    <div v-if="showConfirmationForm" class="mt-6 bg-gray-100 p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-bold mb-4">Confirmar Reserva</h2>
+      <form @submit.prevent="handleConfirmReservation">
+        <input 
+          type="text"
+          v-model="confirmationData.name"
+          placeholder="Nombre"
+          required
+          class="input-field"
+        />
+        <input 
+          type="text"
+          v-model="confirmationData.lastName"
+          placeholder="Apellidos"
+          required
+          class="input-field"
+        />
+        <input 
+          type="email"
+          v-model="confirmationData.email"
+          placeholder="Correo electrónico"
+          required
+          class="input-field"
+        />
+
+        <button type="submit" class="btn-confirm">
+          ✅ Confirmar Reserva
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -89,6 +120,19 @@ const seats = ref([]);
 const selectedSeats = ref([]);
 const reservations = ref([]);
 const cartOpen = ref(false);
+const showConfirmationForm = ref(false);
+const reservaId = ref(null); // 👈 Asegúrate de que exista
+
+
+
+const confirmationData = ref({
+  sessionId: '',
+  reservaId: '',
+  seatIds: [],
+  name: '',
+  lastName: '',
+  email: ''
+});
 
 const toggleCart = () => {
   cartOpen.value = !cartOpen.value;
@@ -130,6 +174,18 @@ const reserveSeats = async () => {
 
     alert('✅ ¡Reserva completada con éxito!');
 
+    // 👉 Llenar el formulario con datos de la reserva
+    confirmationData.value = {
+      sessionId: selectedSession.value,
+      reservaId: Math.floor(Math.random() * 1000), // Simulación de ID de reserva
+      seatIds: [...selectedSeats.value],
+      name: '',
+      lastName: '',
+      email: ''
+    };
+
+    showConfirmationForm.value = true;
+
     // 👉 Limpiar la selección y actualizar las butacas
     selectedSeats.value = [];
     await fetchSeats(selectedSession.value);
@@ -139,7 +195,47 @@ const reserveSeats = async () => {
     alert(`❌ Error: ${error.message}`);
   }
 };
+const handleConfirmReservation = async () => {
+  try {
+    if (
+      !confirmationData.value.name ||
+      !confirmationData.value.lastName ||
+      !confirmationData.value.email
+    ) {
+      throw new Error('⚠️ Faltan datos para confirmar la reserva');
+    }
 
+    await CommunicationManager.confirmReservation(
+      confirmationData.value.sessionId,
+      confirmationData.value.reservaId,
+      confirmationData.value.seatIds,
+      confirmationData.value.name,
+      confirmationData.value.lastName,
+      confirmationData.value.email
+    );
+
+    alert('✅ Reserva confirmada correctamente');
+
+    // 👉 Limpiar el formulario después de confirmar
+    confirmationData.value = {
+      sessionId: '',
+      reservaId: '',
+      seatIds: [],
+      name: '',
+      lastName: '',
+      email: ''
+    };
+
+    showConfirmationForm.value = false;
+
+    // 🔄 Actualiza las reservas después de confirmar
+    await fetchReservations();
+
+  } catch (error) {
+    console.error('❌ Error al confirmar la reserva:', error);
+    alert(error.message);
+  }
+};
 
 const fetchReservations = async () => {
   try {
