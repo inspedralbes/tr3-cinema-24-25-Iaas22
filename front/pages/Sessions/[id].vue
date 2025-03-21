@@ -78,7 +78,13 @@
  <!-- ✅ Formulario de confirmación como popup -->
 <div v-if="showConfirmationForm" class="modal-container">
   <div class="modal-content">
-    <button @click="showConfirmationForm = false" class="close-btn">✖️</button>
+    <button  @click="() => { 
+        showConfirmationForm = false; 
+        if (confirmationData.seats.length) {
+          cancelReservation(confirmationData.seatIds[0]);
+        }
+      }" 
+      class="close-btn">✖️</button>
     <h2 class="text-xl font-bold mb-4">Confirmar Reserva</h2>
 
     <!-- ✅ Mostrar información de la reserva -->

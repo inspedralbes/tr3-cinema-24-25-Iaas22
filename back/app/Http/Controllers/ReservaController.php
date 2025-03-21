@@ -51,7 +51,7 @@ class ReservaController extends Controller
     {
         $reservations = Reserva::with(['seat', 'session.movie'])
             ->where('user_id', $userId)
-            ->where('status', 'confirmada') // Filtrar solo las reservas con estado 'reservada'
+            ->where('status', 'reservada') // Filtrar solo las reservas con estado 'reservada'
             ->get();
     
         if ($reservations->isEmpty()) {
