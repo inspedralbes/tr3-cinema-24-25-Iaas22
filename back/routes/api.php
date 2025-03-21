@@ -61,7 +61,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/reservations/{id}', [ReservaController::class, 'destroy']);
     Route::get('/reservations/user/{userId}', [ReservaController::class, 'getReservationsByUser']);
     Route::delete('/cancel-reservation/{seatId}', [ReservaController::class, 'cancelReservation']);
-    // Dentro del middleware auth:sanctum
+    Route::delete('/reservas/cancelar-multiples', [ReservaController::class, 'cancelReservations']);
+
     Route::post('/confirmar-reserva', [ReservaController::class, 'confirmReservation']);
 
 

@@ -92,6 +92,41 @@ public function cancelReservation($seatId)
     return response()->json(['success' => '✅ Reserva cancelada con éxito']);
 }
 
+public function cancelReservations(Request $request)
+{
+    $request->validate([
+        'seat_ids' => 'required|array|min:1|max:10',
+        'seat_ids.*' => 'exists:reservas,seat_id',
+        'session_id' => 'required|exists:session,session_id'
+    ]);
+
+    $seatIds = $request->seat_ids;
+    $sessionId = $request->session_id;
+    $userId = auth()->id();
+
+    // Buscar reservas que pertenezcan al usuario y a la sesión indicada
+    $reservations = Reserva::whereIn('seat_id', $seatIds)
+        ->where('session_id', $sessionId)
+        ->where('user_id', $userId)
+        ->get();
+
+    if ($reservations->isEmpty()) {
+        return response()->json([
+            'error' => '⚠️ No hay reservas para cancelar o no pertenecen a este usuario'
+        ], 404);
+    }
+
+    // Cancelar las reservas (eliminar)
+    $reservations->each(function ($reservation) {
+        $reservation->delete();
+    });
+
+    return response()->json([
+        'success' => '✅ Reservas canceladas con éxito',
+        'butacas_canceladas' => $seatIds
+    ]);
+}
+
     /**
      * Reservar una butaca.
      */

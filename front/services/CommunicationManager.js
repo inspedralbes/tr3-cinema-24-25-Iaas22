@@ -232,6 +232,22 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
     }
   },   
 
+  async cancelReservations(seatIds)  {
+    try {
+      const response = await axios.delete(`${API_URL}/reservas/cancelar-multiples`, {
+        data: seatIds,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error al cancelar las reservas:', error);
+      throw error;
+    }
+  },
+  
+   
   // ✅ Obtener historial de reservas
   async fetchReservations() {
     const response = await axios.get(`${API_URL}/reservations`);
