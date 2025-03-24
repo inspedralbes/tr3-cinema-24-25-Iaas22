@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav class="navbar">
-      <h1>Lista de Películas</h1>
+      <h1>C𝕚𝕟𝕖Y𝕒</h1>
       <div class="actions">
         <div class="search-container">
           <input 
@@ -14,7 +14,6 @@
           <button @click="toggleSearch" class="search-button">🔍</button>
         </div>
 
-        <!-- ✅ Mostrar botón solo si el usuario es admin -->
         <button 
           v-if="isAdmin" 
           @click="goToAdminPanel" 
@@ -25,10 +24,10 @@
 
         <button @click="goToLogin" class="login-button">Iniciar sesión</button>
         <button @click="handleLogout" class="logout-button">Cerrar sesión</button>
-
       </div>
     </nav>
 
+    <!-- ✅ Carrusel de Imágenes -->
     <div class="carousel-container">
       <div 
         class="carousel-track"
@@ -46,24 +45,45 @@
       <button @click="nextSlide" class="carousel-button right">❯</button>
     </div>
 
-    <div v-if="pending">Cargando películas...</div>
-    <div v-if="error" class="error">
-      <p>Error al cargar las películas: {{ error.message }}</p>
+    <!-- ✅ Carrusel de Películas Populares -->
+    <div v-if="popularMovies.length" class="popular-section">
+      <div class="title-section">
+        <h2>MÁS POPULARES</h2>
+      </div>
+      <div class="popular-carousel-container">
+        <div 
+          class="popular-carousel-track"
+          :style="{ transform: `translateX(-${popularIndex * 100}%)` }"
+        >
+          <div 
+            class="popular-movie-card" 
+            v-for="(movie, index) in popularMovies" 
+            :key="index"
+            @click="navigateTo(`/pelicula/${movie.movie_id}`)"
+          >
+            <h3>{{ movie.title }}</h3>
+            <img :src="movie.img" alt="Imagen de la película" />
+          </div>
+        </div>
+        <button @click="prevPopularSlide" class="carousel-button left">❮</button>
+        <button @click="nextPopularSlide" class="carousel-button right">❯</button>
+      </div>
     </div>
-    <div class="title-section">
-  <h2>TODAS LAS PELICULAS</h2>
-</div>
 
-    <div v-if="movies.length">
+    <!-- ✅ Sección de Todas las Películas -->
+    <div v-if="remainingMovies.length">
+      <div class="title-section">
+        <h2>TODAS LAS PELÍCULAS</h2>
+      </div>
       <div class="movies-grid">
         <div 
-          v-for="movie in filteredMovies" 
+          v-for="movie in remainingMovies" 
           :key="movie.id" 
           class="movie-card"
           @click="navigateTo(`/pelicula/${movie.movie_id}`)"
         >
           <h3>{{ movie.title }}</h3>
-          <img :src="movie.img" alt="Imagen de la película" v-if="movie.img" />
+          <img :src="movie.img" alt="Imagen de la película" />
         </div>
       </div>
     </div>
@@ -71,7 +91,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import CommunicationManager from '@/services/CommunicationManager'
 import axios from 'axios' 
@@ -81,6 +101,7 @@ const searchQuery = ref('')
 const searchVisible = ref(false)
 const isAdmin = ref(false)
 const currentIndex = ref(0)
+const popularIndex = ref(0) // ✅ Índice del carrusel de populares
 let interval = null
 
 onMounted(() => {
@@ -88,14 +109,11 @@ onMounted(() => {
   if (user?.role === 'admin') {
     isAdmin.value = true
   }
+
+  interval = setInterval(() => {
+    nextSlide()
+  }, 3000)
 })
-
- if (process.client) {
-    interval = setInterval(() => {
-      nextSlide()
-    }, 3000)
-  }
-
 
 onUnmounted(() => {
   clearInterval(interval)
@@ -110,7 +128,6 @@ const goToLogin = () => {
   router.push('/login')
 }
 
-// ✅ Redirigir al archivo "movieCRUD.vue"
 const goToAdminPanel = () => {
   router.push('/movieCRUD')
 }
@@ -140,26 +157,38 @@ const filteredMovies = computed(() => {
     : []
 })
 
-// ✅ Rutas de las imágenes
+const popularMovies = computed(() => filteredMovies.value.slice(0, 6))
+const remainingMovies = computed(() => filteredMovies.value.slice(6))
+
+// ✅ Carrusel de Populares
+const nextPopularSlide = () => {
+  const totalSlides = Math.ceil(popularMovies.value.length / 3)
+  popularIndex.value = (popularIndex.value + 1) % totalSlides
+}
+
+const prevPopularSlide = () => {
+  const totalSlides = Math.ceil(popularMovies.value.length / 3)
+  popularIndex.value = (popularIndex.value - 1 + totalSlides) % totalSlides
+}
+
+// ✅ Carrusel de Imágenes
 const images = ref([
-  '/images/carrusel/peli.jpg',
-  '/images/carrusel/peli1.jpg',
-  '/images/carrusel/peli2.jpg',
-  '/images/carrusel/peli4.jpg',
-  '/images/carrusel/peli5.jpg',
-  '/images/carrusel/peli6.jpg',
-  '/images/carrusel/peli7.jpg',
-  '/images/carrusel/peli8.jpg',
-  '/images/carrusel/peli9.jpg',
-  '/images/carrusel/peli10.jpg',
+  '/images/carrusel/peli.png',
+  '/images/carrusel/peli1.png',
+  '/images/carrusel/peli2.png',
+  '/images/carrusel/peli4.png',
+  '/images/carrusel/peli5.png',
+  '/images/carrusel/peli6.png',
+  '/images/carrusel/peli7.png',
+  '/images/carrusel/peli8.png',
+  '/images/carrusel/peli9.png',
+  '/images/carrusel/peli10.png',
 ])
 
-// ✅ Función para avanzar en el carrusel
 const nextSlide = () => {
   currentIndex.value = (currentIndex.value + 1) % images.value.length
 }
 
-// ✅ Función para retroceder en el carrusel
 const prevSlide = () => {
   currentIndex.value =
     (currentIndex.value - 1 + images.value.length) % images.value.length
@@ -167,8 +196,75 @@ const prevSlide = () => {
 </script>
 
 <style scoped>
+/* ✅ Carrusel de Populares */
+.popular-carousel-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+.popular-carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.popular-movie-card {
+  flex: 0 0 calc(100% / 3);
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.popular-movie-card img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  font-size: 24px;
+  border-radius: 50%;
+}
+
+.carousel-button.left {
+  left: 10px;
+}
+
+.carousel-button.right {
+  right: 10px;
+}
+
+@media (max-width: 768px) {
+  .popular-movie-card {
+    flex: 0 0 calc(100% / 1);
+  }
+}
+</style>
+
+
+<style scoped>
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+* {
+  font-family: 'Poppins', sans-serif;
+}
+div {
+  background-color: #0a0f2c; /* Azul oscuro */
+  color: white; /* Para que el texto sea legible sobre el fondo oscuro */
+}
+
 .navbar {
-  background-color: #333;
+  background-color: #0a0f2c; /* Azul oscuro */
   color: white;
   padding: 1rem;
   display: flex;
@@ -176,11 +272,15 @@ const prevSlide = () => {
   align-items: center;
   font-size: 1.5rem;
 }
+.navbar h1 {
+  margin-left: 50px; /* Ajusta el valor según lo necesites */
+}
 
 .actions {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-left: -50px; /* Mueve los botones más a la izquierda */
 }
 
 .search-bar {
@@ -194,13 +294,12 @@ const prevSlide = () => {
 .login-button,
 .logout-button,
 .admin-button {
-  background: #ff6600;
-  color: white;
+  color: rgb(0, 0, 0);
   border: none;
-  padding: 5px 10px;
-  font-size: 1rem;
+  padding: 12px 20px; /* Aumenta el tamaño de los botones */
+  font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 5px; /* Bordes más suaves */
   transition: background 0.3s;
 }
 
@@ -208,46 +307,47 @@ const prevSlide = () => {
 .login-button:hover,
 .logout-button:hover,
 .admin-button:hover {
-  background: #e65c00;
+  background: #010a43;
 }
 
+/* ✅ Sección de Todas las Películas */
 .movies-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
   max-width: 1400px;
-  margin: auto;
+  margin: 20px auto;
 }
 
 .movie-card {
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 15px;
+  flex: 0 0 calc(100% / 6); /* ✅ Mostrar 6 películas por fila */
+  padding: 10px;
   text-align: center;
   cursor: pointer;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
+.movie-card img {
+  width: 100%;
+  height: 250px; /* ✅ Ajustar altura */
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.movie-card h3 {
+  color: #fff;
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+/* ✅ Efecto hover */
 .movie-card:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.movie-card h3 {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  color: #333;
-}
 
-.movie-card img {
-  width: 100%; /* Esto mantiene el ancho al 100% del contenedor */
-  height: 300px; /* Altura fija para que todas las imágenes tengan el mismo tamaño */
-  border-radius: 8px;
-  object-fit: cover; /* Cubre el área manteniendo la proporción sin deformar */
-}
 
 .error {
   color: red;
@@ -315,6 +415,69 @@ const prevSlide = () => {
   right: 10px;
 }
 
+/* ✅ Carrusel de Populares */
+.popular-carousel-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+.popular-carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.popular-movie-card {
+  flex: 0 0 calc(100% / 3); /* ✅ Mostrar 3 películas a la vez */
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.popular-movie-card img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.popular-movie-card h3 {
+  color: #fff;
+  font-size: 1.2rem;
+  margin-top: 8px;
+}
+
+/* ✅ Carrusel Botones */
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 14px;
+  cursor: pointer;
+  font-size: 28px;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.carousel-button.left {
+  left: 10px;
+}
+
+.carousel-button.right {
+  right: 10px;
+}
+
+/* ✅ Diseño responsive */
+@media (max-width: 768px) {
+  .popular-movie-card {
+    flex: 0 0 calc(100% / 1); /* ✅ Mostrar 1 película en dispositivos móviles */
+  }
+}
 /* ✅ Diseño responsive */
 @media (max-width: 768px) {
   .carousel-container {
@@ -330,7 +493,7 @@ const prevSlide = () => {
   font-size: 2rem;
   font-weight: bold;
   margin-top: 20px;
-  color: #333;
+  color: #ffffff;
 }
 
 
