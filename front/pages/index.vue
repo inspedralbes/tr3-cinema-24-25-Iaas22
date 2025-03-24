@@ -25,13 +25,34 @@
 
         <button @click="goToLogin" class="login-button">Iniciar sesión</button>
         <button @click="handleLogout" class="logout-button">Cerrar sesión</button>
+
       </div>
     </nav>
+
+    <div class="carousel-container">
+      <div 
+        class="carousel-track"
+        :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
+      >
+        <div 
+          class="carousel-slide" 
+          v-for="(image, index) in images" 
+          :key="index"
+        >
+          <img :src="image" alt="Imagen de la película" class="carousel-image" />
+        </div>
+      </div>
+      <button @click="prevSlide" class="carousel-button left">❮</button>
+      <button @click="nextSlide" class="carousel-button right">❯</button>
+    </div>
 
     <div v-if="pending">Cargando películas...</div>
     <div v-if="error" class="error">
       <p>Error al cargar las películas: {{ error.message }}</p>
     </div>
+    <div class="title-section">
+  <h2>TODAS LAS PELICULAS</h2>
+</div>
 
     <div v-if="movies.length">
       <div class="movies-grid">
@@ -58,15 +79,26 @@ import axios from 'axios'
 const router = useRouter()
 const searchQuery = ref('')
 const searchVisible = ref(false)
-
-// ✅ Variable para almacenar si el usuario es admin
 const isAdmin = ref(false)
+const currentIndex = ref(0)
+let interval = null
 
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem('user'))
   if (user?.role === 'admin') {
     isAdmin.value = true
   }
+})
+
+ if (process.client) {
+    interval = setInterval(() => {
+      nextSlide()
+    }, 3000)
+  }
+
+
+onUnmounted(() => {
+  clearInterval(interval)
 })
 
 const toggleSearch = () => {
@@ -107,6 +139,31 @@ const filteredMovies = computed(() => {
       )
     : []
 })
+
+// ✅ Rutas de las imágenes
+const images = ref([
+  '/images/carrusel/peli.jpg',
+  '/images/carrusel/peli1.jpg',
+  '/images/carrusel/peli2.jpg',
+  '/images/carrusel/peli4.jpg',
+  '/images/carrusel/peli5.jpg',
+  '/images/carrusel/peli6.jpg',
+  '/images/carrusel/peli7.jpg',
+  '/images/carrusel/peli8.jpg',
+  '/images/carrusel/peli9.jpg',
+  '/images/carrusel/peli10.jpg',
+])
+
+// ✅ Función para avanzar en el carrusel
+const nextSlide = () => {
+  currentIndex.value = (currentIndex.value + 1) % images.value.length
+}
+
+// ✅ Función para retroceder en el carrusel
+const prevSlide = () => {
+  currentIndex.value =
+    (currentIndex.value - 1 + images.value.length) % images.value.length
+}
 </script>
 
 <style scoped>
@@ -202,4 +259,79 @@ const filteredMovies = computed(() => {
   text-align: center;
   font-size: 1.2rem;
 }
+
+/* ✅ Carrusel más grande */
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 1200px; /* Aumentar tamaño del carrusel */
+  height: 500px; /* Altura mayor */
+  margin: 20px auto;
+  border-radius: 16px;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+  min-width: 100%;
+}
+
+.carousel-image {
+  width: 100%;
+  height: 500px; /* Altura fija */
+  object-fit: cover; /* Mantener proporción sin deformar */
+  border-radius: 16px;
+}
+
+/* ✅ Botones de navegación */
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 14px;
+  cursor: pointer;
+  font-size: 28px;
+  border-radius: 50%;
+  transition: background 0.3s;
+  z-index: 10;
+}
+
+.carousel-button:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-button.left {
+  left: 10px;
+}
+
+.carousel-button.right {
+  right: 10px;
+}
+
+/* ✅ Diseño responsive */
+@media (max-width: 768px) {
+  .carousel-container {
+    height: 300px;
+  }
+
+  .carousel-image {
+    height: 300px;
+  }
+}
+.title-section {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-top: 20px;
+  color: #333;
+}
+
+
 </style>
