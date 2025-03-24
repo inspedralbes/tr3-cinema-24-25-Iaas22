@@ -14,9 +14,11 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            MoviesTableSeeder::class,
+            MovieSeeder::class,
             SessionSeeder::class,
             SeatsSeeder::class,
+            UsersSeeder::class,
+            ReservasSeeder::class,
         ]);
     }
 }

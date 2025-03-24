@@ -200,8 +200,6 @@ const reserveSeats = async () => {
   try {
     await CommunicationManager.reserveSeats(selectedSeats.value, selectedSession.value);
 
-    alert('✅ ¡Reserva completada con éxito!');
-
     // 👉 Obtener detalles de la película y butacas
     const session = sessions.value.find(s => s.session_id === selectedSession.value);
     const selectedSeatsDetails = selectedSeats.value.map(seatId => {
@@ -230,14 +228,20 @@ const reserveSeats = async () => {
 
     // 👉 Limpiar la selección y actualizar las butacas
     selectedSeats.value = [];
+    
+    // 🔥 Asegúrate de que ambas funciones se completen antes de mostrar el alert
     await fetchSeats(selectedSession.value);
     await fetchReservations();
 
+    // ✅ Mostrar el alert después de que todo termine
+    alert('✅ ¡Reserva completada con éxito!');
+    
   } catch (error) {
     console.error('❌ Error al reservar las butacas:', error);
     alert(`❌ Error: ${error.message}`);
   }
 };
+
 
 const handleConfirmReservation = async () => {
   try {
