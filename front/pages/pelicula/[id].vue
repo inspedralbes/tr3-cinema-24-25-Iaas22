@@ -20,6 +20,12 @@
         <p><strong>Director:</strong> {{ movie.director }}</p>
         <p><strong>Actores:</strong> {{ movie.actors }}</p>
         <p><strong>Estreno:</strong> {{ movie.release_date }}</p>
+        <p v-if="movie.trailer">
+          <strong>Trailer: </strong> 
+          <a :href="movie.trailer" target="_blank" class="trailer-link">
+            Ver Trailer en YouTube
+          </a>
+        </p>
         <button class="buy-ticket" @click="goToReserva">Comprar Entrada</button>
       </div>
     </div>
@@ -144,4 +150,14 @@ function goToReserva() {
 .error {
   color: red;
 }
+.trailer-link {
+  color: #ff9900;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.trailer-link:hover {
+  color: #007bff;
+}
+
 </style>

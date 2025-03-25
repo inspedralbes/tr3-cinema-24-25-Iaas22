@@ -41,6 +41,7 @@ class MovieController extends Controller
                 'synopsis' => 'required|string',
                 'release_date' => 'required|date',
                 'img' => 'nullable|string',
+                'trailer' => 'nullable|string',  // Agregamos el campo trailer que puede ser NULL
             ]);
 
             $movie = Movie::create($request->all());
@@ -78,6 +79,7 @@ class MovieController extends Controller
             'synopsis' => 'sometimes|string',
             'release_date' => 'sometimes|date',
             'img' => 'nullable|string',
+            'trailer' => 'nullable|string',  // Agregamos el campo trailer que puede ser NULL
         ]);
 
         $movie->update($request->all());

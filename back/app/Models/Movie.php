@@ -10,6 +10,6 @@ class Movie extends Model
     protected $primaryKey = 'movie_id'; // Asegúrate de que la clave primaria sea correcta
     public $timestamps = false; // Si tu tabla no tiene los campos created_at y updated_at
     protected $fillable = [
-        'title', 'genre', 'duration', 'director', 'actors', 'synopsis', 'release_date', 'img'
-    ]; // Asegúrate de que todos los campos sean asignables
+        'title', 'genre', 'duration', 'director', 'actors', 'synopsis', 'release_date', 'img',   'trailer',  
+    ]; 
 }

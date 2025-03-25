@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://cinema.a23ishamisul.daw.inspedralbes.cat/laravel/public/api';
+const API_URL = 'http://localhost:8000/api';
 
 // ✅ Configurar axios para usar el token si está disponible
 if (typeof window !== 'undefined') {
