@@ -43,7 +43,6 @@
         </button>
       </div>
     </nav>
-  <!-- Mostrar botones para elegir el CRUD -->
   <div v-if="showAdminOptions" class="admin-options">
       <button @click="goToMovieCRUD">Ir a Movie CRUD</button>
       <button @click="goToReservationsCRUD">Ir a Reservations CRUD</button>
@@ -286,7 +285,6 @@ const prevSlide = () => {
   margin-left: auto;
 }
 
-/* ✅ Botones de acción */
 .search-button,
 .login-button,
 .logout-button,
@@ -339,7 +337,6 @@ const prevSlide = () => {
   box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
 }
 
-/* ✅ Carrusel principal */
 .carousel-container {
   position: relative;
   overflow: hidden;
@@ -405,7 +402,6 @@ const prevSlide = () => {
   right: 20px;
 }
 
-/* ✅ Sección de populares */
 .title-section {
   text-align: center;
   margin: 3rem 0 1.5rem;
@@ -493,7 +489,6 @@ const prevSlide = () => {
   text-align: center;
 }
 
-/* ✅ Grid de películas */
 .movies-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -538,7 +533,6 @@ const prevSlide = () => {
   text-align: center;
 }
 
-/* ✅ Responsive */
 @media (max-width: 1024px) {
   .popular-movie-card {
     flex: 0 0 calc(100% / 2);
@@ -605,7 +599,6 @@ const prevSlide = () => {
     height: 200px;
   }
 }
-/* ✅ Estilos para los botones del CRUD */
 .admin-options {
   display: flex;
   justify-content: center;
@@ -643,7 +636,6 @@ const prevSlide = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive para botones CRUD */
 @media (max-width: 768px) {
   .admin-options {
     flex-direction: column;
