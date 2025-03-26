@@ -357,4 +357,26 @@ public function getConfirmedReservations(Request $request)
         return response()->json(['error' => 'Hubo un error al procesar la solicitud'], 500);
     }
 }
+public function getAvailableDates()
+{
+    if (auth()->user()->role !== 'admin') {
+        return response()->json(['error' => 'No tienes permisos para acceder a esta información'], 403);
+    }
+
+    try {
+        // Obtener todas las fechas únicas de las reservas confirmadas
+        $dates = Reserva::where('status', 'confirmada')
+            ->distinct()
+            ->pluck('compra_dia');
+
+        return response()->json([
+            'dates' => $dates
+        ]);
+
+    } catch (\Exception $e) {
+        \Log::error("Error al obtener fechas: " . $e->getMessage());
+        return response()->json(['error' => 'Hubo un error al procesar la solicitud'], 500);
+    }
+}
+
 }

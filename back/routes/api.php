@@ -63,6 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/cancel-reservation/{seatId}', [ReservaController::class, 'cancelReservation']);
     Route::delete('/reservas/cancelar-multiples', [ReservaController::class, 'cancelReservations']);
     Route::post('/admin/reservations/confirmed', [ReservaController::class, 'getConfirmedReservations']);
+    Route::get('/admin/reservations/available-dates', [ReservaController::class, 'getAvailableDates']);
+
     Route::post('/confirmar-reserva', [ReservaController::class, 'confirmReservation']);
 
 
