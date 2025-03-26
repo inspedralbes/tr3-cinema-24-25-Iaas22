@@ -1,6 +1,8 @@
 <template>
   <div>
     <nav class="navbar">
+      <img src="/images/logoo.png" alt="Logo" class="logo" />
+
       <h1>C𝕚𝕟𝕖Y𝕒</h1>
       <div class="actions">
         <div class="search-container">
@@ -37,7 +39,7 @@
           @click="handleLogout" 
           class="logout-button"
         >
-          <img src="/images/logout.png" alt="Cerrar sesión" class="icon-button" />
+          <img src="/images/out.png" alt="Cerrar sesión" class="icon-button" />
         </button>
       </div>
     </nav>
@@ -273,29 +275,37 @@ div {
   color: white;
   padding: 1rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.5rem;
+  align-items: center; 
+  gap: 10px; 
+  font-size: 15px;
 }
+
+.logo {
+  width: 50px; 
+  height: 50px;
+  object-fit: contain;
+}
+
 .navbar h1 {
-  margin-left: 50px;
+  font-size: 1.5rem;
+  margin: 0; 
 }
 
 .actions {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-left: -20px;
+  margin-left: auto; /* Mueve las acciones hacia la derecha */
 }
 
 .search-button img,
 .login-button img,
 .logout-button img,
 .admin-button img {
-  width: 50px;
+  width: 30px;
   border: none; 
 
-  height: 50px;
+  height: 30px;
   object-fit: contain;
 }
 
