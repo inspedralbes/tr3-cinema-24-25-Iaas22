@@ -52,34 +52,61 @@ function goToReserva() {
   router.push({ path: `/Sessions/${movieId}` });  
 }
 </script>
-
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 * {
   font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Contenedor de los detalles de la película */
+/* ✅ Contenedor principal */
 .movie-details {
-  max-width: 2000px;
-  height: 790px;
-  padding: 20px;
-  background-color: #0a0f2c;
-  color: #ffffff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #081e27, #02465d, #011721);
+  color: #e6f1ff;
   display: flex;
   flex-direction: column;
-  gap: 20px;
   align-items: center;
 }
 
-.movie-info {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  margin-top: 100px;
+/* ✅ Mensajes de carga y error */
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  border-radius: 12px;
+  margin: 2rem auto;
+  max-width: 800px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.error {
+  color: #ff6b6b;
+  border-left: 3px solid #ff6b6b;
+}
+
+/* ✅ Contenedor de información */
+.movie-info {
+  display: flex;
+  gap: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin-top: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ✅ Imagen de la película */
 .movie-image {
   flex: 1;
   max-width: 400px;
@@ -87,77 +114,177 @@ function goToReserva() {
 
 .movie-image img {
   width: 100%;
-  height: 600px; /* Tamaño constante para todas las imágenes */
+  height: 600px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(100, 255, 218, 0.2);
+  transition: all 0.3s ease;
 }
 
-/* Descripción de la película */
+.movie-image img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* ✅ Descripción de la película */
 .movie-description {
   flex: 2;
   text-align: left;
 }
 
 .movie-description h2 {
-  margin-top: 0;
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  color: #64ffda;
+  font-weight: 600;
 }
 
-/* Botón de volver con flecha */
+.movie-description p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.movie-description strong {
+  color: #1e90ff;
+  font-weight: 500;
+}
+
+/* ✅ Botón de volver */
 .back-button {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  background-color: transparent;
-  color: #ffffff;
+  top: 1.5rem;
+  left: 1.5rem;
+  background: rgba(10, 25, 47, 0.7);
+  color: #64ffda;
   border: none;
-  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: color 0.3s ease;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .back-button:hover {
-  color: #007bff;
+  background: rgba(30, 144, 255, 0.8);
+  color: white;
+  transform: translateX(-3px);
 }
 
-/* Botón de comprar entrada */
+/* ✅ Botón de comprar entrada */
 .buy-ticket {
-  margin-top: 20px;
-  background-color: #ffffff;
-  color: rgb(0, 0, 0);
-  padding: 12px 20px;
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+  color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .buy-ticket:hover {
-  background-color: #05086e;
-  transform: scale(1.05);
+  background: linear-gradient(to right, #3a92d8 0%, #00d9e6 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .buy-ticket:active {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
-/* Mensaje de carga y error */
-.loading, .error {
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-.error {
-  color: red;
-}
+/* ✅ Enlace del trailer */
 .trailer-link {
-  color: #ff9900;
+  color: #4facfe;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin-left: 0.5rem;
 }
 
 .trailer-link:hover {
-  color: #007bff;
+  color: #64ffda;
+  text-decoration: underline;
+  transform: translateX(3px);
 }
 
+/* ✅ Responsive */
+@media (max-width: 1024px) {
+  .movie-info {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .movie-image {
+    max-width: 100%;
+  }
+  
+  .movie-image img {
+    height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .movie-details {
+    padding: 1.5rem;
+  }
+  
+  .movie-info {
+    padding: 1.5rem;
+  }
+  
+  .movie-description h2 {
+    font-size: 1.8rem;
+  }
+  
+  .movie-image img {
+    height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .movie-details {
+    padding: 1rem;
+  }
+  
+  .movie-info {
+    padding: 1rem;
+    margin-top: 3rem;
+  }
+  
+  .movie-description h2 {
+    font-size: 1.5rem;
+  }
+  
+  .movie-image img {
+    height: 300px;
+  }
+  
+  .back-button {
+    top: 1rem;
+    left: 1rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .buy-ticket {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+}
 </style>
