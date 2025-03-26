@@ -292,6 +292,69 @@ public function cancelReservations(Request $request)
         ]);
     }
     
-    
+/**
+ * Obtener todas las reservas confirmadas para una fecha específica (solo admin)
+ */
+public function getConfirmedReservations(Request $request)
+{
+    if (auth()->user()->role !== 'admin') {
+        return response()->json(['error' => 'No tienes permisos para acceder a esta información'], 403);
+    }
 
+    try {
+        $request->validate([
+            'date' => 'required|date_format:Y-m-d'
+        ]);
+
+        $date = $request->date;
+
+        // Modificación importante: Buscar por compra_dia en lugar de session_date
+        $reservations = Reserva::with(['seat', 'session.movie', 'user'])
+            ->where('compra_dia', $date)
+            ->where('status', 'confirmada')
+            ->get();
+
+        $formattedReservations = $reservations->map(function ($reservation) {
+            return [
+                'reserva_id' => $reservation->reserva_id,
+                'user' => [
+                    'id' => $reservation->user->id,
+                    'name' => $reservation->user->name,
+                    'email' => $reservation->user->email,
+                ],
+                'seat' => [
+                    'id' => $reservation->seat->seat_id,
+                    'row' => $reservation->seat->row,
+                    'number' => $reservation->seat->seat_num,
+                    'type' => $reservation->seat->type ?? (strtoupper($reservation->seat->row) === 'F' ? 'vip' : 'normal'),
+                ],
+                'session' => [
+                    'id' => $reservation->session->session_id ?? null,
+                    'movie' => $reservation->session->movie->title ?? null,
+                    'date' => $reservation->session->session_date ?? null,
+                    'time' => $reservation->session->session_time ?? null,
+                ],
+                'reservation_details' => [
+                    'price' => $reservation->precio,
+                    'purchase_date' => $reservation->compra_dia,
+                    'purchase_time' => $reservation->compra_hora,
+                    'name' => $reservation->name,
+                    'lastname' => $reservation->apellidos,
+                    'email' => $reservation->email,
+                    'status' => $reservation->status,
+                ]
+            ];
+        });
+
+        return response()->json([
+            'date' => $date,
+            'total' => $reservations->count(),
+            'reservations' => $formattedReservations
+        ]);
+
+    } catch (\Exception $e) {
+        \Log::error("Error al obtener reservas: " . $e->getMessage());
+        return response()->json(['error' => 'Hubo un error al procesar la solicitud'], 500);
+    }
+}
 }
