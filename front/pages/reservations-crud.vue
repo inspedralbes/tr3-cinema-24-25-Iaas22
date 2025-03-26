@@ -12,6 +12,11 @@
         </select>
       </div>
   
+      <!-- Mostrar los totales por tipo de asiento -->
+      <div v-if="countByType">
+        <p><strong>Total de reservas confirmadas:</strong> {{ countByType.normal }} Normal / {{ countByType.vip }} VIP</p>
+      </div>
+  
       <!-- Lista de Reservas Confirmadas -->
       <div v-if="reservations.length > 0">
         <h3>Reservas Confirmadas para {{ selectedDate }}:</h3>
@@ -36,6 +41,7 @@
   
   const availableDates = ref([]);
   const reservations = ref([]);
+  const countByType = ref({ normal: 0, vip: 0 }); // Añadimos esta variable para los totales por tipo
   const selectedDate = ref('');
   
   // Función para cargar las fechas disponibles de las reservas
@@ -51,7 +57,9 @@
   const fetchConfirmedReservations = async () => {
     if (!selectedDate.value) return;
     try {
-      reservations.value = await CommunicationManager.fetchConfirmedReservations(selectedDate.value);
+      const data = await CommunicationManager.fetchConfirmedReservations(selectedDate.value);
+      reservations.value = data.reservations;
+      countByType.value = data.countByType; // Asignamos los totales por tipo
     } catch (error) {
       console.error('Error al obtener las reservas confirmadas:', error);
     }

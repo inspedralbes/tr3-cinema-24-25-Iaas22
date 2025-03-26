@@ -352,20 +352,31 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
     }
   },
 
- // Función para obtener las reservas confirmadas en una fecha
-async fetchConfirmedReservations(date) {
-  try {
+  async fetchConfirmedReservations(date) {
+    try {
       const response = await axios.get(`${API_URL}/admin/reservations/confirmed`, {
           params: {
               date: date,  // Pasamos la fecha como parámetro en la URL
           }
       });
-      return response.data.reservations;
-  } catch (error) {
+  
+      // Asegurarnos de que la respuesta contiene los datos que necesitamos
+      if (!response.data.reservations || !response.data.countByType) {
+        throw new Error('Los datos de las reservas no están disponibles');
+      }
+  
+      return {
+        reservations: response.data.reservations,
+        countByType: response.data.countByType // Añadimos esta parte
+      };
+    } catch (error) {
       console.error('❌ Error al obtener las reservas confirmadas:', error);
-      throw new Error(error.response?.data?.message || 'Error al obtener las reservas confirmadas');
-  }
-},
+      // Mostrar el error de una forma más clara
+      const errorMessage = error.response?.data?.message || error.message || 'Error al obtener las reservas confirmadas';
+      throw new Error(errorMessage);
+    }
+  },
+  
 
   // Lógica combinada para obtener fechas y luego reservas confirmadas
   async fetchDatesAndReservations() {

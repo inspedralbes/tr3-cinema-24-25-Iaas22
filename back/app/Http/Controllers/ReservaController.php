@@ -292,9 +292,6 @@ public function cancelReservations(Request $request)
         ]);
     }
     
-/**
- * Obtener todas las reservas confirmadas para una fecha específica (solo admin)
- */
 public function getConfirmedReservations(Request $request)
 {
     if (auth()->user()->role !== 'admin') {
@@ -308,7 +305,6 @@ public function getConfirmedReservations(Request $request)
 
         $date = $request->date;
 
-        // Modificación importante: Buscar por compra_dia en lugar de session_date
         $reservations = Reserva::with(['seat', 'session.movie', 'user'])
             ->where('compra_dia', $date)
             ->where('status', 'confirmada')
@@ -346,17 +342,24 @@ public function getConfirmedReservations(Request $request)
             ];
         });
 
+        // Contamos las reservas por tipo de asiento (normal o vip)
+        $countByType = [
+            'normal' => $reservations->where('seat.type', 'normal')->count(),
+            'vip' => $reservations->where('seat.type', 'vip')->count(),
+        ];
+
         return response()->json([
             'date' => $date,
             'total' => $reservations->count(),
+            'countByType' => $countByType,  
             'reservations' => $formattedReservations
         ]);
-
     } catch (\Exception $e) {
         \Log::error("Error al obtener reservas: " . $e->getMessage());
         return response()->json(['error' => 'Hubo un error al procesar la solicitud'], 500);
     }
 }
+
 public function getAvailableDates()
 {
     if (auth()->user()->role !== 'admin') {
