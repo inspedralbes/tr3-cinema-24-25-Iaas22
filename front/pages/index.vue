@@ -278,6 +278,7 @@ div {
   align-items: center; 
   gap: 10px; 
   font-size: 15px;
+  padding-top: 30px;
 }
 
 .logo {
@@ -402,8 +403,7 @@ div {
   width: 100%;
   max-width: 1000px;
   height: 500px;
-  margin: 20px auto;
-  border-radius: 16px;
+  margin: 10px auto;
 }
 
 .carousel-track {
@@ -419,10 +419,10 @@ div {
 }
 
 .carousel-image {
+  padding-top: 50px;
   width: 1000px; 
-  height: 400px; 
+  height: 500px; 
   object-fit: cover; 
-  border-radius: 16px;
 }
 
 .carousel-button {
@@ -464,8 +464,7 @@ div {
   position: relative;
   overflow: hidden;
   width: 100%;
-  max-width: 1200px;
-  margin: 20px auto;
+  margin: 10px auto;
 }
 
 .popular-carousel-track {
@@ -535,7 +534,7 @@ div {
   text-align: center;
   font-size: 2rem;
   font-weight: bold;
-  margin-top: 20px;
+  margin-top: 10px;
   color: #ffffff;
 }
 </style>
