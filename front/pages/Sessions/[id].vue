@@ -3,7 +3,6 @@
    
     <!-- ✅ Navbar -->
     <nav class="navbar">
-       <!-- ✅ Botón de volver atrás -->
     <!-- Botón de volver -->
     <button class="back-button" @click="$router.push('/')">
         ⬅️

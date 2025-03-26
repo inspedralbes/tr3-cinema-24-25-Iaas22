@@ -108,6 +108,9 @@ onMounted(fetchMovies)
 
 <template>
   <div class="movies-container">
+    <button class="back-button" @click="$router.push('/')">
+        ⬅️
+      </button>
     <div class="movies-card">
       <h2 class="movies-title">Gestión de Películas</h2>
       
@@ -201,6 +204,33 @@ onMounted(fetchMovies)
   align-items: flex-start;
   padding: 2rem 1rem;
 }
+/* ✅ Botón de volver */
+.back-button {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  background: rgba(10, 25, 47, 0.7);
+  color: #64ffda;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:hover {
+  background: rgba(30, 144, 255, 0.8);
+  color: white;
+  transform: translateX(-3px);
+}
 
 /* ✅ Tarjeta principal con efecto de vidrio (glassmorphism) */
 .movies-card {
@@ -214,6 +244,7 @@ onMounted(fetchMovies)
   max-width: 900px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 50px;
 }
 
 .movies-card:hover {
