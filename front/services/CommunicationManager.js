@@ -340,6 +340,57 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
       throw new Error(error.response?.data?.message || 'Error al confirmar la reserva');
     }
   },  
+ 
+   // ✅ Obtener las fechas disponibles
+   async fetchAvailableDates() {
+    try {
+      const response = await axios.get(`${API_URL}/admin/reservations/available-dates`);
+      return response.data.dates; // Devuelve el arreglo de fechas disponibles
+    } catch (error) {
+      console.error('Error al obtener las fechas disponibles:', error);
+      throw new Error(error.response?.data?.message || 'Error al obtener las fechas disponibles');
+    }
+  },
+
+ // Función para obtener las reservas confirmadas en una fecha
+async fetchConfirmedReservations(date) {
+  try {
+      const response = await axios.get(`${API_URL}/admin/reservations/confirmed`, {
+          params: {
+              date: date,  // Pasamos la fecha como parámetro en la URL
+          }
+      });
+      return response.data.reservations;
+  } catch (error) {
+      console.error('❌ Error al obtener las reservas confirmadas:', error);
+      throw new Error(error.response?.data?.message || 'Error al obtener las reservas confirmadas');
+  }
+},
+
+  // Lógica combinada para obtener fechas y luego reservas confirmadas
+  async fetchDatesAndReservations() {
+    try {
+      // Paso 1: Obtener fechas disponibles
+      const availableDates = await this.fetchAvailableDates();
+      if (availableDates && availableDates.length > 0) {
+        const date = availableDates[0]; // Selecciona la primera fecha disponible
+        console.log('Fecha seleccionada:', date);
+
+        // Paso 2: Obtener reservas confirmadas para esa fecha
+        const confirmedReservations = await this.fetchConfirmedReservations(date);
+        console.log('Reservas confirmadas:', confirmedReservations);
+        return confirmedReservations; // Devuelve las reservas confirmadas
+      } else {
+        console.error('No hay fechas disponibles');
+        throw new Error('No hay fechas disponibles');
+      }
+    } catch (error) {
+      console.error('Error al obtener las fechas y reservas:', error);
+      throw new Error(error.message);
+    }
+  },
+
+
   // ✅ Obtener configuración base de la API
   getApiBase() {
     return API_URL;
