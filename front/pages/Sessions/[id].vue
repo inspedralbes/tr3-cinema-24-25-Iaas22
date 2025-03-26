@@ -6,7 +6,7 @@
 
       <h1>C𝕚𝕟𝕖Y𝕒</h1>
       <button @click="toggleCart" class="btn-cart">
-        <img src="/images/cart.jpg" alt="Carrito" class="icon-button" />
+        <img src="/images/ticket.svg" alt="Carrito" class="icon-button" />
         <span class="cart-count">{{ reservations.length }}</span>
       </button>
     </nav>
@@ -424,7 +424,7 @@ onMounted(() => {
   border-radius: 8px;
   padding: 0.5rem 1rem;
   color: #64ffda;
-  font-size: 1rem;
+  font-size: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;

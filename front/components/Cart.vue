@@ -3,14 +3,14 @@
     <div class="sidebar-content">
       <div class="sidebar-header">
         <button @click="$emit('toggle-cart')" class="close-btn">
-          <img src="/images/close.png" alt="Cerrar" class="icon-button" />
+          <img src="/images/cancelar.svg" alt="Cerrar" class="icon-button" />
         </button>
-        <h3 class="sidebar-title">Cesta de reservas</h3>
+        <h3 class="sidebar-title">MIS ENTRADAS </h3>
       </div>
       
       <div v-if="reservations.length === 0" class="empty-cart">
         <img src="/images/cart.jpg" alt="Carrito vacío" class="empty-icon" />
-        <p>No hay reservas en tu cesta</p>
+        <p>No hay entradas confirmadas. </p>
       </div>
       
       <ul v-else class="reservations-list">
@@ -40,7 +40,7 @@
             @click="$emit('cancel-reservation', reservation.seat_id)"
             class="cancel-btn"
           >
-            <img src="/images/login.png" alt="Eliminar" class="icon-button" />
+            <img src="/images/delete.svg" alt="Eliminar" class="icon-button" />
           </button>
         </li>
       </ul>
