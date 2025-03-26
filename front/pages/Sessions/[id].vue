@@ -1,7 +1,13 @@
 <template>
-  <div class="main-container">
+    <div class="main-container">
+   
     <!-- ✅ Navbar -->
     <nav class="navbar">
+       <!-- ✅ Botón de volver atrás -->
+    <!-- Botón de volver -->
+    <button class="back-button" @click="$router.push('/')">
+        ⬅️
+      </button>
       <img src="/images/logoo.png" alt="Logo" class="logo" />
 
       <h1>C𝕚𝕟𝕖Y𝕒</h1>
@@ -388,6 +394,8 @@ onMounted(() => {
   z-index: 100;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+  padding-left: 4rem; 
+
 }
 .logo {
   width: 50px;
@@ -395,7 +403,9 @@ onMounted(() => {
   object-fit: contain;
   transition: transform 0.3s ease;
 }
-
+img.logo{
+  margin-left: 50px;
+}
 .logo:hover {
   transform: scale(1.1);
 }
@@ -417,7 +427,33 @@ onMounted(() => {
   color: transparent;
   margin: 0;
 }
+/* ✅ Botón de volver */
+.back-button {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  background: rgba(10, 25, 47, 0.7);
+  color: #64ffda;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 
+.back-button:hover {
+  background: rgba(30, 144, 255, 0.8);
+  color: white;
+  transform: translateX(-3px);
+}
 .btn-cart {
   background: rgba(100, 255, 218, 0.1);
   border: 1px solid rgba(100, 255, 218, 0.2);

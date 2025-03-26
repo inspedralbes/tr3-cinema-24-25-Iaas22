@@ -107,157 +107,397 @@ onMounted(fetchMovies)
 </script>
 
 <template>
-  <div>
-    <h2>Películas</h2>
-    <form @submit.prevent="handleSubmit">
-      <input v-model="form.title" placeholder="Título" required />
-      <input v-model="form.genre" placeholder="Género" required />
-      <input v-model="form.duration" placeholder="Duración" type="number" required />
-      <input v-model="form.director" placeholder="Director" required />
-      <input v-model="form.actors" placeholder="Actores" required />
-      <textarea v-model="form.synopsis" placeholder="Sinopsis" required></textarea>
-      <input v-model="form.release_date" type="date" required />
-
-      <!-- ✅ Carga de imagen -->
-      <input type="file" @change="uploadImage" />
-      <div v-if="form.img">
-        <img :src="form.img" alt="Imagen de la película" style="width: 100px; height: auto; margin-top: 10px;" />
-      </div>
-
-      <button type="submit">{{ editing ? 'Actualizar' : 'Crear' }} Película</button>
-      <button type="button" @click="resetForm">Cancelar</button>
-    </form>
-
-    <div v-if="movies.length">
-      <ul>
-        <li v-for="movie in movies" :key="movie.movie_id">
-          <div>
-            <strong>{{ movie.title }}</strong> ({{ movie.genre }}) - {{ movie.director }}
-            <img v-if="movie.img" :src="movie.img" alt="Imagen de la película" style="width: 50px; height: auto; margin-left: 10px;" />
+  <div class="movies-container">
+    <div class="movies-card">
+      <h2 class="movies-title">Gestión de Películas</h2>
+      
+      <form @submit.prevent="handleSubmit" class="movies-form">
+        <div class="form-group">
+          <label>Título</label>
+          <input v-model="form.title" class="form-input" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Género</label>
+          <input v-model="form.genre" class="form-input" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Duración (minutos)</label>
+          <input v-model="form.duration" type="number" class="form-input" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Director</label>
+          <input v-model="form.director" class="form-input" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Actores</label>
+          <input v-model="form.actors" class="form-input" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Sinopsis</label>
+          <textarea v-model="form.synopsis" class="form-input" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Fecha de estreno</label>
+          <input v-model="form.release_date" type="date" class="form-input" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Imagen</label>
+          <input type="file" @change="uploadImage" class="form-input" />
+          <div v-if="form.img" class="image-preview">
+            <img :src="form.img" alt="Imagen de la película" />
           </div>
-          <button @click="editMovie(movie)">Editar</button>
-          <button @click="deleteMovie(movie.movie_id)">Eliminar</button>
-        </li>
-      </ul>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="submit-button">
+            {{ editing ? 'Actualizar' : 'Crear' }} Película
+          </button>
+          <button type="button" @click="resetForm" class="cancel-button">
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <div class="movies-list">
+        <h3 class="list-title">Películas Registradas</h3>
+        
+        <div v-if="movies.length" class="movie-items">
+          <div v-for="movie in movies" :key="movie.movie_id" class="movie-item">
+            <div class="movie-info">
+              <div class="movie-header">
+                <h4>{{ movie.title }}</h4>
+                <span class="movie-genre">{{ movie.genre }}</span>
+              </div>
+              <p class="movie-director">Director: {{ movie.director }}</p>
+              <p class="movie-duration">Duración: {{ movie.duration }} minutos</p>
+              <img v-if="movie.img" :src="movie.img" alt="Imagen de la película" />
+            </div>
+            <div class="movie-actions">
+              <button @click="editMovie(movie)" class="edit-button">Editar</button>
+              <button @click="deleteMovie(movie.movie_id)" class="delete-button">Eliminar</button>
+            </div>
+          </div>
+        </div>
+        <p v-else class="empty-message">No hay películas disponibles.</p>
+      </div>
     </div>
-    <p v-else>No hay películas disponibles.</p>
   </div>
 </template>
+
 <style scoped>
-/* ✅ Estilo general */
-div {
-  font-family: 'Arial', sans-serif;
-  color: #333;
-  padding: 16px;
-  background-color: #f9f9f9;
+/* ✅ Fondo azul oscuro con gradiente */
+.movies-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #081e27, #02465d, #011721);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+}
+
+/* ✅ Tarjeta principal con efecto de vidrio (glassmorphism) */
+.movies-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 900px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.movies-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
 /* ✅ Título */
-h2 {
-  font-size: 24px;
-  color: #2c3e50;
-  margin-bottom: 16px;
+.movies-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.list-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 2rem 0 1rem;
+  letter-spacing: 0.5px;
 }
 
 /* ✅ Formulario */
-form {
+.movies-form {
   display: grid;
-  gap: 12px;
-  background: #ffffff;
-  padding: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
 }
 
-input,
-textarea,
-button {
-  width: 100%;
-  padding: 10px;
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.5rem;
+  display: block;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 350px;
+  padding: 0.9rem 1.2rem;
+  font-size: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
-input:focus,
-textarea:focus {
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.form-input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   outline: none;
-  border-color: #3498db;
 }
 
-/* ✅ Botones */
-button {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-button:hover {
-  background-color: #2980b9;
-}
-
-button[type='button'] {
-  background-color: #e74c3c;
-}
-
-button[type='button']:hover {
-  background-color: #c0392b;
+textarea.form-input {
+  min-height: 100px;
+  resize: vertical;
 }
 
 /* ✅ Imagen de vista previa */
-img {
+.image-preview {
+  margin-top: 10px;
+}
+
+.image-preview img {
   max-width: 100px;
   border-radius: 8px;
-  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ✅ Botones del formulario */
+.form-actions {
+  grid-column: span 2;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.submit-button {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.submit-button:hover {
+  background: linear-gradient(to right, #3a92d8 0%, #00d9e6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cancel-button {
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.cancel-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* ✅ Lista de películas */
-ul {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  gap: 16px;
+.movies-list {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
 }
 
-li {
+.movie-items {
+  display: grid;
+  gap: 1rem;
+}
+
+.movie-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #ffffff;
-  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.2rem;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
 
-li img {
-  width: 50px;
-  height: auto;
-  margin-left: 12px;
-  border-radius: 6px;
+.movie-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-li div {
+.movie-info {
+  flex: 1;
+}
+
+.movie-header {
   display: flex;
   align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-li button {
-  margin-left: 8px;
+.movie-header h4 {
+  font-size: 1.1rem;
+  color: #ffffff;
+  margin: 0;
+}
+
+.movie-genre {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.movie-director, .movie-duration {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0.3rem 0;
+}
+
+.movie-info img {
+  max-width: 60px;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.movie-actions {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.edit-button {
+  padding: 0.6rem 1rem;
+  background: rgba(74, 144, 226, 0.2);
+  color: #4a90e2;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(74, 144, 226, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-button:hover {
+  background: rgba(74, 144, 226, 0.3);
+  transform: translateY(-2px);
+}
+
+.delete-button {
+  padding: 0.6rem 1rem;
+  background: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-button:hover {
+  background: rgba(231, 76, 60, 0.3);
+  transform: translateY(-2px);
+}
+
+.empty-message {
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 1rem;
+  font-style: italic;
 }
 
 /* ✅ Diseño responsive */
-@media (max-width: 600px) {
-  form,
-  li {
-    flex-direction: column;
-    gap: 10px;
+@media (max-width: 768px) {
+  .movies-form {
+    grid-template-columns: 1fr;
   }
-
-  li img {
+  
+  .form-actions {
+    grid-column: span 1;
+  }
+  
+  .movie-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .movie-actions {
     width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .movies-card {
+    padding: 1.5rem;
+  }
+  
+  .movies-title {
+    font-size: 1.7rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-input {
+    padding: 0.8rem 1rem;
+  }
+  
+  .submit-button, .cancel-button {
+    padding: 0.9rem 1.2rem;
+    font-size: 0.95rem;
   }
 }
 </style>
