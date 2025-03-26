@@ -2,7 +2,9 @@
   <div class="main-container">
     <!-- ✅ Navbar -->
     <nav class="navbar">
-      <h1 class="title">CineYa</h1>
+      <img src="/images/logoo.png" alt="Logo" class="logo" />
+
+      <h1>C𝕚𝕟𝕖Y𝕒</h1>
       <button @click="toggleCart" class="btn-cart">
         <img src="/images/cart.jpg" alt="Carrito" class="icon-button" />
         <span class="cart-count">{{ reservations.length }}</span>
@@ -387,7 +389,25 @@ onMounted(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(100, 255, 218, 0.1);
 }
+.logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
 
+.logo:hover {
+  transform: scale(1.1);
+}
+.navbar h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #64ffda, #1e90ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0;
+}
 .title {
   font-size: 1.8rem;
   font-weight: 700;
