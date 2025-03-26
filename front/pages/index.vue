@@ -11,7 +11,9 @@
             placeholder="Buscar..." 
             class="search-bar" 
           />
-          <button @click="toggleSearch" class="search-button">🔍</button>
+          <button @click="toggleSearch" class="search-button">
+            <img src="/images/lupa.png" alt="Buscar" class="icon-button" />
+          </button>
         </div>
 
         <button 
@@ -19,15 +21,27 @@
           @click="goToAdminPanel" 
           class="admin-button"
         >
-          Panel de Admin
+          <img src="/images/admin.png" alt="Admin" class="icon-button" />
         </button>
 
-        <button @click="goToLogin" class="login-button">Iniciar sesión</button>
-        <button @click="handleLogout" class="logout-button">Cerrar sesión</button>
+        <button 
+          v-if="!isLoggedIn" 
+          @click="goToLogin" 
+          class="login-button"
+        >
+          <img src="/images/login.png" alt="Iniciar sesión" class="icon-button" />
+        </button>
+
+        <button 
+          v-if="isLoggedIn" 
+          @click="handleLogout" 
+          class="logout-button"
+        >
+          <img src="/images/logout.png" alt="Cerrar sesión" class="icon-button" />
+        </button>
       </div>
     </nav>
 
-    <!-- ✅ Carrusel de Imágenes -->
     <div class="carousel-container">
       <div 
         class="carousel-track"
@@ -45,7 +59,6 @@
       <button @click="nextSlide" class="carousel-button right">❯</button>
     </div>
 
-    <!-- ✅ Carrusel de Películas Populares -->
     <div v-if="popularMovies.length" class="popular-section">
       <div class="title-section">
         <h2>MÁS POPULARES</h2>
@@ -70,7 +83,6 @@
       </div>
     </div>
 
-    <!-- ✅ Sección de Todas las Películas -->
     <div v-if="remainingMovies.length">
       <div class="title-section">
         <h2>TODAS LAS PELÍCULAS</h2>
@@ -101,13 +113,17 @@ const searchQuery = ref('')
 const searchVisible = ref(false)
 const isAdmin = ref(false)
 const currentIndex = ref(0)
-const popularIndex = ref(0) // ✅ Índice del carrusel de populares
+const popularIndex = ref(0) 
 let interval = null
+const isLoggedIn = ref(false) 
 
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem('user'))
-  if (user?.role === 'admin') {
-    isAdmin.value = true
+  if (user) {
+    isLoggedIn.value = true
+    if (user.role === 'admin') {
+      isAdmin.value = true
+    }
   }
 
   interval = setInterval(() => {
@@ -137,6 +153,7 @@ const handleLogout = async () => {
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user')
     delete axios.defaults.headers.common['Authorization']
+    isLoggedIn.value = false 
 
     alert('✅ Has cerrado sesión correctamente.')
     router.push('/')
@@ -160,7 +177,6 @@ const filteredMovies = computed(() => {
 const popularMovies = computed(() => filteredMovies.value.slice(0, 6))
 const remainingMovies = computed(() => filteredMovies.value.slice(6))
 
-// ✅ Carrusel de Populares
 const nextPopularSlide = () => {
   const totalSlides = Math.ceil(popularMovies.value.length / 3)
   popularIndex.value = (popularIndex.value + 1) % totalSlides
@@ -171,7 +187,6 @@ const prevPopularSlide = () => {
   popularIndex.value = (popularIndex.value - 1 + totalSlides) % totalSlides
 }
 
-// ✅ Carrusel de Imágenes
 const images = ref([
   '/images/carrusel/peli.png',
   '/images/carrusel/peli1.png',
@@ -196,7 +211,6 @@ const prevSlide = () => {
 </script>
 
 <style scoped>
-/* ✅ Carrusel de Populares */
 .popular-carousel-container {
   position: relative;
   overflow: hidden;
@@ -244,27 +258,18 @@ const prevSlide = () => {
   right: 10px;
 }
 
-@media (max-width: 768px) {
-  .popular-movie-card {
-    flex: 0 0 calc(100% / 1);
-  }
-}
-</style>
-
-
-<style scoped>
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 * {
   font-family: 'Poppins', sans-serif;
 }
 div {
-  background-color: #0a0f2c; /* Azul oscuro */
-  color: white; /* Para que el texto sea legible sobre el fondo oscuro */
+  background-color: #0a0f2c;
+  color: white;
 }
 
 .navbar {
-  background-color: #0a0f2c; /* Azul oscuro */
+  background-color: #0a0f2c;
   color: white;
   padding: 1rem;
   display: flex;
@@ -273,21 +278,25 @@ div {
   font-size: 1.5rem;
 }
 .navbar h1 {
-  margin-left: 50px; /* Ajusta el valor según lo necesites */
+  margin-left: 50px;
 }
 
 .actions {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-left: -50px; /* Mueve los botones más a la izquierda */
+  margin-left: -20px;
 }
 
-.search-bar {
-  padding: 5px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+.search-button img,
+.login-button img,
+.logout-button img,
+.admin-button img {
+  width: 50px;
+  border: none; 
+
+  height: 50px;
+  object-fit: contain;
 }
 
 .search-button,
@@ -296,10 +305,11 @@ div {
 .admin-button {
   color: rgb(0, 0, 0);
   border: none;
-  padding: 12px 20px; /* Aumenta el tamaño de los botones */
-  font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
+  padding: 5px;
+  background-color: transparent;
+  font-size: 1rem;
   cursor: pointer;
-  border-radius: 5px; /* Bordes más suaves */
+  border-radius: 5px;
   transition: background 0.3s;
 }
 
@@ -310,7 +320,26 @@ div {
   background: #010a43;
 }
 
-/* ✅ Sección de Todas las Películas */
+.icon-button {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar {
+  padding: 5px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 300px;
+  margin-right: 20px;
+}
+
 .movies-grid {
   display: flex;
   flex-wrap: wrap;
@@ -321,7 +350,7 @@ div {
 }
 
 .movie-card {
-  flex: 0 0 calc(100% / 6); /* ✅ Mostrar 6 películas por fila */
+  flex: 0 0 calc(100% / 6);
   padding: 10px;
   text-align: center;
   cursor: pointer;
@@ -330,7 +359,7 @@ div {
 
 .movie-card img {
   width: 100%;
-  height: 250px; /* ✅ Ajustar altura */
+  height: 250px;
   object-fit: cover;
   border-radius: 8px;
 }
@@ -341,13 +370,10 @@ div {
   margin-top: 8px;
 }
 
-/* ✅ Efecto hover */
 .movie-card:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
-
-
 
 .error {
   color: red;
@@ -360,13 +386,12 @@ div {
   font-size: 1.2rem;
 }
 
-/* ✅ Carrusel más grande */
 .carousel-container {
   position: relative;
   overflow: hidden;
   width: 100%;
-  max-width: 1200px; /* Aumentar tamaño del carrusel */
-  height: 500px; /* Altura mayor */
+  max-width: 1000px;
+  height: 500px;
   margin: 20px auto;
   border-radius: 16px;
 }
@@ -377,17 +402,19 @@ div {
 }
 
 .carousel-slide {
-  min-width: 100%;
+  flex: 0 0 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .carousel-image {
-  width: 100%;
-  height: 500px; /* Altura fija */
-  object-fit: cover; /* Mantener proporción sin deformar */
+  width: 1000px; 
+  height: 400px; 
+  object-fit: cover; 
   border-radius: 16px;
 }
 
-/* ✅ Botones de navegación */
 .carousel-button {
   position: absolute;
   top: 50%;
@@ -399,8 +426,16 @@ div {
   cursor: pointer;
   font-size: 28px;
   border-radius: 50%;
-  transition: background 0.3s;
   z-index: 10;
+  transition: background 0.3s;
+}
+
+.carousel-button.left {
+  left: 10px;
+}
+
+.carousel-button.right {
+  right: 10px;
 }
 
 .carousel-button:hover {
@@ -415,7 +450,6 @@ div {
   right: 10px;
 }
 
-/* ✅ Carrusel de Populares */
 .popular-carousel-container {
   position: relative;
   overflow: hidden;
@@ -430,7 +464,7 @@ div {
 }
 
 .popular-movie-card {
-  flex: 0 0 calc(100% / 3); /* ✅ Mostrar 3 películas a la vez */
+  flex: 0 0 calc(100% / 3);
   padding: 10px;
   text-align: center;
   cursor: pointer;
@@ -449,7 +483,6 @@ div {
   margin-top: 8px;
 }
 
-/* ✅ Carrusel Botones */
 .carousel-button {
   position: absolute;
   top: 50%;
@@ -472,13 +505,12 @@ div {
   right: 10px;
 }
 
-/* ✅ Diseño responsive */
 @media (max-width: 768px) {
   .popular-movie-card {
-    flex: 0 0 calc(100% / 1); /* ✅ Mostrar 1 película en dispositivos móviles */
+    flex: 0 0 calc(100% / 1);
   }
 }
-/* ✅ Diseño responsive */
+
 @media (max-width: 768px) {
   .carousel-container {
     height: 300px;
@@ -488,6 +520,7 @@ div {
     height: 300px;
   }
 }
+
 .title-section {
   text-align: center;
   font-size: 2rem;
@@ -495,6 +528,4 @@ div {
   margin-top: 20px;
   color: #ffffff;
 }
-
-
 </style>
