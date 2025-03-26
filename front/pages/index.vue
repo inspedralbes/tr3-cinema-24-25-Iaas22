@@ -1,6 +1,5 @@
 <template>
-  
-  <div>
+  <div class="main-container">
     <nav class="navbar">
       <img src="/images/logoo.png" alt="Logo" class="logo" />
 
@@ -86,7 +85,7 @@
       </div>
     </div>
 
-    <div v-if="remainingMovies.length">
+    <div v-if="remainingMovies.length" class="all-movies-section">
       <div class="title-section">
         <h2>TODAS LAS PELÍCULAS</h2>
       </div>
@@ -212,6 +211,7 @@ const prevSlide = () => {
     (currentIndex.value - 1 + images.value.length) % images.value.length
 }
 </script>
+
 <style scoped>
 /* ✅ Estilos base */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -222,19 +222,18 @@ const prevSlide = () => {
   padding: 0;
   box-sizing: border-box;
 }
+
 .main-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #081e27, #02465d, #011721);
   color: #e6f1ff;
-}
-body {
-  background-color: #0a192f;
-  color: #e6f1ff;
+  padding-bottom: 2rem;
 }
 
 /* ✅ Barra de navegación */
 .navbar {
-  background-color: #112240;
+  background: rgba(10, 25, 47, 0.8);
+  backdrop-filter: blur(10px);
   padding: 1rem 2rem;
   display: flex;
   align-items: center;
@@ -336,6 +335,9 @@ body {
   margin: 2rem auto;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .carousel-track {
@@ -398,7 +400,7 @@ body {
 .title-section h2 {
   font-size: 2rem;
   font-weight: 600;
-  color: #031d3e;
+  color: #e6f1ff;
   position: relative;
   display: inline-block;
 }
@@ -415,12 +417,23 @@ body {
   border-radius: 3px;
 }
 
+.popular-section,
+.all-movies-section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
 .popular-carousel-container {
   position: relative;
   overflow: hidden;
   width: 100%;
-  max-width: 1200px;
   margin: 0 auto 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .popular-carousel-track {
@@ -433,10 +446,14 @@ body {
   padding: 1rem;
   cursor: pointer;
   transition: transform 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin: 0.5rem;
 }
 
 .popular-movie-card:hover {
   transform: translateY(-10px);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .popular-movie-card img {
@@ -455,7 +472,7 @@ body {
 }
 
 .popular-movie-card h3 {
-  color: #031d3e;
+  color: #e6f1ff;
   font-size: 1.1rem;
   font-weight: 500;
   margin-top: 1rem;
@@ -467,20 +484,21 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.5rem;
-  padding: 0 2rem;
-  max-width: 1400px;
-  margin: 0 auto 3rem;
-  justify-content: center; /* Centra el grid completo */
+  margin: 0 auto;
 }
-
 
 .movie-card {
   cursor: pointer;
   transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow: hidden;
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .movie-card img {
@@ -499,7 +517,7 @@ body {
 }
 
 .movie-card h3 {
-  color: #031d3e;
+  color: #e6f1ff;
   font-size: 1rem;
   font-weight: 400;
   margin-top: 0.8rem;
@@ -520,7 +538,6 @@ body {
 @media (max-width: 768px) {
   .navbar {
     padding: 1rem;
-
     flex-wrap: wrap;
   }
   
