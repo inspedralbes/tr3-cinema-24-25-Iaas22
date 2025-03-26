@@ -97,168 +97,214 @@ const goToRegister = () => {
   router.push('/register');
 };
 </script>
-
 <style scoped>
-/* ✅ Fondo blanco */
+/* ✅ Fondo azul oscuro con gradiente */
 .login-container {
   min-height: 100vh;
-  background-color: #ffffff;
+  background: linear-gradient(135deg, #081e27, #02465d, #011721);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1rem;
 }
 
-/* ✅ Tarjeta de login adaptable */
+/* ✅ Tarjeta de login con efecto de vidrio (glassmorphism) */
 .login-card {
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 2.5rem;
   width: 100%;
-  max-width: 400px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 420px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .login-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* ✅ Título centrado */
+/* ✅ Título con color claro */
 .login-title {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 1.5rem;
+  color: #ffffff;
+  margin-bottom: 2rem;
   text-align: center;
+  letter-spacing: 0.5px;
 }
 
-/* ✅ Campos de formulario */
+/* ✅ Campos de formulario con estilo moderno */
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.5rem;
   display: block;
+  font-weight: 500;
 }
 
 .form-input {
-  width: 100%;
-  padding: 0.8rem;
+  width: 380px;
+  padding: 0.9rem 1.2rem;
   font-size: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  transition: border-color 0.3s ease;
-  background-color: #fafafa;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .form-input:focus {
-  border-color: #333;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  outline: none;
 }
 
-/* ✅ Botón de login */
+/* ✅ Botón de login con gradiente */
 .login-button {
   width: 100%;
-  padding: 0.8rem;
-  background-color: #333;
+  padding: 1rem;
+  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
   color: #ffffff;
   font-size: 1rem;
   font-weight: 600;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .login-button:hover {
-  background-color: #555;
+  background: linear-gradient(to right, #3a92d8 0%, #00d9e6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.login-button:active {
+  transform: translateY(0);
 }
 
 .login-button:disabled {
-  background-color: #ccc;
+  background: #cccccc;
+  transform: none;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
 /* ✅ Mensaje de error */
 .error-message {
-  color: #ff4d4d;
+  color: #ff6b6b;
   font-size: 0.9rem;
-  margin-top: 0.8rem;
+  margin-top: 1rem;
   text-align: center;
+  background: rgba(255, 107, 107, 0.1);
+  padding: 0.7rem;
+  border-radius: 6px;
+  border-left: 3px solid #ff6b6b;
 }
 
 /* ✅ Texto para registro */
 .register-text {
-  font-size: 0.9rem;
-  color: #777;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
   text-align: center;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 .register-link {
-  color: #333;
-  font-weight: bold;
+  color: #4facfe;
+  font-weight: 600;
   cursor: pointer;
   transition: color 0.3s ease;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .register-link:hover {
-  color: #555;
+  color: #3a92d8;
+  text-decoration: underline;
 }
 
-/* ✅ Fondo del modal */
+/* ✅ Modal con estilo de vidrio */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
   padding: 1rem;
+  backdrop-filter: blur(5px);
 }
 
-/* ✅ Contenido del modal */
 .modal-content {
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   text-align: center;
   width: 100%;
-  max-width: 400px;
-  animation: fadeIn 0.3s ease;
+  max-width: 450px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeIn 0.4s ease;
+}
+
+.modal-content h2 {
+  color: #ffffff;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+}
+
+.modal-content p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
 }
 
 .modal-button {
-  background-color: #333;
+  background: linear-gradient(to right, #0a2d4b 0%, #00f2fe 100%);
   color: white;
-  padding: 0.8rem 1.5rem;
+  padding: 0.9rem 2rem;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
   font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .modal-button:hover {
-  background-color: #555;
+  background: linear-gradient(to right, #3a92d8 0%, #00d9e6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* ✅ Animación de fade-in */
+/* ✅ Animaciones */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -266,61 +312,44 @@ const goToRegister = () => {
   }
 }
 
-/* ✅ Responsive para tablets (≤ 768px) */
+/* ✅ Responsive para tablets */
 @media (max-width: 768px) {
   .login-card {
-    padding: 1.5rem;
-    max-width: 320px;
+    padding: 2rem;
+    max-width: 380px;
   }
+  
+  .login-title {
+    font-size: 1.7rem;
+  }
+}
 
+/* ✅ Responsive para móviles */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+  
   .login-title {
     font-size: 1.5rem;
+    margin-bottom: 1.5rem;
   }
-
-  .form-input {
-    font-size: 0.9rem;
-  }
-
-  .login-button {
-    font-size: 0.9rem;
-  }
-
-  .modal-content {
-    padding: 1.5rem;
-    max-width: 320px;
-  }
-}
-
-/* ✅ Responsive para móviles pequeños (≤ 400px) */
-@media (max-width: 400px) {
-  .login-card {
-    padding: 1.2rem;
-    max-width: 100%;
-  }
-
-  .login-title {
-    font-size: 1.3rem;
-  }
-
-  .form-input {
-    font-size: 0.85rem;
-    padding: 0.6rem;
-  }
-
-  .login-button {
-    font-size: 0.85rem;
-    padding: 0.6rem;
-  }
-
-  .modal-content {
-    padding: 1.2rem;
-    max-width: 100%;
-  }
-
-  .modal-button {
-    font-size: 0.9rem;
-  }
-}
-
-  </style>
   
+  .form-input {
+    padding: 0.8rem 1rem;
+  }
+  
+  .modal-content {
+    padding: 1.8rem;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .modal-content p {
+    font-size: 1rem;
+  }
+}
+</style>
