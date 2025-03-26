@@ -34,6 +34,10 @@
             <h3>Total Reservas</h3>
             <p class="stat-value">{{ countByType.normal + countByType.vip }}</p>
           </div>
+          <div class="stat-card revenue">
+            <h3>Total Recaudado</h3>
+            <p class="stat-value">${{ totalRevenue.toFixed(2) }}</p>
+          </div>
         </div>
     
         <!-- Lista de Reservas Confirmadas -->
@@ -50,8 +54,20 @@
                 
                 <div class="reservation-details">
                   <div class="detail-group">
+                    <span class="detail-label">Sesión ID:</span>
+                    <span class="detail-value">{{ reservation.session.id }}</span>
+                  </div>
+                  
+                  <div class="detail-group">
                     <span class="detail-label">Película:</span>
                     <span class="detail-value">{{ reservation.session.movie }}</span>
+                  </div>
+                  
+                  <div class="detail-group">
+                    <span class="detail-label">Fecha y Hora:</span>
+                    <span class="detail-value">
+                      {{ formatDate(reservation.session.date) }} a las {{ formatTime(reservation.session.time) }}
+                    </span>
                   </div>
                   
                   <div class="detail-group">
@@ -80,13 +96,20 @@
   </template>
   
   <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import CommunicationManager from '@/services/CommunicationManager'
   
   const availableDates = ref([]);
   const reservations = ref([]);
   const countByType = ref({ normal: 0, vip: 0 });
   const selectedDate = ref('');
+  
+  // Calculamos el total recaudado
+  const totalRevenue = computed(() => {
+    return reservations.value.reduce((total, reservation) => {
+      return total + parseFloat(reservation.reservation_details.price || 0);
+    }, 0);
+  });
   
   const fetchAvailableDates = async () => {
     try {
@@ -110,11 +133,24 @@
       console.error('Error al obtener las reservas confirmadas:', error);
     }
   }
+
+  const formatTime = (timeString) => {
+    if (!timeString) return '--:--';
+    // Asumiendo que el formato es HH:MM:SS y queremos mostrar solo HH:MM
+    return timeString.substring(0, 5);
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '--/--/----';
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  }
   
   onMounted(fetchAvailableDates)
   </script>
   
   <style scoped>
+  /* Estilos anteriores se mantienen igual */
   /* ✅ Fondo azul oscuro con gradiente (consistente con el de películas) */
   .reservations-container {
     min-height: 100vh;
@@ -245,7 +281,7 @@
   /* ✅ Estadísticas */
   .stats-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
   }
@@ -298,6 +334,14 @@
   
   .stat-card.total .stat-value {
     color: #64ffda;
+  }
+  
+  .stat-card.revenue {
+    border-color: rgba(46, 204, 113, 0.3);
+  }
+  
+  .stat-card.revenue .stat-value {
+    color: #2ecc71;
   }
   
   /* ✅ Lista de reservas */
@@ -413,7 +457,7 @@
   /* ✅ Diseño responsive */
   @media (max-width: 768px) {
     .stats-container {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
     }
     
     .reservation-details {
@@ -439,6 +483,10 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 0.5rem;
+    }
+    
+    .stats-container {
+      grid-template-columns: 1fr;
     }
   }
   </style>

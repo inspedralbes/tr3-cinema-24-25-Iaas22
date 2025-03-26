@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             SessionSeeder::class,
             SeatsSeeder::class,
             UsersSeeder::class,
-            ReservasSeeder::class,
         ]);
     }
 }

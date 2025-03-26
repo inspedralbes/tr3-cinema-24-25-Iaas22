@@ -521,6 +521,7 @@ textarea.form-input {
     margin-bottom: 1.5rem;
   }
   
+  
   .form-input {
     padding: 0.8rem 1rem;
   }
