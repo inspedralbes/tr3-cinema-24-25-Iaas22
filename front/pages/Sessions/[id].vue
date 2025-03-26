@@ -102,6 +102,11 @@
           Fila {{ seat.row }}, Asiento {{ seat.seatNum }} – {{ seat.price }}€
         </li>
       </ul>
+      
+  <!-- ✅ Mostrar total -->
+  <p class="text-lg font-bold mt-4">
+    Total: {{ confirmationData.totalPrice.toFixed(2) }}€
+  </p>
     </div>
 
     <!-- ✅ Formulario de usuario -->
@@ -200,16 +205,23 @@ const reserveSeats = async () => {
   try {
     await CommunicationManager.reserveSeats(selectedSeats.value, selectedSession.value);
 
-    // 👉 Obtener detalles de la película y butacas
     const session = sessions.value.find(s => s.session_id === selectedSession.value);
+    const isSpecialDay = session.special_day; // ✅ Comprobar si es un día especial
+
     const selectedSeatsDetails = selectedSeats.value.map(seatId => {
       const seat = seats.value.find(s => s.seat_id === seatId);
+      let basePrice = seat.row === 'F' ? 8 : 6;
+      let finalPrice = isSpecialDay ? basePrice - 2 : basePrice; // ✅ Aplicar descuento de 2€ si es especial
+
       return {
         row: seat.row,
         seatNum: seat.seat_num,
-        price: seat.row === 'F' ? 8 : 6 // Precio basado en la fila
+        price: finalPrice
       };
     });
+
+    // ✅ Calcular el total
+    const totalPrice = selectedSeatsDetails.reduce((sum, seat) => sum + seat.price, 0);
 
     confirmationData.value = {
       sessionId: selectedSession.value,
@@ -219,23 +231,18 @@ const reserveSeats = async () => {
       sessionTime: session.session_time,
       sessionDate: session.session_date,
       seats: selectedSeatsDetails,
+      totalPrice, // ✅ Añadir el total al objeto
       name: '',
       lastName: '',
       email: ''
     };
 
     showConfirmationForm.value = true;
-
-    // 👉 Limpiar la selección y actualizar las butacas
     selectedSeats.value = [];
-    
-    // 🔥 Asegúrate de que ambas funciones se completen antes de mostrar el alert
+
     await fetchSeats(selectedSession.value);
     await fetchReservations();
 
-    // ✅ Mostrar el alert después de que todo termine
-    alert('✅ ¡Reserva completada con éxito!');
-    
   } catch (error) {
     console.error('❌ Error al reservar las butacas:', error);
     alert(`❌ Error: ${error.message}`);

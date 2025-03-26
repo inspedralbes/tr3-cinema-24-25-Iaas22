@@ -9,9 +9,8 @@ class SessionSeeder extends Seeder
 {
     public function run()
     {
-        $now = now(); // Fecha y hora actual
+        $now = now();
 
-        // Insertar sesiones para movie_id = 1
         DB::table('session')->insert([
             [
                 'movie_id' => 1,
@@ -28,34 +27,48 @@ class SessionSeeder extends Seeder
                 'special_day' => 0,
                 'created_at' => $now,
                 'updated_at' => $now,
-            ]
-        ]);
-
-        // ✅ Insertar sesiones para movie_id = 2
-        DB::table('session')->insert([
+            ],
             [
-                'movie_id' => 2,
-                'session_time' => '17:00:00',
+                'movie_id' => 1,
+                'session_time' => '18:00:00',
                 'session_date' => '2025-03-07',
                 'special_day' => 1,
                 'created_at' => $now,
                 'updated_at' => $now,
+            ]
+        ]);
+
+        DB::table('session')->insert([
+            [
+                'movie_id' => 2,
+                'session_time' => '16:00:00',
+                'session_date' => '2025-03-07',
+                'special_day' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             [
                 'movie_id' => 2,
-                'session_time' => '20:00:00',
+                'session_time' => '18:00:00',
                 'session_date' => '2025-03-07',
                 'special_day' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'movie_id' => 2,
+                'session_time' => '18:00:00',
+                'session_date' => '2025-03-08',
+                'special_day' => 1,
                 'created_at' => $now,
                 'updated_at' => $now,
             ]
         ]);
 
-        // ✅ Insertar sesiones para movie_id = 3
         DB::table('session')->insert([
             [
                 'movie_id' => 3,
-                'session_time' => '15:00:00',
+                'session_time' => '16:00:00',
                 'session_date' => '2025-03-08',
                 'special_day' => 0,
                 'created_at' => $now,
@@ -63,8 +76,16 @@ class SessionSeeder extends Seeder
             ],
             [
                 'movie_id' => 3,
-                'session_time' => '19:00:00',
+                'session_time' => '18:00:00',
                 'session_date' => '2025-03-08',
+                'special_day' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'movie_id' => 3,
+                'session_time' => '18:00:00',
+                'session_date' => '2025-03-09',
                 'special_day' => 1,
                 'created_at' => $now,
                 'updated_at' => $now,
