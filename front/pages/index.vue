@@ -43,7 +43,11 @@
         </button>
       </div>
     </nav>
-
+  <!-- Mostrar botones para elegir el CRUD -->
+  <div v-if="showAdminOptions" class="admin-options">
+      <button @click="goToMovieCRUD">Ir a Movie CRUD</button>
+      <button @click="goToReservationsCRUD">Ir a Reservations CRUD</button>
+    </div>
     <div class="carousel-container">
       <div 
         class="carousel-track"
@@ -118,6 +122,8 @@ const currentIndex = ref(0)
 const popularIndex = ref(0) 
 let interval = null
 const isLoggedIn = ref(false) 
+const showAdminOptions = ref(false) 
+
 
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem('user'))
@@ -147,7 +153,15 @@ const goToLogin = () => {
 }
 
 const goToAdminPanel = () => {
+  showAdminOptions.value = true 
+}
+
+const goToMovieCRUD = () => {
   router.push('/movieCRUD')
+}
+
+const goToReservationsCRUD = () => {
+  router.push('/reservations-crud')
 }
 
 const handleLogout = async () => {
@@ -589,6 +603,58 @@ const prevSlide = () => {
   
   .movie-card img {
     height: 200px;
+  }
+}
+/* ✅ Estilos para los botones del CRUD */
+.admin-options {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem auto;
+  max-width: 1200px;
+  padding: 0 2rem;
+}
+
+.admin-options button {
+  background: rgba(100, 255, 218, 0.1);
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  color: #64ffda;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.admin-options button:hover {
+  background: rgba(100, 255, 218, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border-color: rgba(100, 255, 218, 0.5);
+}
+
+.admin-options button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive para botones CRUD */
+@media (max-width: 768px) {
+  .admin-options {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .admin-options button {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.8rem;
   }
 }
 </style>
