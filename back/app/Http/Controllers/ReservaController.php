@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Mail\ReservaConfirmadaMail;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+
+
 
 class ReservaController extends Controller
 {
@@ -235,67 +239,102 @@ public function cancelReservations(Request $request)
             'total' => $total
         ]);
     }
-   
+
+    
     public function confirmReservation(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'apellidos' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'seat_ids' => 'required|array|min:1',
-            'seat_ids.*' => 'exists:seats,seat_id',
-            'session_id' => 'required|integer', 
-        ]);
-    
-        // Obtener el usuario autenticado
-        $userId = auth()->id();
-    
-        // Obtener los datos de los asientos
-        $seats = Seat::whereIn('seat_id', $request->seat_ids)->get();
-    
-        // Calcular el total y obtener el precio por asiento
-        $total = 0;
-        $seatsWithPrices = [];
-    
-        foreach ($seats as $seat) {
-            $precio = $seat->type === 'vip' ? 8 : 6; // 8 para VIP, 6 para normal
-            $total += $precio;
-    
-            $seatsWithPrices[] = [
-                'seat_id' => $seat->seat_id,
-                'precio' => $precio
-            ];
-        }
-    
-        foreach ($seatsWithPrices as $seatWithPrice) {
-            Reserva::where('seat_id', $seatWithPrice['seat_id'])
-                ->where('user_id', $userId)
-                ->where('status', 'reservada')
-                ->where('session_id', $request->session_id)
-                ->update([
-                    'status' => 'confirmada',
-                    'name' => $request->name,
-                    'apellidos' => $request->apellidos,
-                    'email' => $request->email,
-                    'precio' => $seatWithPrice['precio'],
-                    'session_id' => $request->session_id,
-                    'compra_dia' => now()->toDateString(),
-                    'compra_hora' => now()->toTimeString(),
-                    'updated_at' => now()
-                ]);
-        }
-    
-        // Enviar el correo
-        Mail::to($request->email)->send(new ReservaConfirmadaMail($request->name, $request->apellidos, $seatsWithPrices, $total, $request->session_id));
-    
-        // Devolver la respuesta con la información de la compra
-        return response()->json([
-            'success' => '✅ Reserva confirmada con éxito',
-            'total' => $total,
-            'session_id' => $request->session_id, // Mostrar el session_id
-            'seats' => $seatsWithPrices,
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'apellidos' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'seat_ids' => 'required|array|min:1',
+        'seat_ids.*' => 'exists:seats,seat_id',
+        'session_id' => 'required|integer',
+    ]);
+
+    $userId = auth()->id();
+    $seats = Seat::whereIn('seat_id', $request->seat_ids)->get();
+
+    // Obtener información de la película
+    $session = DB::table('session')
+                ->join('movies', 'session.movie_id', '=', 'movies.movie_id')
+                ->where('session.session_id', $request->session_id)
+                ->first(['movies.title', 'session.session_date', 'session.session_time']);
+
+    $total = 0;
+    $seatsWithPrices = [];
+
+    foreach ($seats as $seat) {
+        $precio = $seat->type === 'vip' ? 8 : 6;
+        $total += $precio;
+
+        $seatsWithPrices[] = [
+            'seat_id' => $seat->seat_id,
+            'row' => $seat->row,
+            'seat_num' => $seat->seat_num,
+            'type' => $seat->type,
+            'precio' => $precio
+        ];
     }
+
+    // Actualizar reservas
+    foreach ($seatsWithPrices as $seatWithPrice) {
+        Reserva::where('seat_id', $seatWithPrice['seat_id'])
+            ->where('user_id', $userId)
+            ->where('status', 'reservada')
+            ->where('session_id', $request->session_id)
+            ->update([
+                'status' => 'confirmada',
+                'name' => $request->name,
+                'apellidos' => $request->apellidos,
+                'email' => $request->email,
+                'precio' => $seatWithPrice['precio'],
+                'session_id' => $request->session_id,
+                'compra_dia' => now()->toDateString(),
+                'compra_hora' => now()->toTimeString(),
+                'updated_at' => now()
+            ]);
+    }
+
+    // Generar y guardar PDF
+    $pdf = PDF::loadView('reserva.pdfform', [
+        'name' => $request->name,
+        'apellidos' => $request->apellidos,
+        'email' => $request->email,
+        'seats' => $seatsWithPrices,
+        'total' => $total,
+        'movie_title' => $session->title ?? 'Película no disponible',
+        'session_date' => $session->session_date ?? 'Fecha no disponible',
+        'session_time' => $session->session_time ?? 'Hora no disponible'
+    ]);
+
+    $filename = 'reserva_'.time().'.pdf';
+    $pdfPath = 'pdfs/'.$filename;
+    
+    // Guardar el PDF en storage/app/public/pdfs
+    Storage::disk('public')->put($pdfPath, $pdf->output());
+
+    // Enviar correo con PDF adjunto
+    Mail::to($request->email)->send(new ReservaConfirmadaMail(
+        $request->name,
+        $request->apellidos,
+        $seatsWithPrices,
+        $total,
+        $request->session_id,
+        $session->title ?? 'Película no disponible',
+        $session->session_date ?? 'Fecha no disponible',
+        $session->session_time ?? 'Hora no disponible',
+        storage_path('app/public/'.$pdfPath) // Ruta completa al PDF
+    ));
+
+    return response()->json([
+        'success' => '✅ Reserva confirmada con éxito',
+        'total' => $total,
+        'session_id' => $request->session_id,
+        'seats' => $seatsWithPrices,
+        'pdf_path' => $pdfPath // Devolver la ruta del PDF guardado
+    ]);
+}
 public function getConfirmedReservations(Request $request)
 {
     if (auth()->user()->role !== 'admin') {

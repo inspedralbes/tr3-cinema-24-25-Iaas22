@@ -2,40 +2,45 @@
 
 namespace App\Mail;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
 class ReservaConfirmadaMail extends Mailable
 {
-    use SerializesModels;
+    use Queueable, SerializesModels;
 
     public $name;
     public $apellidos;
     public $seats;
     public $total;
-    public $session_id;
+    public $sessionId;
+    public $movieTitle;
+    public $sessionDate;
+    public $sessionTime;
+    public $pdfPath;
 
-    /**
-     * Create a new message instance.
-     *
-     * @param string $name
-     * @param string $apellidos
-     * @param array $seats
-     * @param float $total
-     * @param int $session_id
-     */
-    public function __construct($name, $apellidos, $seats, $total, $session_id)
+    public function __construct($name, $apellidos, $seats, $total, $sessionId, $movieTitle, $sessionDate, $sessionTime, $pdfPath)
     {
         $this->name = $name;
         $this->apellidos = $apellidos;
         $this->seats = $seats;
         $this->total = $total;
-        $this->session_id = $session_id;
+        $this->sessionId = $sessionId;
+        $this->movieTitle = $movieTitle;
+        $this->sessionDate = $sessionDate;
+        $this->sessionTime = $sessionTime;
+        $this->pdfPath = $pdfPath;
     }
 
     public function build()
     {
-        return $this->subject('Confirmación de Reserva')
-                    ->view('emails.reserva_confirmada');  // Se usará un archivo Blade para el contenido
+        return $this->subject('Reserva Confirmada - '.$this->movieTitle)
+                    ->view('emails.reserva')
+                    ->attach($this->pdfPath, [
+                        'as' => 'reserva_confirmada.pdf',
+                        'mime' => 'application/pdf',
+                    ]);
     }
 }
