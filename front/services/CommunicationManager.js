@@ -131,11 +131,12 @@ async login(email, password) {
     return response.data;
   },
 
-  // ✅ Obtener sesiones por ID de película
-  async fetchSessionsByMovie(movieId) {
-    const response = await axios.get(`${API_URL}/sessions/movie/${movieId}`);
-    return response.data;
-  },
+ async fetchSessionsByMovie(movieId) {
+  const response = await axios.get(`${API_URL}/sessions/movie/${movieId}`);
+  console.log('🔍 Sesiones obtenidas:', response.data); // 👀 Para depurar
+  return response.data;
+}
+,
 
   // ✅ Obtener butacas por ID de sesión
   async fetchSeatsBySession(sessionId) {

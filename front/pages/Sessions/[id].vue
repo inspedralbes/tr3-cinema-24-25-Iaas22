@@ -192,15 +192,16 @@ const toggleCart = () => {
   cartOpen.value = !cartOpen.value;
 };
 
-const fetchSessions = async () => {
+const fetchSessions = async (movieId) => {
   try {
-    const movieId = 1; // Reemplaza con el ID real
     const response = await CommunicationManager.fetchSessionsByMovie(movieId);
     sessions.value = response;
   } catch (error) {
     console.error('Error al cargar las sesiones:', error.message);
   }
 };
+;
+
 
 const fetchSeats = async (sessionId) => {
   try {
@@ -357,8 +358,9 @@ const formatDate = (dateString) => {
 };
 
 onMounted(() => {
-  fetchSessions();
-  fetchReservations();
+  const movieId = window.location.pathname.split('/')[2];  // Obtén el ID desde la URL
+  fetchSessions(movieId); 
+    fetchReservations();
 });
 </script>
 
