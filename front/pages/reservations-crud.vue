@@ -64,9 +64,9 @@
                   </div>
                   
                   <div class="detail-group">
-                    <span class="detail-label">Fecha y Hora:</span>
+                    <span class="detail-label">Hora:</span>
                     <span class="detail-value">
-                      {{ formatDate(reservation.session.date) }} a las {{ formatTime(reservation.session.time) }}
+                     {{ formatTime(reservation.session.time) }}
                     </span>
                   </div>
                   
@@ -140,11 +140,7 @@
     return timeString.substring(0, 5);
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '--/--/----';
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
-  }
+  
   
   onMounted(fetchAvailableDates)
   </script>
