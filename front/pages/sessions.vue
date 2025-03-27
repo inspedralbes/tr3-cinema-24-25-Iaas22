@@ -22,15 +22,20 @@
               <th>Fecha</th>
               <th>Hora</th>
               <th>Especial</th>
+              <th>Acciones</th> <!-- Nueva columna para las acciones -->
             </tr>
           </thead>
           <tbody>
             <tr v-for="session in sessions" :key="session.session_id">
               <td>{{ session.session_id }}</td>
-              <td>{{ session.movie ? session.movie.title : 'Desconocida' }}</td> <!-- Verificación de movie -->
-              <td>{{ session.session_date.split('T')[0] }}</td> <!-- Formato de fecha: YYYY-MM-DD -->
+              <td>{{ session.movie ? session.movie.title : 'Desconocida' }}</td>
+              <td>{{ session.session_date.split('T')[0] }}</td>
               <td>{{ session.session_time }}</td>
-              <td>{{ session.special_day ? 'Sí' : 'No' }}</td> <!-- Condición para "Sí" o "No" -->
+              <td>{{ session.special_day ? 'Sí' : 'No' }}</td>
+              <td>
+                <!-- Botón para eliminar la sesión -->
+                <button @click="handleDelete(session.session_id)">Eliminar</button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -75,108 +80,122 @@
       </div>
     </div>
   </template>
-  
-  <script>
-  import CommunicationManager from '@/services/CommunicationManager'; // Asegúrate de que la ruta sea correcta
-  
-  export default {
-    data() {
-      return {
-        sessions: [], // Almacena las sesiones obtenidas
-        loading: false, // Estado para mostrar "cargando"
-        error: null, // Estado para manejar errores
-        newSession: { // Datos del formulario para crear una nueva sesión
-          movie_id: '',
-          session_date: '',
-          session_time: '',
-          special_day: 0, // '0' por defecto para "No"
-        },
-        success: null, // Mensaje de éxito al crear la sesión
-        createError: null, // Error al crear la sesión
-      };
-    },
-  
-    async mounted() {
-      this.loading = true;
+<script>
+import CommunicationManager from '@/services/CommunicationManager'; // Asegúrate de que la ruta sea correcta
+
+export default {
+  data() {
+    return {
+      sessions: [], // Almacena las sesiones obtenidas
+      loading: false, // Estado para mostrar "cargando"
+      error: null, // Estado para manejar errores
+      newSession: { // Datos del formulario para crear una nueva sesión
+        movie_id: '',
+        session_date: '',
+        session_time: '',
+        special_day: 0, // '0' por defecto para "No"
+      },
+      success: null, // Mensaje de éxito al crear la sesión
+      createError: null, // Error al crear la sesión
+    };
+  },
+
+  async mounted() {
+    this.loading = true;
+    try {
+      // Llamada a la función fetchAllSessions para obtener las sesiones
+      const fetchedSessions = await CommunicationManager.fetchAllSessions();
+      this.sessions = fetchedSessions;
+    } catch (error) {
+      this.error = error.message || 'Error al obtener las sesiones';
+    } finally {
+      this.loading = false;
+    }
+  },
+
+  methods: {
+    async handleSubmit() {
+      this.createError = null;
+      this.success = null;
+
       try {
-        // Llamada a la función fetchAllSessions para obtener las sesiones
-        const fetchedSessions = await CommunicationManager.fetchAllSessions();
-        this.sessions = fetchedSessions;
+        // Validación de los datos antes de enviarlos
+        if (!this.newSession.movie_id || !this.newSession.session_date || !this.newSession.session_time) {
+          this.createError = 'Por favor, complete todos los campos.';
+          return;
+        }
+
+        // Llamada a la función de CommunicationManager para crear una nueva sesión
+        const createdSession = await CommunicationManager.createSession(this.newSession);
+
+        // Si la sesión se crea con éxito, mostramos el mensaje y limpiamos el formulario
+        this.success = `Sesión creada con éxito. ID: ${createdSession.session_id}`;
+        this.newSession = { movie_id: '', session_date: '', session_time: '', special_day: 0 }; // Limpiar el formulario
+        this.sessions.push(createdSession); // Agregar la nueva sesión a la lista
       } catch (error) {
-        this.error = error.message || 'Error al obtener las sesiones';
-      } finally {
-        this.loading = false;
+        this.createError = error.message || 'Hubo un error al crear la sesión';
       }
     },
-  
-    methods: {
-      async handleSubmit() {
-        this.createError = null;
-        this.success = null;
-  
+
+    async handleDelete(sessionId) {
+      const confirmDelete = confirm('¿Estás seguro de que deseas eliminar esta sesión?');
+      if (confirmDelete) {
         try {
-          // Validación de los datos antes de enviarlos
-          if (!this.newSession.movie_id || !this.newSession.session_date || !this.newSession.session_time) {
-            this.createError = 'Por favor, complete todos los campos.';
-            return;
-          }
-  
-          // Llamada a la función de CommunicationManager para crear una nueva sesión
-          const createdSession = await CommunicationManager.createSession(this.newSession);
-  
-          // Si la sesión se crea con éxito, mostramos el mensaje y limpiamos el formulario
-          this.success = `Sesión creada con éxito. ID: ${createdSession.session_id}`;
-          this.newSession = { movie_id: '', session_date: '', session_time: '', special_day: 0 }; // Limpiar el formulario
-          this.sessions.push(createdSession); // Agregar la nueva sesión a la lista
+          // Llamada al método de eliminación en CommunicationManager
+          await CommunicationManager.deleteSession(sessionId);
+
+          // Eliminar la sesión de la lista localmente
+          this.sessions = this.sessions.filter(session => session.session_id !== sessionId);
+          this.success = `Sesión con ID: ${sessionId} eliminada con éxito.`;
         } catch (error) {
-          this.createError = error.message || 'Hubo un error al crear la sesión';
+          this.error = error.message || 'Hubo un error al eliminar la sesión';
         }
-      },
+      }
     },
-  };
-  </script>
-  
-  <style scoped>
-  .loading {
-    text-align: center;
-  }
-  
-  .error {
-    color: red;
-    text-align: center;
-  }
-  
-  .success {
-    color: green;
-    text-align: center;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  th, td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ddd;
-  }
-  
-  th {
-    background-color: #f4f4f4;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  form {
-    margin-top: 20px;
-  }
-  
-  div {
-    margin-bottom: 10px;
-  }
-  </style>
+  },
+};
+</script>
+<style scoped>
+.loading {
+  text-align: center;
+}
+
+.error {
+  color: red;
+  text-align: center;
+}
+
+.success {
+  color: green;
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+form {
+  margin-top: 20px;
+}
+
+div {
+  margin-bottom: 10px;
+}
+</style>
   

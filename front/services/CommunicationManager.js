@@ -439,6 +439,17 @@ async createSession(sessionData) {
     }
   }
 },
+// Función para eliminar una sesión por su ID
+async deleteSession(sessionId) {
+  try {
+    const response = await axios.delete(`${API_URL}/sessions/${sessionId}`);
+    console.log('✅ Sesión eliminada con éxito:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al eliminar la sesión:', error.response?.data?.message || error.message);
+    throw new Error(error.response?.data?.message || 'Error al eliminar la sesión');
+  }
+},
 
 
   // ✅ Obtener configuración base de la API
