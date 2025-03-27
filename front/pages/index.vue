@@ -46,6 +46,8 @@
   <div v-if="showAdminOptions" class="admin-options">
       <button @click="goToMovieCRUD">Ir a Movie CRUD</button>
       <button @click="goToReservationsCRUD">Ir a Reservations CRUD</button>
+      <button @click="goToSessionsCRUD">Ir a Sessions CRUD</button>
+
     </div>
     <div class="carousel-container">
       <div 
@@ -161,6 +163,9 @@ const goToMovieCRUD = () => {
 
 const goToReservationsCRUD = () => {
   router.push('/reservations-crud')
+}
+const goToSessionsCRUD = () => {
+  router.push('/sessions')
 }
 
 const handleLogout = async () => {
