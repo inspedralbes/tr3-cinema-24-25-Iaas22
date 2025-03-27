@@ -22,6 +22,9 @@ Route::get('/sessions/{id}', [SessionController::class, 'show']);
 Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsByMovie']);
 Route::get('/seatsStatus', [ReservaController::class, 'getSeatsWithStatus']);
 Route::get('/sessions/date/{movieId}', [SessionController::class, 'getSessionDateByMovieId']);
+Route::post('/sessions', [SessionController::class, 'store']);
+Route::delete('/sessions/{id}', [SessionController::class, 'destroy']);
+
 
 // ✅ Rutas de autenticación (registro y login)
 Route::post('/register', [AuthController::class, 'register']); 
