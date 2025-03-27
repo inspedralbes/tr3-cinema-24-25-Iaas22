@@ -23,6 +23,12 @@ Route::get('/sessions/movie/{movieId}', [SessionController::class, 'getSessionsB
 Route::get('/seatsStatus', [ReservaController::class, 'getSeatsWithStatus']);
 Route::get('/sessions/date/{movieId}', [SessionController::class, 'getSessionDateByMovieId']);
 
+// Solo admins pueden crear y eliminar sesiones
+Route::middleware('admin')->group(function () {
+    Route::post('/sessions', [SessionController::class, 'store']);
+    Route::delete('/sessions/{id}', [SessionController::class, 'destroy']);
+});
+
 // ✅ Rutas de autenticación (registro y login)
 Route::post('/register', [AuthController::class, 'register']); 
 Route::post('/login', [AuthController::class, 'login']); 
@@ -67,7 +73,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/confirmar-reserva', [ReservaController::class, 'confirmReservation']);
 
-
+// Rutas para sesiones (solo admin)
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/sessions', [SessionController::class, 'store']);
+    Route::put('/sessions/{id}', [SessionController::class, 'update']);
+    Route::delete('/sessions/{id}', [SessionController::class, 'destroy']);
+});
  
 });
 

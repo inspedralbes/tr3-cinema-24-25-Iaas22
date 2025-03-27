@@ -400,6 +400,69 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
       throw new Error(error.message);
     }
   },
+// ✅ Obtener todas las sesiones (solo admin)
+async fetchAllSessions() {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user?.role !== 'admin') {
+      throw new Error('No tienes permisos para ver todas las sesiones.');
+    }
+    
+    const response = await axios.get(`${API_URL}/sessions`);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al obtener las sesiones:', error);
+    throw new Error(error.response?.data?.message || 'Error al obtener las sesiones');
+  }
+},
+
+// ✅ Obtener sesiones por ID de película
+async fetchSessionsByMovieId(movieId) {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/movie/${movieId}`);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al obtener las sesiones de la película:', error);
+    throw new Error(error.response?.data?.message || 'Error al obtener las sesiones de la película');
+  }
+},
+// ✅ Crear una nueva sesión (solo admin)
+async createSession(sessionData) {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user?.role !== 'admin') {
+      throw new Error('No tienes permisos para crear sesiones.');
+    }
+
+    const response = await axios.post(`${API_URL}/sessions`, sessionData, {
+      headers: this.getAuthHeaders()
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al crear la sesión:', error);
+    throw new Error(error.response?.data?.message || 'Error al crear la sesión');
+  }
+},
+
+// ✅ Eliminar sesión por ID (solo admin)
+async deleteSession(sessionId) {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user?.role !== 'admin') {
+      throw new Error('No tienes permisos para eliminar sesiones.');
+    }
+
+    const response = await axios.delete(`${API_URL}/sessions/${sessionId}`, {
+      headers: this.getAuthHeaders()
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al eliminar la sesión:', error);
+    throw new Error(error.response?.data?.message || 'Error al eliminar la sesión');
+  }
+},
 
 
   // ✅ Obtener configuración base de la API

@@ -32,7 +32,7 @@ class Session extends Model
     // Relación con Movie
     public function movie()
     {
-        return $this->belongsTo(Movie::class, 'movie_id');
+        return $this->belongsTo(Movie::class);
     }
 
     // Relación con Reserva
