@@ -95,6 +95,22 @@ public function destroy($id)
         'session' => $session // Devuelve los datos de la sesión eliminada
     ], Response::HTTP_OK);
 }
+public function getAllSessions()
+{
+    // Obtener todas las sesiones
+    $sessions = DB::table('session')
+        ->join('movies', 'session.movie_id', '=', 'movies.movie_id')
+        ->select('session.session_id', 'session.session_date', 'session.session_time', 'movies.title')
+        ->get();
+
+    // Agregar el campo 'is_dia_del_espectador' para saber si es miércoles
+    $sessions->transform(function ($session) {
+        $session->is_dia_del_espectador = (new \Carbon\Carbon($session->session_date))->dayOfWeek === 3; // 3 es miércoles
+        return $session;
+    });
+
+    return response()->json($sessions);
+}
 
 
 }

@@ -401,6 +401,44 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
       throw new Error(error.message);
     }
   },
+ // ✅ Obtener todas las sesiones
+ async fetchAllSessions() {
+  try {
+    const response = await axios.get(`${API_URL}/sessions`);
+    console.log('🔍 Todas las sesiones obtenidas:', response.data); // Para depuración
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al obtener las sesiones:', error);
+    throw new Error(error.response?.data?.message || 'Error al obtener las sesiones');
+  }
+},
+// Función para crear una nueva sesión
+async createSession(sessionData) {
+  // Verificación de que sessionData tenga los campos necesarios
+  if (!sessionData.movie_id || !sessionData.session_date || !sessionData.session_time) {
+    throw new Error('Los datos de la sesión están incompletos.');
+  }
+
+  try {
+    const response = await axios.post(`${API_URL}/sessions`, sessionData);
+    
+    // Verificar que la respuesta contiene los datos esperados
+    if (response && response.data) {
+      return response.data;  // Devuelve los datos de la sesión creada
+    } else {
+      throw new Error('No se recibió una respuesta válida del servidor');
+    }
+  } catch (error) {
+    console.error('Error al crear la sesión:', error);
+
+    // Verificar si la respuesta de error tiene un mensaje específico
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message || 'Error desconocido al crear la sesión');
+    } else {
+      throw new Error('Error al crear la sesión: ' + (error.message || 'Desconocido'));
+    }
+  }
+},
 
 
   // ✅ Obtener configuración base de la API
