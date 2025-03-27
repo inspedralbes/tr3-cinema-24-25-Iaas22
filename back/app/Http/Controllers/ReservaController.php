@@ -6,6 +6,8 @@ use App\Models\Seat;
 use App\Models\Reserva;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Mail\ReservaConfirmadaMail;
+use Illuminate\Support\Facades\Mail;
 
 class ReservaController extends Controller
 {
@@ -242,7 +244,7 @@ public function cancelReservations(Request $request)
             'email' => 'required|email|max:255',
             'seat_ids' => 'required|array|min:1',
             'seat_ids.*' => 'exists:seats,seat_id',
-            'session_id' => 'required|integer', // Ahora es un número
+            'session_id' => 'required|integer', 
         ]);
     
         // Obtener el usuario autenticado
@@ -268,8 +270,8 @@ public function cancelReservations(Request $request)
         foreach ($seatsWithPrices as $seatWithPrice) {
             Reserva::where('seat_id', $seatWithPrice['seat_id'])
                 ->where('user_id', $userId)
-                ->where('status', 'reservada') // Solo si está reservada
-                ->where('session_id', $request->session_id) // Coincidir con el session_id
+                ->where('status', 'reservada')
+                ->where('session_id', $request->session_id)
                 ->update([
                     'status' => 'confirmada',
                     'name' => $request->name,
@@ -283,6 +285,9 @@ public function cancelReservations(Request $request)
                 ]);
         }
     
+        // Enviar el correo
+        Mail::to($request->email)->send(new ReservaConfirmadaMail($request->name, $request->apellidos, $seatsWithPrices, $total, $request->session_id));
+    
         // Devolver la respuesta con la información de la compra
         return response()->json([
             'success' => '✅ Reserva confirmada con éxito',
@@ -291,7 +296,6 @@ public function cancelReservations(Request $request)
             'seats' => $seatsWithPrices,
         ]);
     }
-    
 public function getConfirmedReservations(Request $request)
 {
     if (auth()->user()->role !== 'admin') {
