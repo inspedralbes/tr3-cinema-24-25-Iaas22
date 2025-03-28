@@ -1,10 +1,9 @@
 <template>
-    <div class="main-container">
-   
+  <div class="main-container">
     <!-- ✅ Navbar -->
     <nav class="navbar">
-    <!-- Botón de volver -->
-    <button class="back-button" @click="$router.push('/')">
+      <!-- Botón de volver -->
+      <button class="back-button" @click="$router.push('/')">
         ⬅️
       </button>
       <img src="/images/logoo.png" alt="Logo" class="logo" />
@@ -158,6 +157,64 @@
         </form>
       </div>
     </div>
+    <!-- Modal de éxito en reserva -->
+<div v-if="showSuccessModal" class="modal-overlay">
+  <div class="modal-content">
+    <button @click="showSuccessModal = false" class="close-btn">
+      <img src="/images/close.png" alt="Cerrar" class="icon-button" />
+    </button>
+
+    <h2 class="modal-title">¡Reserva Confirmada!</h2>
+    
+    <div class="success-icon">✅</div>
+    
+    <div class="reservation-details">
+      <div class="detail-item">
+        <span class="detail-label">Película:</span>
+        <span class="detail-value">{{ reservationSuccessData.movieTitle }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Hora:</span>
+        <span class="detail-value">{{ reservationSuccessData.sessionTime }}</span>
+      </div>
+      
+      <div class="seats-summary">
+        <h4>Butacas reservadas:</h4>
+        <div 
+          v-for="(seat, index) in reservationSuccessData.seats" 
+          :key="index"
+          class="seat-item"
+        >
+          Fila {{ seat.row }}, Asiento {{ seat.seatNum }}
+        </div>
+      </div>
+    </div>
+
+    <button 
+      @click="showSuccessModal = false" 
+      class="confirm-btn success-btn"
+    >
+      Aceptar
+    </button>
+  </div>
+</div>
+
+    <!-- ✅ Modal de confirmación de cancelación -->
+    <div v-if="showCancelModal" class="modal-overlay">
+      <div class="modal-content">
+        <h2 class="modal-title">Cancelar Reserva</h2>
+        
+        <div class="confirmation-message">
+          ¿Estás seguro de que deseas cancelar esta reserva?
+        </div>
+        
+        <div class="modal-buttons">
+          <button @click="confirmCancel" class="confirm-btn">
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -173,6 +230,14 @@ const selectedSeats = ref([]);
 const reservations = ref([]);
 const cartOpen = ref(false);
 const showConfirmationForm = ref(false);
+const showCancelModal = ref(false);
+const seatToCancel = ref(null);
+const showSuccessModal = ref(false);
+const reservationSuccessData = ref({
+  movieTitle: '',
+  sessionTime: '',
+  seats: []
+});
 
 const confirmationData = ref({
   sessionId: '',
@@ -200,8 +265,6 @@ const fetchSessions = async (movieId) => {
     console.error('Error al cargar las sesiones:', error.message);
   }
 };
-;
-
 
 const fetchSeats = async (sessionId) => {
   try {
@@ -215,12 +278,10 @@ const fetchSeats = async (sessionId) => {
 
 const reserveSeats = async () => {
   if (!selectedSession.value) {
-    alert('Primero debes seleccionar una sesión.');
     return;
   }
 
   if (!selectedSeats.value.length) {
-    alert('No hay butacas seleccionadas.');
     return;
   }
 
@@ -266,10 +327,8 @@ const reserveSeats = async () => {
 
   } catch (error) {
     console.error('Error al reservar las butacas:', error);
-    alert(`Error: ${error.message}`);
   }
 };
-
 const handleConfirmReservation = async () => {
   try {
     if (!confirmationData.value.name || !confirmationData.value.lastName || !confirmationData.value.email) {
@@ -285,8 +344,18 @@ const handleConfirmReservation = async () => {
       confirmationData.value.email
     );
 
-    alert('Reserva confirmada correctamente');
+    // Guardar datos para el modal de éxito
+    reservationSuccessData.value = {
+      movieTitle: confirmationData.value.movieTitle,
+      sessionTime: confirmationData.value.sessionTime,
+      seats: confirmationData.value.seats
+    };
 
+    // Cerrar el modal de confirmación y mostrar el de éxito
+    showConfirmationForm.value = false;
+    showSuccessModal.value = true;
+
+    // Limpiar datos de confirmación
     confirmationData.value = {
       sessionId: '',
       reservaId: '',
@@ -296,15 +365,12 @@ const handleConfirmReservation = async () => {
       email: ''
     };
 
-    showConfirmationForm.value = false;
     await fetchReservations();
 
   } catch (error) {
     console.error('Error al confirmar la reserva:', error);
-    alert(error.message);
   }
 };
-
 const fetchReservations = async () => {
   try {
     const response = await CommunicationManager.fetchReservationsByUser();
@@ -315,12 +381,20 @@ const fetchReservations = async () => {
 };
 
 const cancelReservation = async (seatId) => {
-  if (!confirm('¿Estás seguro de que deseas cancelar esta reserva?')) return;
+  seatToCancel.value = seatId;
+  showCancelModal.value = true;
+};
+
+const confirmCancel = async () => {
   try {
-    await CommunicationManager.cancelReservation(seatId);
-    reservations.value = reservations.value.filter(r => r.seat_id !== seatId);
+    await CommunicationManager.cancelReservation(seatToCancel.value);
+    reservations.value = reservations.value.filter(r => r.seat_id !== seatToCancel.value);
+    showCancelModal.value = false;
+    seatToCancel.value = null;
   } catch (error) {
     console.error('Error al cancelar la reserva:', error.message);
+    showCancelModal.value = false;
+    seatToCancel.value = null;
   }
 };
 
@@ -358,9 +432,9 @@ const formatDate = (dateString) => {
 };
 
 onMounted(() => {
-  const movieId = window.location.pathname.split('/')[2];  // Obtén el ID desde la URL
+  const movieId = window.location.pathname.split('/')[2];
   fetchSessions(movieId); 
-    fetchReservations();
+  fetchReservations();
 });
 </script>
 
@@ -396,20 +470,23 @@ onMounted(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(100, 255, 218, 0.1);
   padding-left: 4rem; 
-
 }
+
 .logo {
   width: 50px;
   height: 50px;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
+
 img.logo{
   margin-left: 50px;
 }
+
 .logo:hover {
   transform: scale(1.1);
 }
+
 .navbar h1 {
   font-size: 1.8rem;
   font-weight: 700;
@@ -419,6 +496,7 @@ img.logo{
   color: transparent;
   margin: 0;
 }
+
 .title {
   font-size: 1.8rem;
   font-weight: 700;
@@ -428,6 +506,7 @@ img.logo{
   color: transparent;
   margin: 0;
 }
+
 /* ✅ Botón de volver */
 .back-button {
   position: absolute;
@@ -455,6 +534,7 @@ img.logo{
   color: white;
   transform: translateX(-3px);
 }
+
 .btn-cart {
   background: rgba(100, 255, 218, 0.1);
   border: 1px solid rgba(100, 255, 218, 0.2);
@@ -670,7 +750,25 @@ img.logo{
   border: 1px solid rgba(100, 255, 218, 0.2);
   animation: fadeIn 0.3s ease;
 }
+.success-icon {
+  font-size: 4rem;
+  text-align: center;
+  margin: 1rem 0;
+  animation: bounce 0.5s;
+}
 
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.success-btn {
+  background: linear-gradient(to right, #4CAF50, #2E7D32) !important;
+}
+
+.success-btn:hover {
+  background: linear-gradient(to right, #3e8e41, #1B5E20) !important;
+}
 .close-btn {
   position: absolute;
   top: 1rem;
@@ -786,6 +884,21 @@ img.logo{
   background: linear-gradient(to right, #3a92d8 0%, #00d9e6 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Modal de cancelación */
+.confirmation-message {
+  text-align: center;
+  margin: 1.5rem 0;
+  font-size: 1.1rem;
+  color: #e6f1ff;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* ✅ Animaciones */
