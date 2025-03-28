@@ -5,24 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalles de la Reserva</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap');
         
         body {
             font-family: 'Montserrat', sans-serif;
             margin: 0;
-            padding: 40px;
-            color: #333;
-            background-color: #f9f9f9;
-            line-height: 1.6;
+            padding: 30px;
+            color: #444;
+            background-color: #f5f7fa;
+            line-height: 1.5;
+            font-size: 14px;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
             background: white;
-            padding: 40px;
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
             position: relative;
             overflow: hidden;
         }
@@ -33,79 +34,83 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45aaf2);
+            height: 6px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             position: relative;
-            padding-bottom: 20px;
+            padding-bottom: 15px;
         }
         
         .header::after {
             content: "";
             position: absolute;
             bottom: 0;
-            left: 25%;
-            width: 50%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #4ecdc4, transparent);
+            left: 30%;
+            width: 40%;
+            height: 1.5px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
         }
         
         h1 {
             font-family: 'Playfair Display', serif;
-            color: #2c3e50;
-            font-size: 2.2em;
-            margin-bottom: 10px;
-            font-weight: 700;
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
         }
         
         .subtitle {
-            font-size: 1.1em;
-            color: #7f8c8d;
-            margin-bottom: 30px;
+            font-size: 0.95em;
+            color: #718096;
+            margin-bottom: 25px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 300;
+            letter-spacing: 0.8px;
+            font-weight: 400;
         }
         
         .movie-info {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 6px;
+            margin-bottom: 25px;
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
+            gap: 10px;
         }
         
         .info-item {
-            flex: 1 1 200px;
-            margin: 10px 0;
+            flex: 1 1 180px;
+            margin: 8px 0;
         }
         
         .info-item strong {
             display: block;
-            color: #7f8c8d;
-            font-size: 0.9em;
-            margin-bottom: 5px;
+            color: #718096;
+            font-size: 0.85em;
+            margin-bottom: 4px;
+            font-weight: 500;
         }
         
         .info-item span {
-            font-size: 1.1em;
-            color: #2c3e50;
+            font-size: 1em;
+            color: #2d3748;
             font-weight: 500;
         }
         
         h2 {
             font-family: 'Playfair Display', serif;
-            color: #2c3e50;
-            font-size: 1.5em;
-            margin: 30px 0 20px;
+            color: #2d3748;
+            font-size: 1.3em;
+            margin: 25px 0 15px;
             position: relative;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+            font-weight: 500;
         }
         
         h2::after {
@@ -113,34 +118,34 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 50px;
-            height: 3px;
-            background: #4ecdc4;
+            width: 40px;
+            height: 2px;
+            background: #667eea;
         }
         
         .table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0 30px;
-            font-size: 0.95em;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin: 15px 0 25px;
+            font-size: 0.9em;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
         }
         
         .table th {
-            background: #2c3e50;
+            background: #4a5568;
             color: white;
-            font-weight: 600;
+            font-weight: 500;
             text-transform: uppercase;
-            font-size: 0.85em;
+            font-size: 0.8em;
             letter-spacing: 0.5px;
-            padding: 12px 15px;
+            padding: 10px 12px;
             text-align: left;
         }
         
         .table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            color: #555;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f4f8;
+            color: #4a5568;
         }
         
         .table tr:last-child td {
@@ -148,56 +153,37 @@
         }
         
         .table tr:hover td {
-            background: #f8f9fa;
+            background: #f8fafc;
         }
         
         .total {
             text-align: right;
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #2c3e50;
-            margin: 30px 0;
-            padding: 15px;
-            background: linear-gradient(to right, transparent, #f8f9fa);
-            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 25px 0;
+            padding: 12px;
+            background: linear-gradient(to right, transparent, #f8fafc);
+            border-radius: 4px;
         }
         
         .total span {
-            color: #ff6b6b;
+            color: #764ba2;
         }
         
         .footer {
-            margin-top: 50px;
+            margin-top: 40px;
             text-align: center;
-            font-size: 0.85em;
-            color: #95a5a6;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
+            font-size: 0.8em;
+            color: #a0aec0;
+            border-top: 1px solid #f0f4f8;
+            padding-top: 15px;
         }
         
         .footer p:first-child {
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: #7f8c8d;
-        }
-        
-        .qr-code {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .qr-code img {
-            width: 120px;
-            height: 120px;
-            border: 1px solid #eee;
-            padding: 10px;
-            background: white;
-        }
-        
-        .qr-code p {
-            font-size: 0.8em;
-            color: #95a5a6;
-            margin-top: 5px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #718096;
         }
         
         @media print {
@@ -273,12 +259,6 @@
             Total: <span>${{ number_format($total, 2) }}</span>
         </div>
         
-        <div class="qr-code no-print">
-            <!-- Espacio para código QR (puedes generarlo dinámicamente) -->
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode('Reserva para ' . $name . ' - ' . $movie_title) }}" alt="Código QR">
-            <p>Presente este código en taquilla</p>
-        </div>
-
         <div class="footer">
             <p>Gracias por su compra. Presente este documento en taquilla.</p>
             <p>CineYa - Todos los derechos reservados © {{ date('Y') }}</p>
