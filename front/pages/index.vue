@@ -208,16 +208,17 @@ const prevPopularSlide = () => {
 }
 
 const images = ref([
-  '/images/carrusel/peli.png',
-  '/images/carrusel/peli1.png',
-  '/images/carrusel/peli2.png',
-  '/images/carrusel/peli4.png',
-  '/images/carrusel/peli5.png',
-  '/images/carrusel/peli6.png',
-  '/images/carrusel/peli7.png',
-  '/images/carrusel/peli8.png',
-  '/images/carrusel/peli9.png',
-  '/images/carrusel/peli10.png',
+  '/images/carrusel/peli.webp',
+  '/images/carrusel/peli1.webp',
+  '/images/carrusel/peli2.webp',
+  '/images/carrusel/peli3.webp',
+  '/images/carrusel/peli4.webp',
+  '/images/carrusel/peli5.webp',
+  '/images/carrusel/peli6.webp',
+  '/images/carrusel/peli7.webp',
+  '/images/carrusel/peli8.webp',
+  '/images/carrusel/peli9.webp',
+  '/images/carrusel/peli10.webp',
 ])
 
 const nextSlide = () => {
