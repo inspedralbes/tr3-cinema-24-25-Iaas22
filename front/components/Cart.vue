@@ -36,12 +36,7 @@
             </div>
           </div>
           
-          <button 
-            @click="$emit('cancel-reservation', reservation.seat_id)"
-            class="cancel-btn"
-          >
-            <img src="/images/delete.svg" alt="Eliminar" class="icon-button" />
-          </button>
+        
         </li>
       </ul>
       
@@ -64,7 +59,7 @@ defineProps({
   }
 });
 
-defineEmits(['toggle-cart', 'cancel-reservation']);
+defineEmits(['toggle-cart']);
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -221,20 +216,7 @@ const formatDate = (dateString) => {
   opacity: 0.7;
 }
 
-.cancel-btn {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 6px;
-  padding: 0.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-left: 1rem;
-}
 
-.cancel-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  transform: scale(1.1);
-}
 
 .sidebar-footer {
   margin-top: 1.5rem;
@@ -280,8 +262,6 @@ const formatDate = (dateString) => {
     gap: 1rem;
   }
   
-  .cancel-btn {
-    align-self: flex-end;
-  }
+ 
 }
 </style>
