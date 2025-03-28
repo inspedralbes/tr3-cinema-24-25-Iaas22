@@ -43,11 +43,10 @@
         </button>
       </div>
     </nav>
-  <div v-if="showAdminOptions" class="admin-options">
+    <div v-if="showAdminOptions" class="admin-options">
       <button @click="goToMovieCRUD">Ir a Movie CRUD</button>
       <button @click="goToReservationsCRUD">Ir a Reservations CRUD</button>
       <button @click="goToSessionsCRUD">Ir a Sessions CRUD</button>
-
     </div>
     <div class="carousel-container">
       <div 
@@ -106,6 +105,15 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de cierre de sesión -->
+    <div v-if="showLogoutModal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-icon">✅</div>
+        <h3>Has cerrado sesión correctamente</h3>
+        <button @click="closeModal" class="modal-button">Aceptar</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -123,8 +131,8 @@ const currentIndex = ref(0)
 const popularIndex = ref(0) 
 let interval = null
 const isLoggedIn = ref(false) 
-const showAdminOptions = ref(false) 
-
+const showAdminOptions = ref(false)
+const showLogoutModal = ref(false)
 
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem('user'))
@@ -164,6 +172,7 @@ const goToMovieCRUD = () => {
 const goToReservationsCRUD = () => {
   router.push('/reservations-crud')
 }
+
 const goToSessionsCRUD = () => {
   router.push('/sessions')
 }
@@ -174,12 +183,19 @@ const handleLogout = async () => {
     localStorage.removeItem('user')
     delete axios.defaults.headers.common['Authorization']
     isLoggedIn.value = false 
-
-    alert('✅ Has cerrado sesión correctamente.')
-    router.push('/')
+    isAdmin.value = false
+    showAdminOptions.value = false
+    
+    // Mostrar modal en lugar de alert
+    showLogoutModal.value = true
   } catch (error) {
     console.error('❌ Error al cerrar sesión:', error)
   }
+}
+
+const closeModal = () => {
+  showLogoutModal.value = false
+  router.push('/')
 }
 
 const { data: movies, pending, error } = await useAsyncData('movies', () =>
@@ -605,6 +621,7 @@ const prevSlide = () => {
     height: 200px;
   }
 }
+
 .admin-options {
   display: flex;
   justify-content: center;
@@ -654,5 +671,59 @@ const prevSlide = () => {
     max-width: 300px;
     padding: 0.8rem;
   }
+}
+
+/* Estilos para el modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #081e27, #02465d);
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(100, 255, 218, 0.2);
+}
+
+.modal-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #64ffda;
+}
+
+.modal-content h3 {
+  color: #e6f1ff;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.modal-button {
+  background: rgba(100, 255, 218, 0.1);
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  color: #64ffda;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-button:hover {
+  background: rgba(100, 255, 218, 0.2);
+  transform: translateY(-2px);
 }
 </style>
