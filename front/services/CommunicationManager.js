@@ -144,27 +144,26 @@ async login(email, password) {
     return response.data;
   },
 
-  // ✅ Reservar asiento (solo si hay token)
-  async reserveSeat(seatId, sessionId) {
-    if (!(await this.checkAuth())) {
-      alert('⚠️ Debes iniciar sesión para reservar una butaca.');
-      window.location.href = '/login';
-      return;
-    }
+ // ✅ Reservar asiento (solo si hay token)
+async reserveSeat(seatId, sessionId) {
+  if (!(await this.checkAuth())) {
+    // Eliminamos el alert y devolvemos un código especial
+    return { status: 'UNAUTHENTICATED' };
+  }
 
-    try {
-      const response = await axios.post(`${API_URL}/reserve-seat`, {
-        seat_id: seatId,
-        session_id: sessionId,
-      });
+  try {
+    const response = await axios.post(`${API_URL}/reserve-seat`, {
+      seat_id: seatId,
+      session_id: sessionId,
+    });
 
-      return response.data;
-    } catch (error) {
-      console.error('❌ Error al reservar la butaca:', error);
-      throw new Error(error.response?.data?.message || 'Error al reservar la butaca');
-    }
-  },
-// Función para comprar un asiento manualmente (nombre, apellidos y email introducidos por el usuario)
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al reservar la butaca:', error);
+    throw new Error(error.response?.data?.message || 'Error al reservar la butaca');
+  }
+},
+
 async buySeatManually(seatId, movieId, name, lastName, email) {
   try {
     // Obtener los detalles del asiento con seatId

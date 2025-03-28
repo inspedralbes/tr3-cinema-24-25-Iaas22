@@ -83,6 +83,37 @@
       </div>
     </div>
 
+    <!-- Modal de inicio de sesión -->
+<div v-if="showLoginModal" class="modal-overlay">
+  <div class="modal-content">
+    <button @click="showLoginModal = false" class="close-btn">
+      <img src="/images/close.png" alt="Cerrar" class="icon-button" />
+    </button>
+
+    <h2 class="modal-title">Inicio de Sesión Requerido</h2>
+    
+    <div class="login-icon">🔒</div>
+    
+    <div class="modal-message">
+      Para reservar butacas, necesitas iniciar sesión primero.
+    </div>
+
+    <div class="modal-buttons">
+      <button 
+        @click="redirectToLogin" 
+        class="confirm-btn login-btn"
+      >
+        Iniciar Sesión
+      </button>
+      <button 
+        @click="showLoginModal = false" 
+        class="confirm-btn cancel-btn"
+      >
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
     <!-- ✅ Formulario de confirmación como popup -->
     <div v-if="showConfirmationForm" class="modal-overlay">
       <div class="modal-content">
@@ -276,6 +307,14 @@ const fetchSeats = async (sessionId) => {
   }
 };
 
+// En las refs
+const showLoginModal = ref(false);
+
+// Métodos nuevos
+const redirectToLogin = () => {
+  window.location.href = '/login';
+};
+
 const reserveSeats = async () => {
   if (!selectedSession.value) {
     return;
@@ -286,8 +325,15 @@ const reserveSeats = async () => {
   }
 
   try {
-    await CommunicationManager.reserveSeats(selectedSeats.value, selectedSession.value);
+    // Primero verificamos si podemos reservar
+    const result = await CommunicationManager.reserveSeat(selectedSeats.value[0], selectedSession.value);
+    
+    if (result?.status === 'UNAUTHENTICATED') {
+      showLoginModal.value = true;
+      return;
+    }
 
+    // El resto de tu lógica actual de reserva...
     const session = sessions.value.find(s => s.session_id === selectedSession.value);
     const isSpecialDay = session.special_day;
 
@@ -507,7 +553,46 @@ img.logo{
   margin: 0;
 }
 
-/* ✅ Botón de volver */
+.login-icon {
+  font-size: 3rem;
+  text-align: center;
+  margin: 1rem 0;
+  color: #64ffda;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.modal-message {
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 1.5rem 0;
+  color: #e6f1ff;
+  line-height: 1.6;
+}
+
+.login-btn[data-v-ca00ae84] {
+    background: linear-gradient(to right, #18bfd3, #0e37a2);
+}
+
+
+.cancel-btn {
+  background: linear-gradient(to right, #f44336, #c62828) !important;
+  margin-top: 0.5rem;
+}
+
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+
 .back-button {
   position: absolute;
   top: 1.5rem;
@@ -548,6 +633,7 @@ img.logo{
   align-items: center;
   gap: 0.5rem;
 }
+
 
 .btn-cart:hover {
   background: rgba(100, 255, 218, 0.2);
@@ -723,8 +809,6 @@ img.logo{
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
-
-/* ✅ Modal de confirmación */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -745,11 +829,13 @@ img.logo{
   border-radius: 16px;
   padding: 2rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 450px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(100, 255, 218, 0.2);
   animation: fadeIn 0.3s ease;
+  position: relative;
 }
+
 .success-icon {
   font-size: 4rem;
   text-align: center;
@@ -867,7 +953,6 @@ img.logo{
 .confirm-btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
   color: white;
   font-size: 1rem;
   font-weight: 600;
@@ -875,9 +960,11 @@ img.logo{
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  background: linear-gradient(to right, #18bfd3, #0e37a2);
+
+
 }
 
 .confirm-btn:hover {
