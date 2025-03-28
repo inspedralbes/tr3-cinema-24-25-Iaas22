@@ -195,7 +195,7 @@
       <img src="/images/close.png" alt="Cerrar" class="icon-button" />
     </button>
 
-    <h2 class="modal-title">¡Reserva Confirmada!</h2>
+    <h2 class="modal-title">¡Reserva Confirmada, Te llegará un comprobante en tu correo electronico!</h2>
     
     <div class="success-icon">✅</div>
     
