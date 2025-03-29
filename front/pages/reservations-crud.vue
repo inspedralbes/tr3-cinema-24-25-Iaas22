@@ -4,11 +4,10 @@
         ⬅️
       </button>
       <div class="reservations-card">
-        <h2 class="reservations-title">Gestión de Reservas</h2>
+        <h2 class="reservations-title">Gestió d' Entrades</h2>
         
-        <!-- Selector de Fechas Disponibles -->
         <div class="date-selector">
-          <label for="reservation-date">Selecciona una fecha:</label>
+          <label for="reservation-date">Selecciona una data:</label>
           <select 
             v-model="selectedDate" 
             @change="fetchConfirmedReservations"
@@ -20,14 +19,13 @@
           </select>
         </div>
     
-        <!-- Mostrar los totales por tipo de asiento -->
         <div v-if="countByType" class="stats-container">
           <div class="stat-card normal">
-            <h3>Asientos Normales</h3>
+            <h3>Butaques Normals</h3>
             <p class="stat-value">{{ countByType.normal }}</p>
           </div>
           <div class="stat-card vip">
-            <h3>Asientos VIP</h3>
+            <h3>Butaques VIP</h3>
             <p class="stat-value">{{ countByType.vip }}</p>
           </div>
           <div class="stat-card total">
@@ -35,14 +33,13 @@
             <p class="stat-value">{{ countByType.normal + countByType.vip }}</p>
           </div>
           <div class="stat-card revenue">
-            <h3>Total Recaudado</h3>
+            <h3>Total recaudat</h3>
             <p class="stat-value">${{ totalRevenue.toFixed(2) }}</p>
           </div>
         </div>
     
-        <!-- Lista de Reservas Confirmadas -->
         <div class="reservations-list">
-          <h3 class="list-title">Reservas Confirmadas <span v-if="selectedDate">para {{ selectedDate }}</span></h3>
+          <h3 class="list-title">Reservas Confirmades <span v-if="selectedDate">para {{ selectedDate }}</span></h3>
           
           <div v-if="reservations.length > 0" class="reservation-items">
             <div v-for="reservation in reservations" :key="reservation.reserva_id" class="reservation-item">
@@ -54,12 +51,12 @@
                 
                 <div class="reservation-details">
                   <div class="detail-group">
-                    <span class="detail-label">Sesión ID:</span>
+                    <span class="detail-label">ID de Sessió:</span>
                     <span class="detail-value">{{ reservation.session.id }}</span>
                   </div>
                   
                   <div class="detail-group">
-                    <span class="detail-label">Película:</span>
+                    <span class="detail-label">Pel·lícula:</span>
                     <span class="detail-value">{{ reservation.session.movie }}</span>
                   </div>
                   
@@ -71,7 +68,7 @@
                   </div>
                   
                   <div class="detail-group">
-                    <span class="detail-label">Asiento:</span>
+                    <span class="detail-label">Butaca:</span>
                     <span class="detail-value">
                       {{ reservation.seat.row }}{{ reservation.seat.number }}
                       <span :class="['seat-type', reservation.seat.type]">{{ reservation.seat.type }}</span>
@@ -79,7 +76,7 @@
                   </div>
                   
                   <div class="detail-group">
-                    <span class="detail-label">Precio:</span>
+                    <span class="detail-label">Preu:</span>
                     <span class="detail-value price">${{ reservation.reservation_details.price }}</span>
                   </div>
                 </div>
@@ -88,7 +85,7 @@
           </div>
           
           <div v-else class="empty-message">
-            <p>No hay reservas confirmadas para esta fecha.</p>
+            <p>No hi han entrades per aquesta pel·lícula.</p>
           </div>
         </div>
       </div>
@@ -104,7 +101,6 @@
   const countByType = ref({ normal: 0, vip: 0 });
   const selectedDate = ref('');
   
-  // Calculamos el total recaudado
   const totalRevenue = computed(() => {
     return reservations.value.reduce((total, reservation) => {
       return total + parseFloat(reservation.reservation_details.price || 0);
@@ -136,7 +132,7 @@
 
   const formatTime = (timeString) => {
     if (!timeString) return '--:--';
-    // Asumiendo que el formato es HH:MM:SS y queremos mostrar solo HH:MM
+   
     return timeString.substring(0, 5);
   }
 
@@ -146,8 +142,7 @@
   </script>
   
   <style scoped>
-  /* Estilos anteriores se mantienen igual */
-  /* ✅ Fondo azul oscuro con gradiente (consistente con el de películas) */
+
   .reservations-container {
     min-height: 100vh;
     background: linear-gradient(135deg, #081e27, #02465d, #011721);
@@ -157,7 +152,6 @@
     padding: 2rem 1rem;
   }
   
-  /* ✅ Botón de volver (mismo estilo que en películas) */
   .back-button {
     position: absolute;
     top: 1.5rem;
@@ -185,7 +179,6 @@
     transform: translateX(-3px);
   }
   
-  /* ✅ Tarjeta principal con efecto de vidrio (glassmorphism) */
   .reservations-card {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -204,7 +197,6 @@
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
   }
   
-  /* ✅ Títulos */
   .reservations-title {
     font-size: 2rem;
     font-weight: 600;
@@ -242,7 +234,6 @@
     color: rgba(255, 255, 255, 0.7);
   }
   
-  /* ✅ Selector de fecha */
   .date-selector {
     margin-bottom: 2rem;
   }
@@ -274,7 +265,6 @@
     box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.2);
   }
   
-  /* ✅ Estadísticas */
   .stats-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -340,7 +330,6 @@
     color: #2ecc71;
   }
   
-  /* ✅ Lista de reservas */
   .reservations-list {
     background: rgba(255, 255, 255, 0.05);
     padding: 1.5rem;
@@ -416,7 +405,6 @@
     font-weight: 600;
   }
   
-  /* ✅ Estilos para el tipo de asiento */
   .seat-type {
     display: inline-block;
     padding: 0.2rem 0.5rem;
@@ -439,7 +427,6 @@
     border: 1px solid rgba(155, 89, 182, 0.3);
   }
   
-  /* ✅ Mensaje cuando no hay reservas */
   .empty-message {
     text-align: center;
     padding: 2rem;
@@ -450,7 +437,6 @@
     border: 1px dashed rgba(255, 255, 255, 0.1);
   }
   
-  /* ✅ Diseño responsive */
   @media (max-width: 768px) {
     .stats-container {
       grid-template-columns: repeat(2, 1fr);

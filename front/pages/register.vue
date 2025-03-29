@@ -1,10 +1,10 @@
 <template>
   <div class="register-container">
     <div class="register-card">
-      <h2 class="register-title">Registro</h2>
+      <h2 class="register-title">Registre</h2>
       <form @submit.prevent="register" class="register-form">
         <div class="form-group">
-          <label>Nombre</label>
+          <label>Nomb</label>
           <input
             type="text"
             v-model="form.name"
@@ -13,7 +13,7 @@
           />
         </div>
         <div class="form-group">
-          <label>Correo electrónico</label>
+          <label>Correu electrónic</label>
           <input
             type="email"
             v-model="form.email"
@@ -22,7 +22,7 @@
           />
         </div>
         <div class="form-group">
-          <label>Contraseña</label>
+          <label>Contrasenya</label>
           <input
             type="password"
             v-model="form.password"
@@ -31,7 +31,7 @@
           />
         </div>
         <div class="form-group">
-          <label>Confirmar contraseña</label>
+          <label>Confirmar contrasenya</label>
           <input
             type="password"
             v-model="form.password_confirmation"
@@ -40,7 +40,7 @@
           />
         </div>
         <div class="form-group">
-          <label>Fecha de nacimiento</label>
+          <label>Data de nacimixement</label>
           <input
             type="date"
             v-model="form.birthday"
@@ -58,8 +58,8 @@
         <p v-if="error" class="error-message">{{ error }}</p>
 
         <p class="login-text">
-          ¿Ya tienes cuenta?  
-          <span @click="goToLogin" class="login-link">Inicia sesión aquí</span>
+          ¿Ja tens compye?  
+          <span @click="goToLogin" class="login-link">Inicia sesió aquí</span>
         </p>
       </form>
     </div>
@@ -104,7 +104,6 @@ const goToLogin = () => {
 </script>
 
 <style scoped>
-/* ✅ Fondo azul oscuro con gradiente */
 .register-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #081e27, #02465d, #011721);
@@ -114,7 +113,6 @@ const goToLogin = () => {
   padding: 1rem;
 }
 
-/* ✅ Tarjeta de registro con efecto de vidrio (glassmorphism) */
 .register-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -133,7 +131,6 @@ const goToLogin = () => {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* ✅ Título con color claro */
 .register-title {
   font-size: 2rem;
   font-weight: 600;
@@ -143,7 +140,6 @@ const goToLogin = () => {
   letter-spacing: 0.5px;
 }
 
-/* ✅ Campos de formulario con estilo moderno */
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -178,7 +174,6 @@ const goToLogin = () => {
   outline: none;
 }
 
-/* ✅ Botón de registro con gradiente */
 .register-button {
   width: 100%;
   padding: 1rem;
@@ -212,7 +207,6 @@ const goToLogin = () => {
   cursor: not-allowed;
 }
 
-/* ✅ Mensaje de error */
 .error-message {
   color: #ff6b6b;
   font-size: 0.9rem;
@@ -224,7 +218,6 @@ const goToLogin = () => {
   border-left: 3px solid #ff6b6b;
 }
 
-/* ✅ Texto para login */
 .login-text {
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.7);
@@ -245,7 +238,6 @@ const goToLogin = () => {
   text-decoration: underline;
 }
 
-/* ✅ Responsive para tablets */
 @media (max-width: 768px) {
   .register-card {
     padding: 2rem;
@@ -257,7 +249,6 @@ const goToLogin = () => {
   }
 }
 
-/* ✅ Responsive para móviles */
 @media (max-width: 480px) {
   .register-card {
     padding: 1.5rem;

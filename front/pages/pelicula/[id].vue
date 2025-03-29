@@ -1,5 +1,5 @@
 <template>
-  <div v-if="pending" class="loading">Cargando detalles de la película...</div>
+  <div v-if="pending" class="loading">Carregant detalls de la pel·lícula...</div>
   <div v-if="error" class="error">
     <p>Error: {{ error.message }}</p>
   </div>
@@ -10,10 +10,9 @@
     </button>
     
     <div class="movie-container">
-      <!-- Sección superior: Imagen + datos básicos -->
       <div class="movie-header">
         <div class="movie-poster">
-          <img :src="movie.img" alt="Poster de la película" v-if="movie.img" />
+          <img :src="movie.img" alt="Cartell de la pel·lícula" v-if="movie.img" />
         </div>
         
         <div class="movie-basic-info">
@@ -21,43 +20,41 @@
           
           <div class="movie-meta">
             <div class="meta-item">
-              <div class="meta-label">Género</div>
+              <div class="meta-label">Gènere</div>
               <div class="meta-value">{{ movie.genre }}</div>
             </div>
             
             <div class="meta-item">
-              <div class="meta-label">Duración</div>
-              <div class="meta-value">{{ movie.duration }} minutos</div>
+              <div class="meta-label">Durada</div>
+              <div class="meta-value">{{ movie.duration }} minuts</div>
             </div>
             
             <div class="meta-item">
-              <div class="meta-label">Estreno</div>
+              <div class="meta-label">Estrena</div>
               <div class="meta-value">{{ movie.release_date }}</div>
             </div>
             
             <div class="meta-item" v-if="movie.trailer">
-              <div class="meta-label">Trailer</div>
+              <div class="meta-label">Tràiler</div>
               <div class="meta-value trailer">
                 <a :href="movie.trailer" target="_blank" class="trailer-link">
-                  Ver en YouTube
+                  Veure a YouTube
                 </a>
               </div>
             </div>
           </div>
           
           <div class="movie-actions">
-            <button class="buy-ticket" @click="goToReserva">Reservar butacas</button>
+            <button class="buy-ticket" @click="goToReserva">Reservar butaques</button>
           </div>
         </div>
       </div>
       
-      <!-- Sección de sinopsis -->
       <div class="movie-synopsis">
-        <h2 class="synopsis-title">Sinopsis</h2>
+        <h2 class="synopsis-title">Sinopsi</h2>
         <p class="synopsis-text">{{ movie.synopsis }}</p>
       </div>
       
-      <!-- Sección de créditos -->
       <div class="movie-credits">
         <div class="credit-item">
           <div class="credit-label">Director</div>
@@ -65,7 +62,7 @@
         </div>
         
         <div class="credit-item">
-          <div class="credit-label">Actores</div>
+          <div class="credit-label">Actors</div>
           <div class="credit-value">{{ movie.actors }}</div>
         </div>
       </div>
@@ -82,7 +79,7 @@ const router = useRouter();
 const movieId = route.params.id;
 
 if (!movieId) {
-  console.error("Error: No se encontró un ID en la ruta");
+  console.error("Error: No s'ha trobat cap ID a la ruta");
 }
 
 const { data: movie, pending, error } = await useAsyncData(`movie-${movieId}`, () =>
@@ -104,7 +101,6 @@ function goToReserva() {
   box-sizing: border-box;
 }
 
-/* ✅ Contenedor principal */
 .movie-details {
   min-height: 100vh;
   padding: 2rem;
@@ -116,7 +112,6 @@ function goToReserva() {
   position: relative;
 }
 
-/* ✅ Mensajes de carga y error */
 .loading, .error {
   text-align: center;
   padding: 2rem;
@@ -140,7 +135,6 @@ function goToReserva() {
   border-left: 3px solid #ff6b6b;
 }
 
-/* ✅ Contenedor principal de información */
 .movie-container {
   display: flex;
   flex-direction: column;
@@ -150,7 +144,6 @@ function goToReserva() {
   gap: 2rem;
 }
 
-/* ✅ Sección superior (imagen + datos básicos) */
 .movie-header {
   display: flex;
   gap: 2.5rem;
@@ -163,7 +156,6 @@ function goToReserva() {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ✅ Contenedor de imagen */
 .movie-poster {
   flex: 0 0 350px;
   position: relative;
@@ -188,7 +180,6 @@ function goToReserva() {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* ✅ Información básica */
 .movie-basic-info {
   flex: 1;
   display: flex;
@@ -246,7 +237,6 @@ function goToReserva() {
   align-items: center;
 }
 
-/* ✅ Sección de sinopsis */
 .movie-synopsis {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -283,7 +273,6 @@ function goToReserva() {
   text-align: justify;
 }
 
-/* ✅ Sección de créditos */
 .movie-credits {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -316,14 +305,12 @@ function goToReserva() {
   font-weight: 500;
 }
 
-/* ✅ Botón de comprar */
 .movie-actions {
   display: flex;
   justify-content: center;
   margin-top: 1rem;
 }
 
-/* ✅ Botón de volver */
 .back-button {
   position: absolute;
   top: 1.5rem;
@@ -351,7 +338,6 @@ function goToReserva() {
   transform: translateX(-3px);
 }
 
-/* ✅ Botón de comprar entrada */
 .buy-ticket {
   padding: 1rem 2.5rem;
   background: linear-gradient(135deg, #64ffda 0%, #1e90ff 100%);
@@ -396,7 +382,6 @@ function goToReserva() {
   transform: translateY(0);
 }
 
-/* ✅ Enlace del trailer */
 .trailer-link {
   color: #1e90ff;
   text-decoration: none;
@@ -433,7 +418,6 @@ function goToReserva() {
   width: 100%;
 }
 
-/* ✅ Responsive */
 @media (max-width: 1024px) {
   .movie-header {
     flex-direction: column;

@@ -1,8 +1,6 @@
 <template>
   <div class="main-container">
-    <!-- ✅ Navbar -->
     <nav class="navbar">
-      <!-- Botón de volver -->
       <button class="back-button" @click="$router.push('/')">
         ⬅️
       </button>
@@ -15,7 +13,6 @@
       </button>
     </nav>
 
-    <!-- ✅ Sidebar como componente externo -->
     <Cart 
       :reservations="reservations"
       :cartOpen="cartOpen"
@@ -24,15 +21,14 @@
     />
 
     <div class="content-wrapper">
-      <!-- ✅ Select para elegir sesión -->
       <div class="session-selector">
-        <h2 class="section-title">Selecciona tu sesión</h2>
+        <h2 class="section-title">SESSIONS </h2>
         <select 
           v-model="selectedSession" 
           @change="onSessionChange"
           class="custom-select"
         >
-          <option value="" disabled>Elige una sesión</option>
+          <option value="" disabled>Selecciona la teva sessió</option>
           <option 
             v-for="session in sessions" 
             :key="session.session_id" 
@@ -42,17 +38,19 @@
             <span v-if="session.special_day" class="special-day">🌟 Especial</span>
           </option>
         </select>
+        <p v-if="sessions.length === 0" class="no-sessions-message">
+    No hi han sessions disponibles per aquesta pel·lícula
+  </p>
       </div>
 
-      <!-- ✅ Mostrar butacas disponibles -->
       <div v-if="seats.length" class="seats-section">
         <h3 class="section-title">Butacas disponibles</h3>
         
         <div class="info-box">
           <ul class="info-list">
-            <li>🎯 Día del Espectador: Descuento de 2€ en todas las entradas</li>
-            <li>💺 Fila VIP (F): Precio de 8€</li>
-            <li>🎟️ Otras filas: Precio de 6€</li>
+            <li>🎯 Día de l'Espectador: Descompte de 2€ en totes les entrades</li>
+            <li>💺 Fila VIP (F): Preu de 8€</li>
+            <li>🎟️ Altres files: Preu de 6€</li>
           </ul>
         </div>
 
@@ -72,7 +70,6 @@
           </div>
         </div>
 
-        <!-- ✅ Botón de reservar -->
         <button 
           v-if="selectedSeats.length" 
           @click="reserveSeats" 
@@ -83,19 +80,20 @@
       </div>
     </div>
 
-    <!-- Modal de inicio de sesión -->
 <div v-if="showLoginModal" class="modal-overlay">
   <div class="modal-content">
     <button @click="showLoginModal = false" class="close-btn">
       <img src="/images/close.png" alt="Cerrar" class="icon-button" />
     </button>
 
-    <h2 class="modal-title">Inicio de Sesión Requerido</h2>
+    <h2 class="modal-title">Inici de sessió obligatori</h2>
     
     <div class="login-icon">🔒</div>
     
     <div class="modal-message">
-      Para reservar butacas, necesitas iniciar sesión primero.
+  <p>
+    Si us plau, inicia sessió per continuar amb la reserva.
+  </p>
     </div>
 
     <div class="modal-buttons">
@@ -103,7 +101,7 @@
         @click="redirectToLogin" 
         class="confirm-btn login-btn"
       >
-        Iniciar Sesión
+        Iniciar Sessió
       </button>
       <button 
         @click="showLoginModal = false" 
@@ -114,7 +112,6 @@
     </div>
   </div>
 </div>
-    <!-- ✅ Formulario de confirmación como popup -->
     <div v-if="showConfirmationForm" class="modal-overlay">
       <div class="modal-content">
         <button @click="closeConfirmation" class="close-btn">
@@ -125,7 +122,7 @@
 
         <div class="reservation-details">
           <div class="detail-item">
-            <span class="detail-label">Película:</span>
+            <span class="detail-label">Pel·lícula:</span>
             <span class="detail-value">{{ confirmationData.movieTitle }}</span>
           </div>
           <div class="detail-item">
@@ -133,18 +130,18 @@
             <span class="detail-value">{{ confirmationData.sessionTime }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">Fecha:</span>
+            <span class="detail-label">Día:</span>
             <span class="detail-value">{{ formatDate(confirmationData.sessionDate) }}</span>
           </div>
           
           <div class="seats-summary">
-            <h4>Butacas seleccionadas:</h4>
+            <h4>Butacas seleccionades:</h4>
             <div 
               v-for="seat in confirmationData.seats" 
               :key="seat.seatNum"
               class="seat-item"
             >
-              Fila {{ seat.row }}, Asiento {{ seat.seatNum }} - {{ seat.price }}€
+              Fila {{ seat.row }}, Butaca {{ seat.seatNum }} - {{ seat.price }}€
             </div>
           </div>
           
@@ -158,7 +155,7 @@
             <input 
               type="text"
               v-model="confirmationData.name"
-              placeholder="Nombre"
+              placeholder="Nom"
               required
               class="form-input"
             />
@@ -167,7 +164,7 @@
             <input 
               type="text"
               v-model="confirmationData.lastName"
-              placeholder="Apellidos"
+              placeholder="Cognoms"
               required
               class="form-input"
             />
@@ -176,7 +173,7 @@
             <input 
               type="email"
               v-model="confirmationData.email"
-              placeholder="Correo electrónico"
+              placeholder="Correu electónic"
               required
               class="form-input"
             />
@@ -187,21 +184,19 @@
           </button>
         </form>
       </div>
-    </div>
-    <!-- Modal de éxito en reserva -->
-<div v-if="showSuccessModal" class="modal-overlay">
+    </div><div v-if="showSuccessModal" class="modal-overlay">
   <div class="modal-content">
     <button @click="showSuccessModal = false" class="close-btn">
       <img src="/images/close.png" alt="Cerrar" class="icon-button" />
     </button>
 
-    <h2 class="modal-title">¡Reserva Confirmada, Te llegará un comprobante en tu correo electronico!</h2>
+    <h2 class="modal-title">¡Reserva Confirmada, t'arribarà un comprovant en el teu correu electrónic!</h2>
     
     <div class="success-icon">✅</div>
     
     <div class="reservation-details">
       <div class="detail-item">
-        <span class="detail-label">Película:</span>
+        <span class="detail-label">Pel·lícula:</span>
         <span class="detail-value">{{ reservationSuccessData.movieTitle }}</span>
       </div>
       <div class="detail-item">
@@ -210,13 +205,13 @@
       </div>
       
       <div class="seats-summary">
-        <h4>Butacas reservadas:</h4>
+        <h4>Butacas reservades:</h4>
         <div 
           v-for="(seat, index) in reservationSuccessData.seats" 
           :key="index"
           class="seat-item"
         >
-          Fila {{ seat.row }}, Asiento {{ seat.seatNum }}
+          Fila {{ seat.row }}, Butatca {{ seat.seatNum }}
         </div>
       </div>
     </div>
@@ -230,13 +225,12 @@
   </div>
 </div>
 
-    <!-- ✅ Modal de confirmación de cancelación -->
     <div v-if="showCancelModal" class="modal-overlay">
       <div class="modal-content">
         <h2 class="modal-title">Cancelar Reserva</h2>
         
         <div class="confirmation-message">
-          ¿Estás seguro de que deseas cancelar esta reserva?
+          Estàs segur que vols camcelar aquesta reserva?
         </div>
         
         <div class="modal-buttons">
@@ -307,10 +301,8 @@ const fetchSeats = async (sessionId) => {
   }
 };
 
-// En las refs
 const showLoginModal = ref(false);
 
-// Métodos nuevos
 const redirectToLogin = () => {
   window.location.href = '/login';
 };
@@ -325,7 +317,6 @@ const reserveSeats = async () => {
   }
 
   try {
-    // Primero verificamos si podemos reservar
     const result = await CommunicationManager.reserveSeat(selectedSeats.value[0], selectedSession.value);
     
     if (result?.status === 'UNAUTHENTICATED') {
@@ -333,7 +324,6 @@ const reserveSeats = async () => {
       return;
     }
 
-    // El resto de tu lógica actual de reserva...
     const session = sessions.value.find(s => s.session_id === selectedSession.value);
     const isSpecialDay = session.special_day;
 
@@ -390,18 +380,15 @@ const handleConfirmReservation = async () => {
       confirmationData.value.email
     );
 
-    // Guardar datos para el modal de éxito
     reservationSuccessData.value = {
       movieTitle: confirmationData.value.movieTitle,
       sessionTime: confirmationData.value.sessionTime,
       seats: confirmationData.value.seats
     };
 
-    // Cerrar el modal de confirmación y mostrar el de éxito
     showConfirmationForm.value = false;
     showSuccessModal.value = true;
 
-    // Limpiar datos de confirmación
     confirmationData.value = {
       sessionId: '',
       reservaId: '',
@@ -485,7 +472,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ✅ Estilos base */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 * {
@@ -502,7 +488,6 @@ onMounted(() => {
   padding-bottom: 2rem;
 }
 
-/* ✅ Barra de navegación */
 .navbar {
   background: rgba(10, 25, 47, 0.8);
   backdrop-filter: blur(10px);
@@ -652,7 +637,6 @@ img.logo{
   border-radius: 50%;
 }
 
-/* ✅ Contenido principal */
 .content-wrapper {
   max-width: 1200px;
   margin: 0 auto;
@@ -679,7 +663,6 @@ img.logo{
   border-radius: 2px;
 }
 
-/* ✅ Selector de sesión */
 .session-selector {
   margin-bottom: 2rem;
 }
@@ -705,8 +688,17 @@ img.logo{
   color: #ffd700;
   font-weight: 600;
 }
+.no-sessions-message {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  padding: 0.5rem;
+  background: rgba(255, 0, 0, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #f44336;
+}
 
-/* ✅ Sección de butacas */
 .seats-section {
   margin-top: 2rem;
 }
@@ -787,7 +779,6 @@ img.logo{
   border: 2px solid #3b82f6;
 }
 
-/* ✅ Botón de reservar */
 .reserve-btn {
   background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
   padding: 0.9rem 1.8rem;
@@ -988,7 +979,6 @@ img.logo{
   margin-top: 1.5rem;
 }
 
-/* ✅ Animaciones */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1000,7 +990,6 @@ img.logo{
   }
 }
 
-/* ✅ Responsive */
 @media (max-width: 1024px) {
   .seats-container {
     grid-template-columns: repeat(8, 1fr);

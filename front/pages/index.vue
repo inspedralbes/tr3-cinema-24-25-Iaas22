@@ -67,7 +67,7 @@
 
     <div v-if="popularMovies.length" class="popular-section">
       <div class="title-section">
-        <h2>MÁS POPULARES</h2>
+        <h2>MÉS POPULARS</h2>
       </div>
       <div class="popular-carousel-container">
         <div 
@@ -91,7 +91,7 @@
 
     <div v-if="remainingMovies.length" class="all-movies-section">
       <div class="title-section">
-        <h2>TODAS LAS PELÍCULAS</h2>
+        <h2>TOTES LES PEL·LÍCULES</h2>
       </div>
       <div class="movies-grid">
         <div 
@@ -106,7 +106,6 @@
       </div>
     </div>
 
-    <!-- Modal de cierre de sesión -->
     <div v-if="showLogoutModal" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-icon">✅</div>
@@ -186,7 +185,6 @@ const handleLogout = async () => {
     isAdmin.value = false
     showAdminOptions.value = false
     
-    // Mostrar modal en lugar de alert
     showLogoutModal.value = true
   } catch (error) {
     console.error('❌ Error al cerrar sesión:', error)
@@ -248,7 +246,6 @@ const prevSlide = () => {
 </script>
 
 <style scoped>
-/* ✅ Estilos base */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 * {
@@ -265,7 +262,6 @@ const prevSlide = () => {
   padding-bottom: 2rem;
 }
 
-/* ✅ Barra de navegación */
 .navbar {
   background: rgba(10, 25, 47, 0.8);
   backdrop-filter: blur(10px);
@@ -673,7 +669,6 @@ const prevSlide = () => {
   }
 }
 
-/* Estilos para el modal */
 .modal-overlay {
   position: fixed;
   top: 0;

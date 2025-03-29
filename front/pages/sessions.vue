@@ -5,11 +5,10 @@
       </button>
       
       <div class="sessions-card">
-        <h2 class="sessions-title">Gestión de Sesiones</h2>
+        <h2 class="sessions-title">Gestió de Sessions</h2>
         
-        <!-- Mensajes de estado -->
         <div v-if="loading" class="loading-message">
-          <p>Cargando sesiones...</p>
+          <p>Carregant sesions...</p>
         </div>
         
         <div v-if="error" class="error-message">
@@ -20,17 +19,16 @@
           <p>✅ {{ success }}</p>
         </div>
         
-        <!-- Tabla de sesiones -->
         <div class="table-container" v-if="sessions.length > 0">
           <table class="sessions-table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Película</th>
-                <th>Fecha</th>
+                <th>Pel·lícula</th>
+                <th>Data</th>
                 <th>Hora</th>
                 <th>Especial</th>
-                <th>Acciones</th>
+                <th>Accions</th>
               </tr>
             </thead>
             <tbody>
@@ -61,13 +59,12 @@
           <p>No hay sesiones programadas</p>
         </div>
         
-        <!-- Formulario para crear nueva sesión -->
         <div class="form-container">
-          <h3 class="form-title">Crear Nueva Sesión</h3>
+          <h3 class="form-title">Crear nova Sessió</h3>
           
           <form @submit.prevent="handleSubmit" class="session-form">
             <div class="form-group">
-              <label for="movie_id">ID de Película:</label>
+              <label for="movie_id">ID de Pel·lícula:</label>
               <input 
                 type="number" 
                 v-model="newSession.movie_id" 
@@ -77,7 +74,7 @@
             </div>
             
             <div class="form-group">
-              <label for="session_date">Fecha:</label>
+              <label for="session_date">Data:</label>
               <input 
                 type="date" 
                 v-model="newSession.session_date" 
@@ -109,7 +106,7 @@
             </div>
             
             <button type="submit" class="submit-button">
-              Crear Sesión
+              Crear Sessió
             </button>
             
             <div v-if="createError" class="error-message">
@@ -202,7 +199,6 @@
   </script>
   
   <style scoped>
-  /* ✅ Estilos base consistentes con el tema */
   .sessions-container {
     min-height: 100vh;
     background: linear-gradient(135deg, #081e27, #02465d, #011721);
@@ -240,7 +236,6 @@
     transform: translateX(-3px);
   }
   
-  /* ✅ Tarjeta principal */
   .sessions-card {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -281,7 +276,6 @@
     border-radius: 3px;
   }
   
-  /* ✅ Mensajes de estado */
   .loading-message,
   .error-message,
   .success-message {
@@ -309,7 +303,6 @@
     border: 1px solid rgba(46, 204, 113, 0.3);
   }
   
-  /* ✅ Tabla de sesiones */
   .table-container {
     overflow-x: auto;
     margin-bottom: 2.5rem;
@@ -343,7 +336,6 @@
     background: rgba(255, 255, 255, 0.08);
   }
   
-  /* ✅ Badges para días especiales */
   .badge {
     display: inline-block;
     padding: 0.3rem 0.6rem;
@@ -364,7 +356,6 @@
     border: 1px solid rgba(149, 165, 166, 0.3);
   }
   
-  /* ✅ Botones */
   .delete-button {
     background: rgba(231, 76, 60, 0.2);
     color: #e74c3c;
@@ -381,7 +372,6 @@
     transform: translateY(-2px);
   }
   
-  /* ✅ Formulario */
   .form-container {
     background: rgba(255, 255, 255, 0.05);
     padding: 1.5rem;
@@ -451,7 +441,6 @@
     transform: translateY(-2px);
   }
   
-  /* ✅ Mensaje cuando no hay sesiones */
   .empty-message {
     text-align: center;
     padding: 2rem;
@@ -463,7 +452,6 @@
     margin-bottom: 2rem;
   }
   
-  /* ✅ Diseño responsive */
   @media (max-width: 768px) {
     .sessions-card {
       padding: 1.5rem;

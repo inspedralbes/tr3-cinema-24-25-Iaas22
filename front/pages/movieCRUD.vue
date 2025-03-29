@@ -16,11 +16,9 @@ const form = ref({
 const editing = ref(false)
 const currentId = ref(null)
 
-// ✅ Cloudinary config
 const CLOUD_NAME = 'dt5vjbgab'
 const UPLOAD_PRESET = 'cinema'
 
-// ✅ Obtener películas
 const fetchMovies = async () => {
   try {
     movies.value = await CommunicationManager.fetchMovies()
@@ -29,7 +27,6 @@ const fetchMovies = async () => {
   }
 }
 
-// ✅ Subir imagen a Cloudinary
 const uploadImage = async (event) => {
   const file = event.target.files[0]
   if (!file) return
@@ -52,7 +49,6 @@ const uploadImage = async (event) => {
   }
 }
 
-// ✅ Crear o actualizar película
 const handleSubmit = async () => {
   try {
     if (editing.value) {
@@ -67,16 +63,14 @@ const handleSubmit = async () => {
   }
 }
 
-// ✅ Editar película
 const editMovie = (movie) => {
   form.value = { ...movie }
   editing.value = true
   currentId.value = movie.movie_id
 }
 
-// ✅ Eliminar película
 const deleteMovie = async (id) => {
-  if (confirm('¿Seguro que deseas eliminar esta película?')) {
+  if (confirm('¿Segur que vols eliminar aquesta pel·lícula?')) {
     try {
       await CommunicationManager.deleteMovie(id)
       fetchMovies()
@@ -86,7 +80,6 @@ const deleteMovie = async (id) => {
   }
 }
 
-// ✅ Resetear formulario
 const resetForm = () => {
   form.value = {
     title: '',
@@ -102,7 +95,6 @@ const resetForm = () => {
   currentId.value = null
 }
 
-// ✅ Cargar películas al montar el componente
 onMounted(fetchMovies)
 </script>
 
@@ -112,21 +104,21 @@ onMounted(fetchMovies)
         ⬅️
       </button>
     <div class="movies-card">
-      <h2 class="movies-title">Gestión de Películas</h2>
+      <h2 class="movies-title">Gestió de Pel·lícules</h2>
       
       <form @submit.prevent="handleSubmit" class="movies-form">
         <div class="form-group">
-          <label>Título</label>
+          <label>Títul</label>
           <input v-model="form.title" class="form-input" required />
         </div>
         
         <div class="form-group">
-          <label>Género</label>
+          <label>Génere</label>
           <input v-model="form.genre" class="form-input" required />
         </div>
         
         <div class="form-group">
-          <label>Duración (minutos)</label>
+          <label>Duració (minuts)</label>
           <input v-model="form.duration" type="number" class="form-input" required />
         </div>
         
@@ -136,7 +128,7 @@ onMounted(fetchMovies)
         </div>
         
         <div class="form-group">
-          <label>Actores</label>
+          <label>Actors</label>
           <input v-model="form.actors" class="form-input" required />
         </div>
         
@@ -146,12 +138,12 @@ onMounted(fetchMovies)
         </div>
         
         <div class="form-group">
-          <label>Fecha de estreno</label>
+          <label>Data d'estreno</label>
           <input v-model="form.release_date" type="date" class="form-input" required />
         </div>
         
         <div class="form-group">
-          <label>Imagen</label>
+          <label>Imatge</label>
           <input type="file" @change="uploadImage" class="form-input" />
           <div v-if="form.img" class="image-preview">
             <img :src="form.img" alt="Imagen de la película" />
@@ -169,7 +161,7 @@ onMounted(fetchMovies)
       </form>
 
       <div class="movies-list">
-        <h3 class="list-title">Películas Registradas</h3>
+        <h3 class="list-title">Pel·lícules Registrades</h3>
         
         <div v-if="movies.length" class="movie-items">
           <div v-for="movie in movies" :key="movie.movie_id" class="movie-item">
@@ -179,7 +171,7 @@ onMounted(fetchMovies)
                 <span class="movie-genre">{{ movie.genre }}</span>
               </div>
               <p class="movie-director">Director: {{ movie.director }}</p>
-              <p class="movie-duration">Duración: {{ movie.duration }} minutos</p>
+              <p class="movie-duration">Duració: {{ movie.duration }} minuts</p>
               <img v-if="movie.img" :src="movie.img" alt="Imagen de la película" />
             </div>
             <div class="movie-actions">
@@ -188,14 +180,13 @@ onMounted(fetchMovies)
             </div>
           </div>
         </div>
-        <p v-else class="empty-message">No hay películas disponibles.</p>
+        <p v-else class="empty-message">No hi han pel·lícules disponibles.</p>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* ✅ Fondo azul oscuro con gradiente */
 .movies-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #081e27, #02465d, #011721);
@@ -204,7 +195,6 @@ onMounted(fetchMovies)
   align-items: flex-start;
   padding: 2rem 1rem;
 }
-/* ✅ Botón de volver */
 .back-button {
   position: absolute;
   top: 1.5rem;
@@ -232,7 +222,6 @@ onMounted(fetchMovies)
   transform: translateX(-3px);
 }
 
-/* ✅ Tarjeta principal con efecto de vidrio (glassmorphism) */
 .movies-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -251,7 +240,6 @@ onMounted(fetchMovies)
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* ✅ Título */
 .movies-title {
   font-size: 2rem;
   font-weight: 600;
@@ -269,7 +257,6 @@ onMounted(fetchMovies)
   letter-spacing: 0.5px;
 }
 
-/* ✅ Formulario */
 .movies-form {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -319,7 +306,6 @@ textarea.form-input {
   resize: vertical;
 }
 
-/* ✅ Imagen de vista previa */
 .image-preview {
   margin-top: 10px;
 }
@@ -330,7 +316,6 @@ textarea.form-input {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* ✅ Botones del formulario */
 .form-actions {
   grid-column: span 2;
   display: flex;
@@ -376,7 +361,6 @@ textarea.form-input {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* ✅ Lista de películas */
 .movies-list {
   background: rgba(255, 255, 255, 0.05);
   padding: 1.5rem;
@@ -489,7 +473,6 @@ textarea.form-input {
   font-style: italic;
 }
 
-/* ✅ Diseño responsive */
 @media (max-width: 768px) {
   .movies-form {
     grid-template-columns: 1fr;

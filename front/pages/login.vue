@@ -1,10 +1,10 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <h2 class="login-title">Iniciar sesión</h2>
+      <h2 class="login-title">Iniciar sessió</h2>
       <form @submit.prevent="login" class="login-form">
         <div class="form-group">
-          <label>Correo electrónico</label>
+          <label>Correu electrónic</label>
           <input
             type="email"
             v-model="form.email"
@@ -13,7 +13,7 @@
           />
         </div>
         <div class="form-group">
-          <label>Contraseña</label>
+          <label>Contrasenya</label>
           <input
             type="password"
             v-model="form.password"
@@ -27,16 +27,15 @@
         <p v-if="error" class="error-message">{{ error }}</p>
 
         <p class="register-text">
-          ¿No tienes cuenta?
-          <span @click="goToRegister" class="register-link">Regístrate aquí</span>
+          ¿No tens compte?
+          <span @click="goToRegister" class="register-link">Registrat aquí</span>
         </p>
       </form>
     </div>
 
-    <!-- ✅ Modal Pop-up -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
-        <h2>¡Inicio de sesión exitoso!</h2>
+        <h2>¡Inici de sesió exitós!</h2>
         <p>Bienvenido, {{ user?.name || 'Usuario' }} 🎉</p>
         <button @click="closeModal" class="modal-button">Aceptar</button>
       </div>
@@ -71,13 +70,11 @@ const login = async () => {
       form.value.password
     );
 
-    // ✅ Guardar token e información en localStorage
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
 
     user.value = data.user;
     
-    // ✅ Mostrar modal pop-up
     showModal.value = true;
   } catch (err) {
     error.value = err.message;
@@ -86,19 +83,17 @@ const login = async () => {
   }
 };
 
-// ✅ Cerrar el modal y redirigir
 const closeModal = () => {
   showModal.value = false;
   router.push('/');
 };
 
-// ✅ Función para redirigir a la página de registro
 const goToRegister = () => {
   router.push('/register');
 };
 </script>
+
 <style scoped>
-/* ✅ Fondo azul oscuro con gradiente */
 .login-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #081e27, #02465d, #011721);
@@ -108,7 +103,6 @@ const goToRegister = () => {
   padding: 1rem;
 }
 
-/* ✅ Tarjeta de login con efecto de vidrio (glassmorphism) */
 .login-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -127,7 +121,6 @@ const goToRegister = () => {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* ✅ Título con color claro */
 .login-title {
   font-size: 2rem;
   font-weight: 600;
@@ -137,7 +130,6 @@ const goToRegister = () => {
   letter-spacing: 0.5px;
 }
 
-/* ✅ Campos de formulario con estilo moderno */
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -172,7 +164,6 @@ const goToRegister = () => {
   outline: none;
 }
 
-/* ✅ Botón de login con gradiente */
 .login-button {
   width: 100%;
   padding: 1rem;
@@ -206,7 +197,6 @@ const goToRegister = () => {
   cursor: not-allowed;
 }
 
-/* ✅ Mensaje de error */
 .error-message {
   color: #ff6b6b;
   font-size: 0.9rem;
@@ -218,7 +208,6 @@ const goToRegister = () => {
   border-left: 3px solid #ff6b6b;
 }
 
-/* ✅ Texto para registro */
 .register-text {
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.7);
@@ -239,7 +228,6 @@ const goToRegister = () => {
   text-decoration: underline;
 }
 
-/* ✅ Modal con estilo de vidrio */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -300,7 +288,6 @@ const goToRegister = () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* ✅ Animaciones */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -312,7 +299,6 @@ const goToRegister = () => {
   }
 }
 
-/* ✅ Responsive para tablets */
 @media (max-width: 768px) {
   .login-card {
     padding: 2rem;
@@ -324,7 +310,6 @@ const goToRegister = () => {
   }
 }
 
-/* ✅ Responsive para móviles */
 @media (max-width: 480px) {
   .login-card {
     padding: 1.5rem;
