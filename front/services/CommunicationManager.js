@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api';
+//const API_URL = 'http://localhost:8000/api';
+const API_URL = "http://cineyaback.daw.inspedralbes.cat/api";
 
 // ✅ Configurar axios para usar el token si está disponible
 if (typeof window !== 'undefined') {
@@ -19,15 +20,13 @@ async login(email, password) {
       const user = response.data.user;
 
       if (typeof window !== 'undefined' && token) {
-          // Guardar el token en localStorage para futuras solicitudes
           localStorage.setItem('auth_token', token);
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       }
 
       if (typeof window !== 'undefined' && user) {
-          // ✅ Guardar datos importantes en localStorage
           localStorage.setItem('user', JSON.stringify(user));
-          localStorage.setItem('user_id', user.id); // 🏆 Guardar el user_id directamente
+          localStorage.setItem('user_id', user.id); 
           localStorage.setItem('user_name', user.name);
           localStorage.setItem('user_email', user.email);
       }
@@ -42,7 +41,6 @@ async login(email, password) {
 },
 
 
-  // ✅ Registrar usuario
   async register(userData) {
     try {
       const response = await axios.post(`${API_URL}/register`, userData);
@@ -63,7 +61,6 @@ async login(email, password) {
     }
   },
 
-  // ✅ Verificar autenticación
   async checkAuth() {
     if (typeof window === 'undefined') return false;
 
@@ -80,7 +77,6 @@ async login(email, password) {
     }
   },
 
-  // ✅ Cierre de sesión
   logout() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
@@ -89,19 +85,16 @@ async login(email, password) {
     }
   },
 
-  // ✅ Obtener listado de películas
   async fetchMovies() {
     const response = await axios.get(`${API_URL}/movies`);
     return response.data;
   },
 
-  // ✅ Obtener detalles de una película
   async fetchMovieDetails(movieId) {
     const response = await axios.get(`${API_URL}/movies/${movieId}`);
     return response.data;
   },
 
-  // ✅ Crear película (solo admin)
   async createMovie(movieData) {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user?.role !== 'admin') {
@@ -111,7 +104,6 @@ async login(email, password) {
     return response.data;
   },
 
-  // ✅ Actualizar película (solo admin)
   async updateMovie(movieId, movieData) {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user?.role !== 'admin') {
@@ -121,7 +113,6 @@ async login(email, password) {
     return response.data;
   },
 
-  // ✅ Eliminar película (solo admin)
   async deleteMovie(movieId) {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user?.role !== 'admin') {
@@ -138,16 +129,13 @@ async login(email, password) {
 }
 ,
 
-  // ✅ Obtener butacas por ID de sesión
   async fetchSeatsBySession(sessionId) {
     const response = await axios.get(`${API_URL}/seats/session/${sessionId}`);
     return response.data;
   },
 
- // ✅ Reservar asiento (solo si hay token)
 async reserveSeat(seatId, sessionId) {
   if (!(await this.checkAuth())) {
-    // Eliminamos el alert y devolvemos un código especial
     return { status: 'UNAUTHENTICATED' };
   }
 
@@ -166,32 +154,27 @@ async reserveSeat(seatId, sessionId) {
 
 async buySeatManually(seatId, movieId, name, lastName, email) {
   try {
-    // Obtener los detalles del asiento con seatId
     const seatResponse = await axios.get(`${API_URL}/seats/${seatId}`);
     const seat = seatResponse.data;
 
-    // Obtener los detalles de la película con movieId
     const movieResponse = await axios.get(`${API_URL}/movies/${movieId}`);
     const movie = movieResponse.data;
 
-    // Obtener el usuario autenticado desde localStorage
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user || !user.id) {
       throw new Error('Usuario no autenticado');
     }
 
-    // Crear el objeto con la información para la compra
     const purchaseData = {
       seat_id: seatId,
       movie_id: movieId,
-      user_id: user.id, // Obtener el user_id desde localStorage
-      name: name, // El nombre que el usuario introduce manualmente
-      apellidos: lastName, // Los apellidos que el usuario introduce manualmente
-      email: email, // El email que el usuario introduce manualmente
-      precio: seat.price, // El precio del asiento
+      user_id: user.id, 
+      name: name, 
+      apellidos: lastName, 
+      email: email, 
+      precio: seat.price, 
     };
 
-    // Realizar la compra llamando al backend
     const response = await axios.post(`${API_URL}/buy-seat`, purchaseData);
 
     console.log('✅ Compra realizada con éxito:', response.data);
@@ -201,7 +184,6 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
     throw new Error(error.response?.data?.message || 'Error al comprar la reserva');
   }
 },
-  // ✅ Reservar múltiples asientos
   async reserveSeats(seatIds, sessionId) {
     if (!(await this.checkAuth())) {
       alert('⚠️ Debes iniciar sesión para reservar butacas.');
@@ -248,7 +230,6 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
   },
   
    
-  // ✅ Obtener historial de reservas
   async fetchReservations() {
     const response = await axios.get(`${API_URL}/reservations`);
     return response.data;
@@ -269,25 +250,21 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
     }
   },  
 
-  // ✅ Obtener precio de butaca por ID
   async getSeatPriceById(seatId) {
     const response = await axios.get(`${API_URL}/seat/price/${seatId}`);
     return response.data;
   },
 
-  // ✅ Obtener total de compra por usuario
   async getTotalPriceByUser(userId) {
     const response = await axios.get(`${API_URL}/compras/total/${userId}`);
     return response.data;
   },
 
-  // ✅ Obtener fecha de sesión por ID de película
   async getSessionDateByMovieId(movieId) {
     const response = await axios.get(`${API_URL}/sessions/date/${movieId}`);
     return response.data;
   },
 
-  // ✅ Completar reserva
   async completeReservation(reservationData) {
     const response = await axios.post(`${API_URL}/reservar-completa`, reservationData);
     return response.data;
@@ -314,21 +291,20 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
         apellidos: lastName,
         email,
         precio: seatIds.length * 6,
-        compra_dia: new Date().toISOString().split('T')[0], // YYYY-MM-DD
-        compra_hora: new Date().toTimeString().split(' ')[0], // HH:MM:SS
+        compra_dia: new Date().toISOString().split('T')[0], 
+        compra_hora: new Date().toTimeString().split(' ')[0], 
         status: 'confirmada'
       };
   
       console.log('📤 Enviando solicitud:', requestBody);
   
-      // 🔥 Toma el token correcto del localStorage
       const token = localStorage.getItem('auth_token');
       if (!token) throw new Error('⚠️ No hay token disponible');
       
       const response = await axios.post(`${API_URL}/confirmar-reserva`, requestBody, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 👈 Usa solo `auth_token`
+          'Authorization': `Bearer ${token}` 
         },
       });
       
@@ -341,11 +317,10 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
     }
   },  
  
-   // ✅ Obtener las fechas disponibles
    async fetchAvailableDates() {
     try {
       const response = await axios.get(`${API_URL}/admin/reservations/available-dates`);
-      return response.data.dates; // Devuelve el arreglo de fechas disponibles
+      return response.data.dates; 
     } catch (error) {
       console.error('Error al obtener las fechas disponibles:', error);
       throw new Error(error.response?.data?.message || 'Error al obtener las fechas disponibles');
@@ -356,41 +331,36 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
     try {
       const response = await axios.get(`${API_URL}/admin/reservations/confirmed`, {
           params: {
-              date: date,  // Pasamos la fecha como parámetro en la URL
+              date: date,  
           }
       });
   
-      // Asegurarnos de que la respuesta contiene los datos que necesitamos
       if (!response.data.reservations || !response.data.countByType) {
         throw new Error('Los datos de las reservas no están disponibles');
       }
   
       return {
         reservations: response.data.reservations,
-        countByType: response.data.countByType // Añadimos esta parte
+        countByType: response.data.countByType 
       };
     } catch (error) {
       console.error('❌ Error al obtener las reservas confirmadas:', error);
-      // Mostrar el error de una forma más clara
       const errorMessage = error.response?.data?.message || error.message || 'Error al obtener las reservas confirmadas';
       throw new Error(errorMessage);
     }
   },
   
 
-  // Lógica combinada para obtener fechas y luego reservas confirmadas
   async fetchDatesAndReservations() {
     try {
-      // Paso 1: Obtener fechas disponibles
       const availableDates = await this.fetchAvailableDates();
       if (availableDates && availableDates.length > 0) {
-        const date = availableDates[0]; // Selecciona la primera fecha disponible
+        const date = availableDates[0]; 
         console.log('Fecha seleccionada:', date);
 
-        // Paso 2: Obtener reservas confirmadas para esa fecha
         const confirmedReservations = await this.fetchConfirmedReservations(date);
         console.log('Reservas confirmadas:', confirmedReservations);
-        return confirmedReservations; // Devuelve las reservas confirmadas
+        return confirmedReservations; 
       } else {
         console.error('No hay fechas disponibles');
         throw new Error('No hay fechas disponibles');
@@ -400,20 +370,17 @@ async buySeatManually(seatId, movieId, name, lastName, email) {
       throw new Error(error.message);
     }
   },
- // ✅ Obtener todas las sesiones
  async fetchAllSessions() {
   try {
     const response = await axios.get(`${API_URL}/sessions`);
-    console.log('🔍 Todas las sesiones obtenidas:', response.data); // Para depuración
+    console.log('🔍 Todas las sesiones obtenidas:', response.data); 
     return response.data;
   } catch (error) {
     console.error('❌ Error al obtener las sesiones:', error);
     throw new Error(error.response?.data?.message || 'Error al obtener las sesiones');
   }
 },
-// Función para crear una nueva sesión
 async createSession(sessionData) {
-  // Verificación de que sessionData tenga los campos necesarios
   if (!sessionData.movie_id || !sessionData.session_date || !sessionData.session_time) {
     throw new Error('Los datos de la sesión están incompletos.');
   }
@@ -421,16 +388,14 @@ async createSession(sessionData) {
   try {
     const response = await axios.post(`${API_URL}/sessions`, sessionData);
     
-    // Verificar que la respuesta contiene los datos esperados
     if (response && response.data) {
-      return response.data;  // Devuelve los datos de la sesión creada
+      return response.data;  
     } else {
       throw new Error('No se recibió una respuesta válida del servidor');
     }
   } catch (error) {
     console.error('Error al crear la sesión:', error);
 
-    // Verificar si la respuesta de error tiene un mensaje específico
     if (error.response && error.response.data) {
       throw new Error(error.response.data.message || 'Error desconocido al crear la sesión');
     } else {
@@ -438,7 +403,6 @@ async createSession(sessionData) {
     }
   }
 },
-// Función para eliminar una sesión por su ID
 async deleteSession(sessionId) {
   try {
     const response = await axios.delete(`${API_URL}/sessions/${sessionId}`);
@@ -451,12 +415,10 @@ async deleteSession(sessionId) {
 },
 
 
-  // ✅ Obtener configuración base de la API
   getApiBase() {
     return API_URL;
   },
 
-  // ✅ Obtener headers de autorización
   getAuthHeaders() {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth_token');

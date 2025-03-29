@@ -5,7 +5,7 @@
         <button @click="$emit('toggle-cart')" class="close-btn">
           <img src="/images/cancelar.svg" alt="Cerrar" class="icon-button" />
         </button>
-        <h3 class="sidebar-title">MIS ENTRADAS </h3>
+        <h3 class="sidebar-title">LES MEVES ENTRADES </h3>
       </div>
       
       <div v-if="reservations.length === 0" class="empty-cart">
@@ -21,11 +21,11 @@
         >
           <div class="reservation-details">
             <div class="movie-title">
-              <img src="/images/login.png" alt="Película" class="detail-icon" />
+              <img src="/images/login.png" alt="Pel·lícula" class="detail-icon" />
               <span>{{ reservation.movie }}</span>
             </div>
             <div class="session-info">
-              <img src="/images/login.png" alt="Fecha" class="detail-icon" />
+              <img src="/images/login.png" alt="Data" class="detail-icon" />
               <span>{{ formatDate(reservation.date) }}</span>
               <img src="/images/login.png" alt="Hora" class="detail-icon" />
               <span>{{ reservation.time }}</span>
@@ -73,7 +73,6 @@ const formatDate = (dateString) => {
 </script>
 
 <style scoped>
-/* ✅ Estilos base */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 .sidebar {
@@ -245,7 +244,6 @@ const formatDate = (dateString) => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* ✅ Responsive */
 @media (max-width: 480px) {
   .sidebar {
     width: 100%;
