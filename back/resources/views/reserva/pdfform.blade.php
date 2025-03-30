@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalles de la Reserva</title>
+    <title>Detalls de la Reserva</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap');
         
@@ -206,17 +206,17 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Confirmación de Reserva</h1>
+            <h1>Confirmació de Reserva</h1>
             <p class="subtitle">CineYa - Entradas de Cine</p>
         </div>
 
         <div class="movie-info">
             <div class="info-item">
-                <strong>Película</strong>
+                <strong>Pel·lícula</strong>
                 <span>{{ $movie_title }}</span>
             </div>
             <div class="info-item">
-                <strong>Fecha</strong>
+                <strong>Data</strong>
                 <span>{{ $session_date }}</span>
             </div>
             <div class="info-item">
@@ -224,7 +224,7 @@
                 <span>{{ $session_time }}</span>
             </div>
             <div class="info-item">
-                <strong>Cliente</strong>
+                <strong>Client</strong>
                 <span>{{ $name }} {{ $apellidos }}</span>
             </div>
             <div class="info-item">
@@ -233,14 +233,14 @@
             </div>
         </div>
         
-        <h2>Detalles de los Asientos</h2>
+        <h2>Detalls de les butaques</h2>
         <table class="table">
             <thead>
                 <tr>
                     <th>Fila</th>
-                    <th>Asiento</th>
-                    <th>Tipo</th>
-                    <th>Precio</th>
+                    <th>Butaca</th>
+                    <th>Tipus</th>
+                    <th>Preu</th>
                 </tr>
             </thead>
             <tbody>
@@ -260,8 +260,8 @@
         </div>
         
         <div class="footer">
-            <p>Gracias por su compra. Presente este documento en taquilla.</p>
-            <p>CineYa - Todos los derechos reservados © {{ date('Y') }}</p>
+            <p>Grcias pper la seva compra. Presenti aquest document en taquilla.</p>
+            <p>CineYa - Tots els drets reservats © {{ date('Y') }}</p>
         </div>
     </div>
 </body>

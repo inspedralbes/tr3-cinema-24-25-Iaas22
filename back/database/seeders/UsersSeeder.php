@@ -9,7 +9,7 @@ class UsersSeeder extends Seeder
 {
     public function run()
     {
-        // Usuario normal de ejemplo
+        // Usuario normal 
         User::create([
             'name' => 'ias',
             'email' => 'ias@gmail.com',

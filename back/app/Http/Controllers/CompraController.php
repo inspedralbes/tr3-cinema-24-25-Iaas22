@@ -29,7 +29,6 @@ class CompraController extends Controller
             'email' => $request->email ?? null,
         ]);
 
-        // ✅ Actualizar el estado de la reserva a 'confirmada'
         \DB::table('reservas')
             ->where('seat_id', $seat->seat_id)
             ->update(['status' => 'confirmada']);
@@ -63,19 +62,17 @@ public function buyMultipleSeats(Request $request)
 
     $reservas = $request->input('reservas');
     $reservasCreadas = [];
-    $totalPrecio = 0; // ✅ Variable para acumular el total
+    $totalPrecio = 0; 
 
-    DB::beginTransaction(); // ✅ Iniciar transacción
+    DB::beginTransaction(); 
 
     try {
         foreach ($reservas as $reserva) {
-            // Verificar si el asiento ya está reservado
             $seat = Seat::findOrFail($reserva['seat_id']);
             if (Compra::where('seat_id', $seat->seat_id)->exists()) {
                 throw new \Exception("El asiento {$seat->seat_id} ya está reservado");
             }
 
-            // ✅ Crear la compra
             $compra = Compra::create([
                 'user_id' => $reserva['user_id'],
                 'seat_id' => $reserva['seat_id'],
@@ -88,27 +85,24 @@ public function buyMultipleSeats(Request $request)
                 'email' => $reserva['email'],
             ]);
 
-            // ✅ Acumular el precio total
             $totalPrecio += $seat->price;
 
-            // ✅ Actualizar el estado de la reserva a 'confirmada'
             \DB::table('reservas')
                 ->where('seat_id', $seat->seat_id)
                 ->update(['status' => 'confirmada']);
 
             $reservasCreadas[] = $compra;
         }
-
-        DB::commit(); // ✅ Confirmar la transacción
+// ✅ Confirmar la transacción
 
         return response()->json([
             'success' => true,
             'message' => 'Reservas compradas con éxito',
             'data' => $reservasCreadas,
-            'total' => $totalPrecio // ✅ Mostrar el total acumulado
+            'total' => $totalPrecio 
         ], 201);
     } catch (\Exception $e) {
-        DB::rollBack(); // 🚨 Revertir en caso de error
+        DB::rollBack(); 
 
         return response()->json([
             'success' => false,

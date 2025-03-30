@@ -10,12 +10,12 @@ class CreateSeatsTable extends Migration
     public function up()
     {
         Schema::create('seats', function (Blueprint $table) {
-            $table->id('seat_id');  // Identificador único del asiento
-            $table->string('row');  // Fila del asiento
-            $table->integer('seat_num');  // Número del asiento
-            $table->enum('type', ['normal', 'vip']); // Tipo de asiento
-            $table->decimal('price', 8, 2); // Precio del asiento
-            $table->timestamps();  // Fechas de creación y actualización
+            $table->id('seat_id');  
+            $table->string('row'); 
+            $table->integer('seat_num'); 
+            $table->enum('type', ['normal', 'vip']); 
+            $table->decimal('price', 8, 2); 
+            $table->timestamps();  
         });
 
     }

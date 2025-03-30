@@ -15,9 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ReservaController extends Controller
 {
-    /**
-     * Mostrar todas las butacas y su estado por ID de sesión.
-     */
+   
     public function getSeatsBySession($sessionId)
     {
         $seats = Seat::leftJoin('reservas', function ($join) use ($sessionId) {
@@ -50,14 +48,12 @@ class ReservaController extends Controller
         return response()->json($seats);
     }
 
-    /**
-     * Mostrar todas las reservas por user_id.
-     */
+   
     public function getReservationsByUser($userId)
     {
         $reservations = Reserva::with(['seat', 'session.movie'])
             ->where('user_id', $userId)
-            ->where('status', 'confirmada') // Filtrar solo las reservas con estado 'reservada'
+            ->where('status', 'confirmada')
             ->get();
     
         if ($reservations->isEmpty()) {
@@ -110,7 +106,7 @@ public function cancelReservations(Request $request)
     $sessionId = $request->session_id;
     $userId = auth()->id();
 
-    // Buscar reservas que pertenezcan al usuario y a la sesión indicada
+
     $reservations = Reserva::whereIn('seat_id', $seatIds)
         ->where('session_id', $sessionId)
         ->where('user_id', $userId)
@@ -122,7 +118,6 @@ public function cancelReservations(Request $request)
         ], 404);
     }
 
-    // Cancelar las reservas (eliminar)
     $reservations->each(function ($reservation) {
         $reservation->delete();
     });
@@ -133,9 +128,7 @@ public function cancelReservations(Request $request)
     ]);
 }
 
-    /**
-     * Reservar una butaca.
-     */
+   
     public function reserveSeat(Request $request)
     {
         $request->validate([
@@ -165,9 +158,7 @@ public function cancelReservations(Request $request)
         return response()->json(['success' => '✅ Butaca reservada con éxito']);
     }
 
-    /**
-     * Reservar múltiples butacas.
-     */
+  
     public function reserveSeats(Request $request)
     {
         $request->validate([
@@ -211,9 +202,7 @@ public function cancelReservations(Request $request)
         ]);
     }
 
-    /**
-     * Obtener el precio total por usuario.
-     */
+  
     public function getTotalPriceByUser($userId)
     {
         $reservas = Reserva::with('seat')
@@ -255,7 +244,6 @@ public function cancelReservations(Request $request)
     $userId = auth()->id();
     $seats = Seat::whereIn('seat_id', $request->seat_ids)->get();
 
-    // Obtener información de la película
     $session = DB::table('session')
                 ->join('movies', 'session.movie_id', '=', 'movies.movie_id')
                 ->where('session.session_id', $request->session_id)
@@ -277,7 +265,6 @@ public function cancelReservations(Request $request)
         ];
     }
 
-    // Actualizar reservas
     foreach ($seatsWithPrices as $seatWithPrice) {
         Reserva::where('seat_id', $seatWithPrice['seat_id'])
             ->where('user_id', $userId)
@@ -296,7 +283,6 @@ public function cancelReservations(Request $request)
             ]);
     }
 
-    // Generar y guardar PDF
     $pdf = PDF::loadView('reserva.pdfform', [
         'name' => $request->name,
         'apellidos' => $request->apellidos,
@@ -311,10 +297,8 @@ public function cancelReservations(Request $request)
     $filename = 'reserva_'.time().'.pdf';
     $pdfPath = 'pdfs/'.$filename;
     
-    // Guardar el PDF en storage/app/public/pdfs
     Storage::disk('public')->put($pdfPath, $pdf->output());
 
-    // Enviar correo con PDF adjunto
     Mail::to($request->email)->send(new ReservaConfirmadaMail(
         $request->name,
         $request->apellidos,
@@ -324,7 +308,7 @@ public function cancelReservations(Request $request)
         $session->title ?? 'Película no disponible',
         $session->session_date ?? 'Fecha no disponible',
         $session->session_time ?? 'Hora no disponible',
-        storage_path('app/public/'.$pdfPath) // Ruta completa al PDF
+        storage_path('app/public/'.$pdfPath) 
     ));
 
     return response()->json([
@@ -332,7 +316,7 @@ public function cancelReservations(Request $request)
         'total' => $total,
         'session_id' => $request->session_id,
         'seats' => $seatsWithPrices,
-        'pdf_path' => $pdfPath // Devolver la ruta del PDF guardado
+        'pdf_path' => $pdfPath 
     ]);
 }
 public function getConfirmedReservations(Request $request)
@@ -385,7 +369,6 @@ public function getConfirmedReservations(Request $request)
             ];
         });
 
-        // Contamos las reservas por tipo de asiento (normal o vip)
         $countByType = [
             'normal' => $reservations->where('seat.type', 'normal')->count(),
             'vip' => $reservations->where('seat.type', 'vip')->count(),
@@ -410,7 +393,6 @@ public function getAvailableDates()
     }
 
     try {
-        // Obtener todas las fechas únicas de las reservas confirmadas
         $dates = Reserva::where('status', 'confirmada')
             ->distinct()
             ->pluck('compra_dia');

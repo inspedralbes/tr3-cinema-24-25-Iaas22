@@ -12,7 +12,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    // Campos que son asignables masivamente
     protected $fillable = [
         'name',
         'email',
@@ -20,18 +19,15 @@ class User extends Authenticatable
         'birthday',
     ];
 
-    // Campos que se deben ocultar en las respuestas
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    // Casts para conversión de tipos
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
-    // Método para cifrar la contraseña al guardar el usuario
     /*public static function boot()
     {
         parent::boot();

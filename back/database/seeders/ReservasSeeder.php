@@ -14,16 +14,16 @@ class ReservasSeeder extends Seeder
         // Insertar múltiples reservas de ejemplo
         DB::table('reservas')->insert([
             [
-                'seat_id' => 1, // Asiento con ID 1
-                'session_id' => 1, // Sesión con ID 1
-                'user_id' => 1, // Usuario con ID 1
-                'precio' => 50.00, // Precio de la compra
-                'compra_dia' => Carbon::now()->toDateString(), // Día de la compra (fecha actual)
-                'compra_hora' => Carbon::now()->toTimeString(), // Hora de la compra (hora actual)
-                'name' => 'Juan', // Nombre del comprador
-                'apellidos' => 'Pérez', // Apellidos del comprador
-                'email' => 'juan.perez@example.com', // Correo del comprador
-                'status' => 'confirmada', // Estado de la reserva
+                'seat_id' => 1, 
+                'session_id' => 1, 
+                'user_id' => 1, 
+                'precio' => 50.00, 
+                'compra_dia' => Carbon::now()->toDateString(), 
+                'compra_hora' => Carbon::now()->toTimeString(), 
+                'name' => 'Juan', 
+                'apellidos' => 'Pérez', 
+                'email' => 'juan.perez@example.com', 
+                'status' => 'confirmada', 
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],

@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Movie extends Model
 {
-    protected $table = 'movies'; // Asegúrate de que el nombre de la tabla sea correcto
-    protected $primaryKey = 'movie_id'; // Asegúrate de que la clave primaria sea correcta
-    public $timestamps = false; // Si tu tabla no tiene los campos created_at y updated_at
+    protected $table = 'movies'; 
+    protected $primaryKey = 'movie_id'; 
+    public $timestamps = false; 
     protected $fillable = [
         'title', 'genre', 'duration', 'director', 'actors', 'synopsis', 'release_date', 'img',   'trailer',  
     ]; 

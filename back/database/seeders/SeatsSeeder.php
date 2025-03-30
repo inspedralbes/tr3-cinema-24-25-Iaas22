@@ -14,7 +14,6 @@ class SeatsSeeder extends Seeder
 
         foreach ($rows as $row) {
             for ($i = 1; $i <= 10; $i++) {
-                // ✅ Toda la fila F es VIP, las demás son normales
                 $type = ($row === 'F') ? 'vip' : 'normal';
                 $price = ($type === 'vip') ? 8.00 : 6.00;
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Confirmación de Reserva</title>
+    <title>Confirmació d' Entrada</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -48,28 +48,28 @@
 <body>
     <div class="container">
         <h1>¡Hola {{ $name }} {{ $apellidos }}!</h1>
-        <p>Tu reserva para <strong>{{ $movieTitle }}</strong> ha sido confirmada con éxito.</p>
+        <p> La terva reserva per <strong>{{ $movieTitle }}</strong> ha sigut confirmada amb éxit!.</p>
         
-        <h3>Detalles de la función:</h3>
-        <p><strong>Fecha:</strong> {{ $sessionDate }}</p>
+        <h3>Detalls de la funció:</h3>
+        <p><strong>Data:</strong> {{ $sessionDate }}</p>
         <p><strong>Hora:</strong> {{ $sessionTime }}</p>
 
-        <h3>Detalles de los asientos:</h3>
+        <h3>Detalles de les butaques:</h3>
         <ul>
             @foreach ($seats as $seat)
                 <li>
-                    <strong>Asiento:</strong> Fila {{ $seat['row'] }}, Número {{ $seat['seat_num'] }} 
-                    ({{ ucfirst($seat['type']) }}) - <strong>Precio:</strong> ${{ number_format($seat['precio'], 2) }}
+                    <strong>Butaca:</strong> Fila {{ $seat['row'] }}, Numero {{ $seat['seat_num'] }} 
+                    ({{ ucfirst($seat['type']) }}) - <strong>Preu:</strong> ${{ number_format($seat['precio'], 2) }}
                 </li>
             @endforeach
         </ul>
 
         <p class="total"><strong>Total: ${{ number_format($total, 2) }}</strong></p>
 
-        <p>Adjunto encontrarás tu comprobante de reserva en formato PDF. Por favor, preséntalo en taquilla el día de la función.</p>
+        <p>Trobaràs el teu comprovant adjunt, preseta-ho a la taquilla.</p>
 
         <div class="footer">
-            <p>Atentamente,</p>
+            <p>Atentament,</p>
             <p><strong>CineYa</strong></p>
         </div>
     </div>

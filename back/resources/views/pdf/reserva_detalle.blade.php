@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Detalles de Reserva</title>
+    <title>Detalls de Reserva</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -36,21 +36,21 @@
 </head>
 <body>
 
-    <h1>Detalles de la Reserva</h1>
+    <h1>Detalls de la Reserva</h1>
 
-    <p><strong>Nombre:</strong> {{ $name }} {{ $apellidos }}</p>
+    <p><strong>Nom:</strong> {{ $name }} {{ $apellidos }}</p>
     <p><strong>Sesión ID:</strong> {{ $session_id }}</p>
 
-    <h3>Detalles de los asientos:</h3>
+    <h3>Detalls de les butaques:</h3>
     <ul>
         @foreach ($seats as $seat)
-            <li><strong>Asiento:</strong> {{ $seat['seat_id'] }} - <strong>Precio:</strong> ${{ $seat['precio'] }}</li>
+            <li><strong>Asiento:</strong> {{ $seat['seat_id'] }} - <strong>Preu:</strong> ${{ $seat['precio'] }}</li>
         @endforeach
     </ul>
 
     <p class="total"><strong>Total: ${{ $total }}</strong></p>
 
-    <p>¡Gracias por elegirnos!</p>
+    <p>¡Gràcies por elegirnos!</p>
 
 </body>
 </html>

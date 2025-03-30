@@ -7,10 +7,9 @@ use App\Models\Movie;
 
 class MovieController extends Controller
 {
-    // Obtener todas las películas desde la base de datos (sin restricción)
     public function index()
     {
-        $movies = Movie::all(); // Obtiene todas las películas
+        $movies = Movie::all(); 
         return response()->json($movies, 200);
     }
 
@@ -24,7 +23,7 @@ class MovieController extends Controller
         }
     }
 
-    // ✅ Solo admin puede crear una película
+    
     public function store(Request $request)
     {
         if (auth()->user()->role !== 'admin') {
@@ -41,7 +40,7 @@ class MovieController extends Controller
                 'synopsis' => 'required|string',
                 'release_date' => 'required|date',
                 'img' => 'nullable|string',
-                'trailer' => 'nullable|string',  // Agregamos el campo trailer que puede ser NULL
+                'trailer' => 'nullable|string',  
             ]);
 
             $movie = Movie::create($request->all());
@@ -57,7 +56,7 @@ class MovieController extends Controller
         }
     }
 
-    // ✅ Solo admin puede actualizar una película
+    
     public function update(Request $request, $id)
     {
         if (auth()->user()->role !== 'admin') {
@@ -79,7 +78,8 @@ class MovieController extends Controller
             'synopsis' => 'sometimes|string',
             'release_date' => 'sometimes|date',
             'img' => 'nullable|string',
-            'trailer' => 'nullable|string',  // Agregamos el campo trailer que puede ser NULL
+            // 'trailer'=> 'nullable',
+            'trailer' => 'nullable|string',  
         ]);
 
         $movie->update($request->all());
@@ -90,7 +90,7 @@ class MovieController extends Controller
         ], 200);
     }
 
-    // ✅ Solo admin puede eliminar una película
+   
     public function destroy($id)
     {
         if (auth()->user()->role !== 'admin') {

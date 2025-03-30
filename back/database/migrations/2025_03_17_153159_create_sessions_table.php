@@ -11,14 +11,14 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('sessions', function (Blueprint $table) {
-            $table->id(); // session_id como clave primaria auto incremental
-            $table->string('user_id')->nullable(); // ID del usuario (nullable para sesiones no autenticadas)
-            $table->string('ip_address')->nullable(); // Dirección IP del cliente
-            $table->text('user_agent')->nullable(); // Info del navegador/dispositivo
-            $table->longText('payload'); // Datos de la sesión serializados
-            $table->integer('last_activity'); // Timestamp de la última actividad
+            $table->id(); 
+            $table->string('user_id')->nullable(); 
+            $table->string('ip_address')->nullable(); 
+            $table->text('user_agent')->nullable(); 
+            $table->longText('payload'); 
+            $table->integer('last_activity'); 
 
-            $table->timestamps(); // created_at y updated_at
+            $table->timestamps(); 
         });
     }
 
