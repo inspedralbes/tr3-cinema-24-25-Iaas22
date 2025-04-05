@@ -1,0 +1,113 @@
+[
+    {
+      "id": 1,
+      "title": "Inception",
+      "duration": "148 min",
+      "genre": "Sci-Fi",
+      "director": "Christopher Nolan",
+      "actors": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Ellen Page"],
+      "sinopsis": "A thief who enters the dreams of others to steal their secrets.",
+      "premiere": "2010-07-16",
+      "room_id": 1
+    },
+    {
+      "id": 2,
+      "title": "The Matrix",
+      "duration": "136 min",
+      "genre": "Sci-Fi",
+      "director": "Lana Wachowski, Lilly Wachowski",
+      "actors": ["Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss"],
+      "sinopsis": "A hacker discovers the true nature of reality.",
+      "premiere": "1999-03-31",
+      "room_id": 2
+    },
+    {
+      "id": 3,
+      "title": "Interstellar",
+      "duration": "169 min",
+      "genre": "Sci-Fi, Adventure",
+      "director": "Christopher Nolan",
+      "actors": ["Matthew McConaughey", "Anne Hathaway", "Jessica Chastain"],
+      "sinopsis": "A team of explorers travels through a wormhole in space to ensure humanity's survival.",
+      "premiere": "2014-11-07",
+      "room_id": 3
+    },
+    {
+      "id": 4,
+      "title": "Titanic",
+      "duration": "195 min",
+      "genre": "Drama, Romance",
+      "director": "James Cameron",
+      "actors": ["Leonardo DiCaprio", "Kate Winslet", "Billy Zane"],
+      "sinopsis": "A love story set against the backdrop of the ill-fated RMS Titanic.",
+      "premiere": "1997-12-19",
+      "room_id": 4
+    },
+    {
+      "id": 5,
+      "title": "The Dark Knight",
+      "duration": "152 min",
+      "genre": "Action, Crime",
+      "director": "Christopher Nolan",
+      "actors": ["Christian Bale", "Heath Ledger", "Aaron Eckhart"],
+      "sinopsis": "Batman faces his greatest challenge yet: The Joker, a criminal mastermind.",
+      "premiere": "2008-07-18",
+      "room_id": 5
+    },
+    {
+      "id": 6,
+      "title": "Avengers: Endgame",
+      "duration": "181 min",
+      "genre": "Action, Sci-Fi",
+      "director": "Anthony Russo, Joe Russo",
+      "actors": ["Robert Downey Jr.", "Chris Evans", "Scarlett Johansson"],
+      "sinopsis": "The Avengers assemble once more in order to undo Thanos' actions.",
+      "premiere": "2019-04-26",
+      "room_id": 6
+    },
+    {
+      "id": 7,
+      "title": "Pulp Fiction",
+      "duration": "154 min",
+      "genre": "Crime, Drama",
+      "director": "Quentin Tarantino",
+      "actors": ["John Travolta", "Uma Thurman", "Samuel L. Jackson"],
+      "sinopsis": "The lives of two hitmen, a boxer, and a gangster intertwine in violent ways.",
+      "premiere": "1994-10-14",
+      "room_id": 7
+    },
+    {
+      "id": 8,
+      "title": "Forrest Gump",
+      "duration": "142 min",
+      "genre": "Drama, Romance",
+      "director": "Robert Zemeckis",
+      "actors": ["Tom Hanks", "Robin Wright", "Gary Sinise"],
+      "sinopsis": "The life journey of a simple man with a kind heart through American history.",
+      "premiere": "1994-07-06",
+      "room_id": 8
+    },
+    {
+      "id": 9,
+      "title": "The Shawshank Redemption",
+      "duration": "142 min",
+      "genre": "Drama",
+      "director": "Frank Darabont",
+      "actors": ["Tim Robbins", "Morgan Freeman", "Bob Gunton"],
+      "sinopsis": "Two imprisoned men bond over years, finding solace and redemption.",
+      "premiere": "1994-09-23",
+      "room_id": 9
+    },
+    {
+      "id": 10,
+      "title": "Gladiator",
+      "duration": "155 min",
+      "genre": "Action, Drama",
+      "director": "Ridley Scott",
+      "actors": ["Russell Crowe", "Joaquin Phoenix", "Connie Nielsen"],
+      "sinopsis": "A betrayed Roman general fights for vengeance in the gladiatorial arena.",
+      "premiere": "2000-05-05",
+      "room_id": 10
+    }
+  ]
+  
