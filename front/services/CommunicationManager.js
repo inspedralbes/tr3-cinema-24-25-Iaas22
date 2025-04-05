@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-//const API_URL = 'http://localhost:8000/api';
-const API_URL = "http://cineyaback.daw.inspedralbes.cat/api";
+const API_URL = 'http://localhost:8000/api';
+// const API_URL = "http://cineyaback.daw.inspedralbes.cat/api";
 
 // ✅ Configurar axios para usar el token si está disponible
 if (typeof window !== 'undefined') {
